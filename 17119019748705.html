@@ -105,7 +105,7 @@
                 </div>
                   <article class="markdown-body single-content">
                     <h2><a id="1-introduction" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. Introduction</h2>
-<p>对于Transformer在三维点云分析中，传统Transformer的结构如下：</p>
+<p>对于<a href="https://zhuanlan.zhihu.com/p/338817680" title="Transformer">Transformer</a>在三维点云分析中，传统Transformer的结构如下：</p>
 <div style="text-align: center">
 <img src="media/17119019748705/1-1.png"/>
 </div>
@@ -113,17 +113,21 @@
 <hr />
 <p>通常的处理范式。对于一个输入点云\(P=\{p_1,\ p_2,\ p_3,\ \ldots,p_N\}\in R^{N\times D}\)，其中\(D\)是输入点云的特征维度。则在Encoder模块中将有以下操作：</p>
 <ol>
-<li><a href="https://zhuanlan.zhihu.com/p/372279569">构造词向量</a>。点云\(P\)将被投影到高维特征空间，生成词特征矩阵\(X \in R^{N\times C}\)。此操作可以通过多层感知机MLP或特征提取骨干网络（如<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=8099499" title="PointNet">PointNet</a>）来实现。</li>
-<li><a href="https://zhuanlan.zhihu.com/p/372279569">位置编码</a>。用于捕捉几何信息或输入点的相对顺序，生成位置特征矩阵\(B \in R^{N\times C}\)。此操作可以通过固定编码（如<a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" title="Transformer">Transformer</a>）或可学习编码（如<a href="https://openaccess.thecvf.com/content/ICCV2021/papers/Zhao_Point_Transformer_ICCV_2021_paper.pdf" title="Point-Transformer">Point-Transformer</a>）来实现。</li>
-<li><a href="https://zhuanlan.zhihu.com/p/609523552">注意力机制</a>。以采用与Transformer中相同的\(sin/cos\)位置编码方式为例，将其位置特征矩阵\(B\)加到词特征矩阵\(X\)中：\(X=X+B \in R^{N\times C}\)，并使用三个可学习权重矩阵\(W_Q \in R^{C\times C_Q}, W_K \in R^{C\times C_K}, W_V \in R^{C\times C}\)将该特征矩阵\(X\)投影到三个不同的特征空间，注意通常\(C_Q=C_K\)。此时\(Query,Key,Value\)矩阵可以表达成如下形式：<br />
+<li><a href="https://zhuanlan.zhihu.com/p/372279569" title="Embedding">构造词向量</a>。点云\(P\)将被投影到高维特征空间，生成词特征矩阵\(X \in R^{N\times C}\)。此操作可以通过多层感知机MLP或特征提取骨干网络（如<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=8099499" title="PointNet">PointNet</a>）来实现。</li>
+<li><a href="https://zhuanlan.zhihu.com/p/372279569" title="Embedding">位置编码</a>。用于捕捉几何信息或输入点的相对顺序，生成位置特征矩阵\(B \in R^{N\times C}\)。此操作可以通过固定编码（如<a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" title="Transformer">Transformer</a>）或可学习编码（如<a href="https://openaccess.thecvf.com/content/ICCV2021/papers/Zhao_Point_Transformer_ICCV_2021_paper.pdf" title="Point-Transformer">Point-Transformer</a>）来实现。</li>
+<li><a href="https://zhuanlan.zhihu.com/p/609523552" title="Attention">注意力机制</a>。以采用与Transformer中相同的\(sin/cos\)位置编码方式为例，将其位置特征矩阵\(B\)加到词特征矩阵\(X\)中：\(X=X+B \in R^{N\times C}\)，并使用三个可学习权重矩阵\(W_Q \in R^{C\times C_Q}, W_K \in R^{C\times C_K}, W_V \in R^{C\times C}\)将该特征矩阵\(X\)投影到三个不同的特征空间，注意通常\(C_Q=C_K\)。此时\(Query,Key,Value\)矩阵可以表达成如下形式：<br />
 \(\begin{align}  \left\{\begin{matrix}   Query=XW_Q \\Key=XW_K \\Value=XW_V\end{matrix}\right.  \end{align}\)<br />
 在给定\(Query,Key,Value\)矩阵后，自注意力矩阵\(F \in R^{N\times C}\)可以表示为：<br />
 \( \begin{align}  F=\operatorname{Attention}(Q, K, V)=\operatorname{Softmax}\left(\frac{Q K^{T}}{\sqrt{C_{K}}}\right) V  \end{align}\)<br />
 \(F\)矩阵中每一个特征向量是通过计算所有输入特征的加权和获得的，因此，它能够与所有输入特征建立连接。</li>
 <li><a href="https://blog.csdn.net/Little_White_9/article/details/123345062" title="Batch&amp;Layer Norm">归一化层</a>。通过在前馈层之前和之后放置归一化层，对特征图进行标准化和归一化。归一化方法可以大体上分为<a href="https://blog.csdn.net/Little_White_9/article/details/123345062" title="Batch&amp;Layer Norm">BatchNorm</a>和<a href="https://blog.csdn.net/Little_White_9/article/details/123345062" title="Batch&amp;Layer Norm">LayerNorm</a>，前者常用于NLP，后者常用于CV领域。</li>
-<li><a href="https://cleverbobo.github.io/2020/08/30/bp/">前馈层</a>。该层用来增强注意力特征的表示，通常由两层MLP和相应的激活函数构成。</li>
-<li><a href="https://blog.csdn.net/weixin_51756104/article/details/127232344">残差连接</a>。通过将某一模块的输入与输出相加，可以保证数据经过该模块后的效果不会变的比之前差，并且可以解决梯度消失问题。</li>
+<li><a href="https://cleverbobo.github.io/2020/08/30/bp/" title="Feed Forward">前馈层</a>。该层用来增强注意力特征的表示，通常由两层MLP和相应的激活函数构成。</li>
+<li><a href="https://blog.csdn.net/weixin_51756104/article/details/127232344" title="Residual Connection">残差连接</a>。通过将某一模块的输入与输出相加，可以保证数据经过该模块后的效果不会变的比之前差，并且可以解决梯度消失问题。</li>
 </ol>
+<blockquote>
+<p>需要注意的是，并非所有处理3D点云的网络都由以上6个组件构成。有一些早期的3D Transformer网络中并没有位置编码模块，它们更关注于自注意力机制在点云上的应用（如<a href="https://www.sciencedirect.com/science/article/pii/S0031320320302491" title="Point Attention">Point Attention</a>或者<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=8578582" title="Attentional ShapeContextNet">Attentional ShapeContextNet</a>）；还有一些Transformer网络将位置编码直接合并到词向量模块中（如<a href="https://link.springer.com/article/10.1007/s41095-021-0229-5" title="Point Cloud Transformer">Point Cloud Transformer</a>采用基于<a href="https://arxiv.org/pdf/1801.07829.pdf" title="EdgeConv">EdgeConv</a>的方法实现）。</p>
+</blockquote>
+<hr />
 
                   </article>
                   <div class="comments-wrap">
