@@ -199,10 +199,10 @@
 </div>
 <p>为了解决局部Transformer捕获全局信息较弱的问题，SSA为每个query point生成密集的局部key point和稀疏的远程key point。其中前者在key point所属的窗口中生成，后者是通过对整个输入点云进行下采样后，在更大的窗口中生成的。此时query point的感受野就不再局限于局部窗口，使SSA可以捕获全局信息。另外要注意的是，Stratified Transformer在初始的Point Embedding阶段执行了<a href="https://arxiv.org/pdf/1904.08889.pdf" title="KPConv">KPConv</a>嵌入，以便能更好的提取输入点云的局部几何信息。</p>
 <h3><a id="2-2-operating-space" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 Operating Space</h3>
-<p>在以操作规模分类的Transformer网络中，Point-wise Transformer注重不同<strong>point</strong>之间的相似性；而Channel-wise Transformer沿<strong>channel</strong>分配权重。其Query与Key之间的attention可以分别表示为如下形式：</p>
-<p>\( \begin{align}  \operatorname{Point-wise Attn}(Q, K)=\operatorname{Softmax}\left(\frac{Q K^{T}}{\sqrt{C_{K}}}\right)   \end{align}\)</p>
-<p>\( \begin{align}  \operatorname{Channel-wise Attn}(Q, K)=\operatorname{Softmax}\left(\frac{Q ^{T} K}{\sqrt{C_{K}}}\right)   \end{align}\)</p>
-<p>其中\(Point-wise Attn\in R^{N\times N}, Channel-wise Attn\in R^{C_{K}\times C_{K}}\)</p>
+<p>在以操作规模分类的Transformer网络中，Point-wise Transformer注重不同<strong>point</strong>之间的相似性；而Channel-wise Transformer沿<strong>channel</strong>分配权重。其Query与Key之间的similarity可以分别表示为如下形式：</p>
+<p>\( \begin{align}  \operatorname{Point-wise Simi}(Q, K)=\operatorname{Softmax}\left(\frac{Q K^{T}}{\sqrt{C_{K}}}\right)   \end{align}\)</p>
+<p>\( \begin{align}  \operatorname{Channel-wise Simi}(Q, K)=\operatorname{Softmax}\left(\frac{Q ^{T} K}{\sqrt{C_{K}}}\right)   \end{align}\)</p>
+<p>其中\(Point-wise \; Simi\in R^{N\times N}, Channel-wise \; Simi\in R^{C_{K}\times C_{K}}\)</p>
 <h4><a id="2-2-1-point-wise-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.1 Point-wise Transformer</h4>
 <p>Point-wise Transformer旨在研究点之间的空间相似性，其输出特征是所有输入特征的加权和。由于2.1节中所有的全局或局部Transformer都是直接对点进行操作和分类的，所以其均可以视为Point-wise Transformer。</p>
 <p><a href="https://arxiv.org/pdf/2112.04863.pdf" title="3D Medical Point Transformer">3D Medical Point Transformer</a>是一种用于医学点云分析的Transformer架构。它包括一个用于分类的分层point-wise transformer和一个用于分割的统一尺度point-wise transformer，每个Transformer块都集成了卷积运算，并在该块之前添加了使用<a href="https://arxiv.org/pdf/1801.07829.pdf" title="DGCNN">DGCNN</a>实现的局部特征提取模块。为了针对医学领域训练样本不足的问题，3DMedPT提出了一个MGR（多图推理）的模块用来丰富特征表示。</p>
@@ -216,6 +216,18 @@
 <div style="text-align: center">
 <img src="media/17119019748705/19.png"/>
 <p>图11 GBNPCC Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2112.02507.pdf" title="TransformerConv">TransformerConv</a>采用将特征通道与坐标通道结合起来构造Transformer。其Query矩阵是由坐标信息不经任何线性变换直接生成的，而Key矩阵是由通过MLP的特征通道生成的。其相似性矩阵\(Similarity(Q,K)\)采用元素乘法而非点积生成，此时相似性矩阵可以表示每个点的坐标通道和特征通道之间的关系。之后通过MLP将Key矩阵投影到潜在空间以构造Value矩阵，并将相似性矩阵和Value矩阵相乘以获得注意力矩阵\(Attention(Q,K,V)\)，通过对其进行通道最大池操作来生成输出特征。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/20.png"/>
+<p>图12 TransformerConv Pipeline</p>
+</div>
+<h3><a id="2-3-efficient-transformers" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3 Efficient Transformers</h3>
+<p>对于标准的Transformer过程，若输入点云的数量为\(N\)，其核心——自注意力模块的计算和存储复杂度均为\(O(N^2)\)，这也成为在大规模点云数据集上应用Transformer的主要缺点。因此，通过改进自注意力模块以提高计算效率的Transformer研究也逐渐受到科研人员的关注。</p>
+<p><a href="https://arxiv.org/pdf/2102.08606.pdf" title="Centroid Transformers">Centroid Transformers</a>将\(N\)个点特征作为输入，其输出只有\(M\)个特征\((M \leq N)\)。其核心思想是<strong>输入点云中的关键信息可以通过较少数量的输出（亦称为质心）来概括</strong>。首先通过优化一个通用的\(soft \; K-means\)目标函数，从\(N\)个输入构建\(M\)个质心，由质心信息构建Query矩阵，输入信息构建Key矩阵，使计算的时间复杂度由\(O(N^2)\)缩减为\(O(NM)\)。为了进一步降低时间复杂度，该方法还采用了KNN近似，本质上是将全局Transformer转换为局部Transformer，此时相似性矩阵是通过衡量每个query特征向量与其K个邻近的key向量之间的关系而生成，将时间复杂度进一步降低到\(O(NK)\)。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/21.png"/>
+<p>图13 Centroid Transformers Pipeline</p>
 </div>
 
                   </article>
