@@ -229,6 +229,33 @@
 <img src="media/17119019748705/21.png"/>
 <p>图13 Centroid Transformers Pipeline</p>
 </div>
+<p><a href="https://arxiv.org/pdf/2202.06263.pdf" title="LighTN">LighTN</a>旨在简化标准Transformer的主要部件，在提高效率的同时保持其卓越性能。其首先删除了Position Embedding模块（由于输入的3D坐标已经包含位置信息，可以被视为位置编码的替代），其行为移除了位置编码的计算开销。其次，它利用小尺寸共享线性层作为Input Embedding Layer，与<a href="https://link.springer.com/article/10.1007/s41095-021-0229-5" title="Point Cloud Transformer">PCT</a>中的相比Embedding特征维度降低了一半，可以减少Input Embedding的计算成本。最后，该方法提出了一个单头自相关层作为自注意力模块，抛弃了投影矩阵\(W_Q , W_K, W_V\)，减少了可学习参数以实现高效，其自相关模块可以表示为：</p>
+<p>\( \begin{align}  SA(X)=FC_{out}(C(X)) \end{align}\)</p>
+<p>\( \begin{align}  C(X)=\operatorname{Softmax}\left(\frac{X X^{T}}{\sqrt{C}}\right)X \end{align}\)</p>
+<p>这里\(SA(*)\)表示自注意力块，\(FC_{out}\)表示线性变换，\(\operatorname{Softmax}\)表示激活函数，\(C\)是输入特征维度。最后，该方法在FFN中构建了三个线性层，并在中间层采用了<a href="https://arxiv.org/pdf/2008.00623.pdf" title="expand reduce">expand reduce</a>策略，可以减轻因自注意力模块中可学习参数的减少造成的负面影响。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/22.png"/>
+<p>图14 LighTN Pipeline</p>
+</div>
+<h2><a id="3-data-representation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3. Data Representation</h2>
+<p>3D数据有多种表示形式，主要分为<strong>点</strong>表示和<strong>体素</strong>表示。这两种形式均可用作3D Transformer的输入，并且之间还可以互相转换。因此根据输入格式的不同，可以将3D Transformer分为Voxel-based Transformer和Point-based Transformer。</p>
+<h3><a id="3-1-voxel-based-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.1 Voxel-based Transformer</h3>
+<p>由于3D点云通常是非结构化的，因此无法通过传统的卷积算子进行处理，除非将其转化为体素形式后，其结构与图像才可以相似。最通用的3D点云体素化方法流程为：通过光栅化将点云的边界框有规律的划分为3D长方体保留包含点云的体素，并生成点云的体素表示。</p>
+<p>受到稀疏卷积在体素数据上运行的效率的启发，<a href="https://arxiv.org/pdf/2109.02497.pdf" title="VoTr">VoTr</a>主干用于对3D点云实施体素变换，以满足3D对象检测任务。其方法提出了Submanifold Voxel模块和Sparse Voxel模块，分别从非空和空体素中提取点云特征。在这两个模块中，基于多头自注意力机制实现了局部注意力和扩张注意力操作，实现了大量体素下的低计算消耗。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/23.png"/>
+<p>图15 VoTr Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2203.10314.pdf" title="VoxSeT">VoxSeT</a>致力于解决Transformer基于体素的室外3D检测的计算问题，其以Set-to-Set的形式检测户外物体。该方法建立在基于体素的集合注意力（VSA）模块上，通过两个交叉注意力减少每个体素中的自注意力，并对一组潜在代码引起的隐藏空间中的特征进行建模。VSA模块可以使VoxSeT管理大范围内任意大小的体素化点簇，并以线性复杂度的方式进行处理。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/24.png"/>
+<p>图16 VoxSeT Pipeline</p>
+</div>
+<p>收到大规模点云上基于体素表示的有效性的启发，基于体素的Transformer也可以应用于大规模点云的处理。<a href="https://arxiv.org/pdf/2105.00149.pdf" title="SVT-Net">SVT-Net</a>提出了用于大规模地点识别的超轻量级稀疏体素Transformer。该框架采用了基于原子的稀疏体素Transformer（ASVT）和基于集群的稀疏体素Transformer（CSVT），其中前者用于编码短程局部关系，后者用于学习远程上下文关系。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/25.png"/>
+<p>图17 SVT-Net Pipeline</p>
+</div>
 
                   </article>
                   <div class="comments-wrap">
