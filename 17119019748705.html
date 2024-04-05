@@ -108,7 +108,7 @@
                   <article class="markdown-body single-content">
                     <h2><a id="1-introduction" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. Introduction</h2>
 <h3><a id="1-1-transformer%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.1 Transformer结构</h3>
-<p>对于<a href="https://zhuanlan.zhihu.com/p/338817680" title="Transformer">Transformer</a>在三维点云分析中，传统Transformer的结构如下：</p>
+<p>对于<a href="https://zhuanlan.zhihu.com/p/338817680" title="Transformer Interpretation">Transformer</a>在三维点云分析中，传统Transformer的结构如下：</p>
 <div style="text-align: center">
 <img src="media/17119019748705/1-1.png"/>
 <p>图1 传统Transformer结构图</p>
@@ -205,19 +205,19 @@
 <p>其中\(Point-wise \; Simi\in R^{N\times N}, Channel-wise \; Simi\in R^{C_{K}\times C_{K}}\)</p>
 <h4><a id="2-2-1-point-wise-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.1 Point-wise Transformer</h4>
 <p>Point-wise Transformer旨在研究点之间的空间相似性，其输出特征是所有输入特征的加权和。由于2.1节中所有的全局或局部Transformer都是直接对点进行操作和分类的，所以其均可以视为Point-wise Transformer。</p>
-<p><a href="https://arxiv.org/pdf/2112.04863.pdf" title="3D Medical Point Transformer">3D Medical Point Transformer</a>是一种用于医学点云分析的Transformer架构。它包括一个用于分类的分层point-wise transformer和一个用于分割的统一尺度point-wise transformer，每个Transformer块都集成了卷积运算，并在该块之前添加了使用<a href="https://arxiv.org/pdf/1801.07829.pdf" title="DGCNN">DGCNN</a>实现的局部特征提取模块。为了针对医学领域训练样本不足的问题，3DMedPT提出了一个MGR（多图推理）的模块用来丰富特征表示。</p>
+<p><a href="https://arxiv.org/pdf/2112.04863.pdf" title="3D Medical Point Transformer">3D Medical Point Transformer</a>是一种用于医学点云分析的Transformer架构。它包括一个用于分类的分层point-wise transformer和一个用于分割的统一尺度point-wise transformer，每个Transformer块都集成了卷积运算，并在该块之前添加了使用<a href="https://arxiv.org/pdf/1801.07829.pdf" title="DGCNN">DGCNN</a>实现的局部特征提取模块。为了针对医学领域训练样本不足的问题，3DMedPT提出了一个<strong>MGR</strong>（多图推理）的模块用来丰富特征表示。</p>
 <div style="text-align: center">
 <img src="media/17119019748705/18.png"/>
 <p>图10 3D Medical Point Transformer Pipeline</p>
 </div>
 <h4><a id="2-2-2-channel-wise-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2 Channel-wise Transformer</h4>
 <p>Channel-wise Transformer专注于研究不同特征通道之间的相似性从而改进上下文信息建模。</p>
-<p><a href="https://arxiv.org/pdf/1911.12885.pdf" title="CAA">GBNPCC</a>利用纠错反馈结构的思想，提出了一种用于局部特征捕获的反投影模块。它设计了一个通道式亲和力注意力（CAA）模块，以实现更好的特征表示。具体来说，CAA 模块由两个模块组成：紧凑通道比较器 (CCC) 模块和通道亲和性估计器 (CAE) 模块。 CCC模块可以生成通道空间中的相似度矩阵。 CAE模块进一步计算了一个亲和力矩阵，其中具有较高注意力值的元素代表相应两个通道的较低相似度。 此操作可以锐化注意力权重并避免聚集相似/冗余信息。 因此，输出特征的每个通道都与其他不同的通道有足够的交互。</p>
+<p><a href="https://arxiv.org/pdf/1911.12885.pdf" title="CAA">GBNPCC</a>利用纠错反馈结构的思想，提出了一种用于局部特征捕获的反投影模块。它设计了一个<strong>通道式亲和力注意力（CAA）模块</strong>，以实现更好的特征表示。具体来说，CAA 模块由两个模块组成：紧凑通道比较器 (CCC) 模块和通道亲和性估计器 (CAE) 模块。 CCC模块可以生成通道空间中的相似度矩阵。 CAE模块进一步计算了一个亲和力矩阵，其中具有较高注意力值的元素代表相应两个通道的较低相似度。 此操作可以锐化注意力权重并避免聚集相似/冗余信息。 因此，输出特征的每个通道都与其他不同的通道有足够的交互。</p>
 <div style="text-align: center">
 <img src="media/17119019748705/19.png"/>
 <p>图11 GBNPCC Pipeline</p>
 </div>
-<p><a href="https://arxiv.org/pdf/2112.02507.pdf" title="TransformerConv">TransformerConv</a>采用将特征通道与坐标通道结合起来构造Transformer。其Query矩阵是由坐标信息不经任何线性变换直接生成的，而Key矩阵是由通过MLP的特征通道生成的。其相似性矩阵\(Similarity(Q,K)\)采用元素乘法而非点积生成，此时相似性矩阵可以表示每个点的坐标通道和特征通道之间的关系。之后通过MLP将Key矩阵投影到潜在空间以构造Value矩阵，并将相似性矩阵和Value矩阵相乘以获得注意力矩阵\(Attention(Q,K,V)\)，通过对其进行通道最大池操作来生成输出特征。</p>
+<p><a href="https://arxiv.org/pdf/2112.02507.pdf" title="TransformerConv">TransformerConv</a>采用<strong>将特征通道与坐标通道结合</strong>起来构造Transformer。其Query矩阵是由坐标信息不经任何线性变换直接生成的，而Key矩阵是由通过MLP的特征通道生成的。其相似性矩阵\(Similarity(Q,K)\)采用元素乘法而非点积生成，此时相似性矩阵可以表示每个点的坐标通道和特征通道之间的关系。之后通过MLP将Key矩阵投影到潜在空间以构造Value矩阵，并将相似性矩阵和Value矩阵相乘以获得注意力矩阵\(Attention(Q,K,V)\)，通过对其进行通道最大池操作来生成输出特征。</p>
 <div style="text-align: center">
 <img src="media/17119019748705/20.png"/>
 <p>图12 TransformerConv Pipeline</p>
@@ -229,7 +229,7 @@
 <img src="media/17119019748705/21.png"/>
 <p>图13 Centroid Transformers Pipeline</p>
 </div>
-<p><a href="https://arxiv.org/pdf/2202.06263.pdf" title="LighTN">LighTN</a>旨在简化标准Transformer的主要部件，在提高效率的同时保持其卓越性能。其首先删除了Position Embedding模块（由于输入的3D坐标已经包含位置信息，可以被视为位置编码的替代），其行为移除了位置编码的计算开销。其次，它利用小尺寸共享线性层作为Input Embedding Layer，与<a href="https://link.springer.com/article/10.1007/s41095-021-0229-5" title="Point Cloud Transformer">PCT</a>中的相比Embedding特征维度降低了一半，可以减少Input Embedding的计算成本。最后，该方法提出了一个单头自相关层作为自注意力模块，抛弃了投影矩阵\(W_Q , W_K, W_V\)，减少了可学习参数以实现高效，其自相关模块可以表示为：</p>
+<p><a href="https://arxiv.org/pdf/2202.06263.pdf" title="LighTN">LighTN</a>旨在简化标准Transformer的主要部件，在提高效率的同时保持其卓越性能。其首先删除了Position Embedding模块（<strong>由于输入的3D坐标已经包含位置信息，可以被视为位置编码的替代</strong>），其行为移除了位置编码的计算开销。其次，它利用小尺寸共享线性层作为Input Embedding Layer，与<a href="https://link.springer.com/article/10.1007/s41095-021-0229-5" title="Point Cloud Transformer">PCT</a>中的相比Embedding特征维度降低了一半，可以减少Input Embedding的计算成本。最后，该方法提出了一个单头自相关层作为自注意力模块，抛弃了投影矩阵\(W_Q , W_K, W_V\)，减少了可学习参数以实现高效，其自相关模块可以表示为：</p>
 <p>\( \begin{align}  SA(X)=FC_{out}(C(X)) \end{align}\)</p>
 <p>\( \begin{align}  C(X)=\operatorname{Softmax}\left(\frac{X X^{T}}{\sqrt{C}}\right)X \end{align}\)</p>
 <p>这里\(SA(*)\)表示自注意力块，\(FC_{out}\)表示线性变换，\(\operatorname{Softmax}\)表示激活函数，\(C\)是输入特征维度。最后，该方法在FFN中构建了三个线性层，并在中间层采用了<a href="https://arxiv.org/pdf/2008.00623.pdf" title="expand reduce">expand reduce</a>策略，可以减轻因自注意力模块中可学习参数的减少造成的负面影响。</p>
@@ -241,20 +241,71 @@
 <p>3D数据有多种表示形式，主要分为<strong>点</strong>表示和<strong>体素</strong>表示。这两种形式均可用作3D Transformer的输入，并且之间还可以互相转换。因此根据输入格式的不同，可以将3D Transformer分为Voxel-based Transformer和Point-based Transformer。</p>
 <h3><a id="3-1-voxel-based-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.1 Voxel-based Transformer</h3>
 <p>由于3D点云通常是非结构化的，因此无法通过传统的卷积算子进行处理，除非将其转化为体素形式后，其结构与图像才可以相似。最通用的3D点云体素化方法流程为：通过光栅化将点云的边界框有规律的划分为3D长方体保留包含点云的体素，并生成点云的体素表示。</p>
-<p>受到稀疏卷积在体素数据上运行的效率的启发，<a href="https://arxiv.org/pdf/2109.02497.pdf" title="VoTr">VoTr</a>主干用于对3D点云实施体素变换，以满足3D对象检测任务。其方法提出了Submanifold Voxel模块和Sparse Voxel模块，分别从非空和空体素中提取点云特征。在这两个模块中，基于多头自注意力机制实现了局部注意力和扩张注意力操作，实现了大量体素下的低计算消耗。</p>
+<p>受到稀疏卷积在体素数据上运行的效率的启发，<a href="https://arxiv.org/pdf/2109.02497.pdf" title="VoTr">VoTr</a>主干用于对3D点云实施体素变换，以满足3D对象检测任务。其方法提出了Submanifold Voxel模块和Sparse Voxel模块，<strong>分别从非空和空体素中提取点云特征</strong>。在这两个模块中，基于多头自注意力机制实现了局部注意力和扩张注意力操作，实现了大量体素下的低计算消耗。</p>
 <div style="text-align: center">
 <img src="media/17119019748705/23.png"/>
 <p>图15 VoTr Pipeline</p>
 </div>
-<p><a href="https://arxiv.org/pdf/2203.10314.pdf" title="VoxSeT">VoxSeT</a>致力于解决Transformer基于体素的室外3D检测的计算问题，其以Set-to-Set的形式检测户外物体。该方法建立在基于体素的集合注意力（VSA）模块上，通过两个交叉注意力减少每个体素中的自注意力，并对一组潜在代码引起的隐藏空间中的特征进行建模。VSA模块可以使VoxSeT管理大范围内任意大小的体素化点簇，并以线性复杂度的方式进行处理。</p>
+<p><a href="https://arxiv.org/pdf/2203.10314.pdf" title="VoxSeT">VoxSeT</a>致力于解决Transformer基于体素的室外3D检测的计算问题，其以 <strong>Set-to-Set</strong>的形式检测户外物体。该方法建立在基于体素的集合注意力（VSA）模块上，通过两个交叉注意力减少每个体素中的自注意力，并对一组潜在代码引起的隐藏空间中的特征进行建模。VSA模块可以使VoxSeT管理大范围内任意大小的体素化点簇，并以线性复杂度的方式进行处理。</p>
 <div style="text-align: center">
 <img src="media/17119019748705/24.png"/>
 <p>图16 VoxSeT Pipeline</p>
 </div>
-<p>收到大规模点云上基于体素表示的有效性的启发，基于体素的Transformer也可以应用于大规模点云的处理。<a href="https://arxiv.org/pdf/2105.00149.pdf" title="SVT-Net">SVT-Net</a>提出了用于大规模地点识别的超轻量级稀疏体素Transformer。该框架采用了基于原子的稀疏体素Transformer（ASVT）和基于集群的稀疏体素Transformer（CSVT），其中前者用于编码短程局部关系，后者用于学习远程上下文关系。</p>
+<p>收到大规模点云上基于体素表示的有效性的启发，基于体素的Transformer也可以应用于大规模点云的处理。<a href="https://arxiv.org/pdf/2105.00149.pdf" title="SVT-Net">SVT-Net</a>提出了用于<strong>大规模地点识别的超轻量级稀疏体素Transformer</strong>。该框架采用了基于原子的稀疏体素Transformer（ASVT）和基于集群的稀疏体素Transformer（CSVT），其中前者用于编码短程局部关系，后者用于学习远程上下文关系。</p>
 <div style="text-align: center">
 <img src="media/17119019748705/25.png"/>
 <p>图17 SVT-Net Pipeline</p>
+</div>
+<p><a href="https://openreview.net/pdf?id=3SUToIxuIT3" title="EPT">EPT</a>提出的高效点Transformer用于从点云理解大规模3D场景。为了<strong>解决点云体素化过程中几何信息丢失</strong>的问题，其引入了中心感知体素化和去体素化操作。并在此基础上，采用高效自注意力（ESA）层来提取体素特征。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/26.png"/>
+<p>图18 EPT Pipeline</p>
+</div>
+<h3><a id="3-2-point-based-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.2 Point-based Transformer</h3>
+<p>具有规定格式的体素在点云表达上势必会造成一定的几何信息丢失，因此大多数基于Transformer的点云处理框架都属于基于点的Transformer。其架构通常分为<strong>均匀尺度架构</strong>和<strong>多尺度架构</strong>。</p>
+<h4><a id="3-2-1-uniform-scale" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.2.1 Uniform Scale</h4>
+<p>均匀尺度架构通常在数据处理过程中保持点特征的尺度恒定，每个模块的输出特征数量和输入特征数量一致。<a href="https://link.springer.com/article/10.1007/s41095-021-0229-5" title="Point Cloud Transformer">PCT</a>是最具代表性的工作之一。在Input Embedding后，PCT的四个全局Transformer块直接对叠在一起细化点特征，这有利于全局特征的学习，并且缺乏分层特征聚合的操作也有利于点云分割等稠密预测任务的Decoder设计。然而该方案也会导致在提取局部特征方面较弱，并且会导致较高的计算占用量和内存消耗。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/12.png"/>
+<p>图19 Point CLoud Transformer Pipeline</p>
+</div>
+<h4><a id="3-2-2-multi-scale" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.2.2 Multi Scale</h4>
+<p>多尺度Transformer是指在特征提取时采用渐进点采样策略的Transformer，也称为分层Transformer。<a href="https://openaccess.thecvf.com/content/ICCV2021/papers/Zhao_Point_Transformer_ICCV_2021_paper.pdf" title="Point-Transformer">PT</a>首次将多尺度结构引入纯Transformer网络，其Transformer层被用于渐进的对子点集进行采样。采样不仅可以通过减少Transformer网络中的参数而加速计算，还可以与基于KNN的局部特征聚合操作相结合，有利于诸如精细语义感知的任务，例如点云分割和点云补全。此外，网络最后一层经过高度聚合的局部特征可以作为全局特征应用于点云分类。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/15.png"/>
+<p>图20 Point Transformer Pipeline</p>
+</div>
+<p>此外，仍有一些Transformer网络架构通过将卷积算子和Transformer进行结合，达到同时提取局部和全局特征的效果，以实现更好的语义特征表示。</p>
+<h2><a id="4-3d-tasks" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4. 3D Tasks</h2>
+<p>与图像处理相似，3D点云相关任务也可以分为两大类：<strong>高级任务</strong>和<strong>低级任务</strong>。高级任务涉及语义分析，重点是<strong>将3D点云转换为人们可以理解的信息</strong>。低级任务侧重于<strong>探索基本几何信息</strong>，与人类语义理解没有直接关系，但是可以间接辅助高级任务。</p>
+<h3><a id="4-1-high-level-task" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1 High-level Task</h3>
+<p>高级任务通常包括：点云分类和分割、点云目标检测、点云目标跟踪以及点云配准等等。</p>
+<h4><a id="4-1-1-classi%EF%AC%81cation-segmentation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1.1 Classiﬁcation &amp; Segmentation</h4>
+<p>3D点云分类旨在将给定的3D形状分类为特定类别，并且用于分割网络的Encoder通常是由分类网络发展而来两者具有很高的相似性。</p>
+<p><a href="https://openaccess.thecvf.com/content_cvpr_2018/papers/Xie_Attentional_ShapeContextNet_for_CVPR_2018_paper.pdf" title="A-SCN">A-SCN</a>首次将自注意力机制引入到点云识别任务中。在受到<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=993558" title="shape context">shape context</a>（形状上下文）的启发后，其首先将输入点云转换为形状上下文表示的形式，该表示由一组同心壳箱构成，随后引入了ShapeContextNet(SCN)来执行点特征的提取。并将点积自注意力模块应用于形状上下文表示中，以便自动捕获丰富的局部和全局信息。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/27.png"/>
+<p>图21 A-SCN Pipeline</p>
+</div>
+<p><a href="https://openaccess.thecvf.com/content/ICCV2021/papers/Zhao_Point_Transformer_ICCV_2021_paper.pdf" title="Point-Transformer">Point Transformer</a>中，Point Transformer块是在Point Transformer层的基础上以残差方式构建的。其Encoder仅由Point Transformer块、逐点变换和点云分类的池化操作构建。此外PT还使用U-Net结构对点云进行分割，并采用与Encoder对称的Decoder设计。其提出的Transition up模块用于从下采样点集中恢复具有语义特征的原始点云，该模块由线性层、Batch Normalization、ReLU和用于特征映射的三次线性插值模块构成。此外，在Encoder和相应的Decoder之间引入了Skip Connection以促进反向传播。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/15.png"/>
+<p>图22 Point Transformer Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2111.14819.pdf" title="Point-BERT">Point-BERT</a>通过用于点云分类的Mask Point Modeling任务来预训练纯基于Transformer的模型。点云首先被分为几个局部point batch，然后利用mini PointNet获取每个patch的Embedding Feature，并将一些Feature随机丢弃，其余送到Transformer网络并恢复被mask的token。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/14.png"/>
+<p>图23 Point-BERT Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2108.06076.pdf" title="PVT">Point-Voxel Transformer</a>(PVT)是一种以3D体素为输入的纯粹基于Transformer的点云学习backbone，采用稀疏窗口注意力（SWA）操作在移动窗口配置的非重叠3D体素窗口内执行自注意力，还引入了相对注意力（RA）操作来计算点的细粒度特征。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/28.png"/>
+<p>图24 PVT Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2203.14508.pdf" title="Stratified Transformer">Stratiﬁed Transformer</a>提出了分层Transformer来显式编码全局上下文，其还通过体素化将<a href="https://arxiv.org/pdf/2103.14030.pdf" title="Swin Transformer">Swin Transformer</a>应用于点云处理。分层Transformer将密集的局部点和稀疏的远点均作为key vector,这种操作有利于立方窗口之间的消息传递以及全局信息捕获。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/17.png"/>
+<p>图25 Stratified Transformer Pipeline</p>
 </div>
 
                   </article>
