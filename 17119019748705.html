@@ -307,6 +307,124 @@
 <img src="media/17119019748705/17.png"/>
 <p>图25 Stratified Transformer Pipeline</p>
 </div>
+<h4><a id="4-1-2-object-detection" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1.2 Object Detection</h4>
+<p>3D点云检测的目标是<strong>输出以点云作为输入数据的3D边界框</strong>。<a href="https://arxiv.org/pdf/2005.12872.pdf" title="DETR">DETR</a>作为第一个基于Transformer的2D目标检测器，提出了将Transformer与CNN结合以便解决<a href="https://zhuanlan.zhihu.com/p/37489043" title="NMS">NMS</a>（非极大值抑制）。</p>
+<p>基于VoteNet，<a href="https://arxiv.org/pdf/2004.05679.pdf" title="MLCVNet">MLCVNet</a>（多级上下文投票网络）首次将自注意力机制进入到室内场景下的3D目标检测。该网络通过编码上下文信息来提高检测性能，网络中每个point patch和vote cluster都被视为Transformer中的Token，并通过自注意力机制分别捕获point patch和vote cluster的关系来增强相应的特征表示。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/29.png"/>
+<p>图26 MLCVNet Pipeline</p>
+</div>
+<p>MLCVNet作为一种手工分组的方案，即通过从相应局部区域内的点学习来获得候选对象的特征。然而<a href="https://arxiv.org/pdf/2104.00678.pdf" title="Group-Free 3D">Group-Free 3D</a>则认为有限区域内的点分组操作会降低3D目标检测的性能，其借助Transformer中的注意力机制提出了一个无群体的框架，其核心思想是候选对象的特征应该来自<strong>给定场景中的所有点</strong>，而不是点云的某个子集。在获得候选目标后，首先利用自注意力模块捕获候选对象之间的上下文信息，接着设计了一个交叉注意力模块，利用所有点的信息进一步细化目标特征。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/30.png"/>
+<p>图27 Group-Free 3D Pipeline</p>
+</div>
+<p>受到<a href="https://arxiv.org/pdf/2005.12872.pdf" title="DETR">DETR</a>的启发，<a href="https://arxiv.org/pdf/2109.08141.pdf" title="3DETR">3DETR</a>提出了基于端到端的3D目标检测网络，首次将3D目标检测描述为set-to-set问题。其网络结构为Encoder-Decoder形式，在Encoder中，采样点与经过MLP提取的相应特征直接输入到Transformer块中进行特征细化；在Decoder中，这些特征通过并行的Decoder并转化为一组对象候选特征，该组特征用于预测3D边界框。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/31.png"/>
+<p>图28 3DETR Pipeline</p>
+</div>
+<p>在室外场景的3D目标检测方向，<a href="https://arxiv.org/pdf/2108.10723.pdf" title="CT3D">CT3D</a>提出了一种Channel-wise Transformer的两阶段框架。Channel-wise Transformer的输入来自于<a href="https://zhuanlan.zhihu.com/p/138515680" title="RPN">RPN</a>（区域提议网络），Transformer由Proposal-to-Point Encoder模块和Channel-wise Decoder模块构成。Encoder模块首先将Proposal及其对应的3D点云作为输入，然后通过自注意力块提取细化的点特征。Decoder模块通过通道重新加权方案将Encoder模块提取的特征转换为全局表示。最后通过前馈网络进行检测预测任务。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/32.png"/>
+<p>图29 CT3D Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2203.11496.pdf" title="TransFusion">TransFusion</a>提出一种基于Transformer的Lidar-Camera融合的3D目标检测器。其采用注意力机制自适应的融合图像中的特征，用于解决Lidar点与标定矩阵建立的地图点关联不良的问题。此外，<a href="https://arxiv.org/pdf/2204.00325.pdf" title="CAT-Det">CAT-Det</a>在点云和图像的分支流程中分别引入了Pointformer和Imgaeformer来提取多模态特征，并设计一个跨模态Transformer来结合上述两个流程得到的特征。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/33.png"/>
+<p>图40 TransFusion Pipeline</p>
+</div>
+<h4><a id="4-1-3-object-tracking" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1.3 Object Tracking</h4>
+<p>3D目标追踪采用两个点云（模版点云和搜索点云）作为输入，输出搜索点云中模版目标的3D边界框。该技术涉及点云的特征提取以及模版和搜索点云之间的特征融合。</p>
+<p><a href="https://arxiv.org/pdf/2110.14921.pdf" title="LTTR">LTTR</a>认为搜索点云中的不同区域应该对特征融合过程贡献不同的重要性，其提出的方法专注于特征融合，可以通过捕获跟踪时间上的注意力变化来改进模版和搜索点云之间的特征融合。其首先构造了一个Encoder分别改进模版和搜索点云的特征表示，接着通过交叉注意力机制构建Decoder。该方法可以融合模版中的特征，并通过捕获两个点云之间的关系来搜索点云。自注意力用来编码点云内的关系，交叉注意力用来编码点云之间的关系。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/34.png"/>
+<p>图44 LTTR Pipeline</p>
+</div>
+<p><a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=9695195" title="PTT">PTT</a>提出了一种实时追踪单一3D目标的方法，引入了点云跟踪Transformer来增强特征融合步骤后的特征表示。该方法还设计了捕捉位置特征的KNN算法和MLP层，作为其位置编码模块。将特征和点云坐标都进行Embedding操作，生成语义特征和位置特征后，通过自注意力块得到更具代表性的特征。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/35.png"/>
+<p>图45 PTT Pipeline</p>
+</div>
+<h4><a id="4-1-4-registration" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1.4 Registration</h4>
+<p>给定两个点云作为输入，点云配准的目的是找到一个变换矩阵将其对齐。</p>
+<p><a href="https://arxiv.org/pdf/1905.03304.pdf" title="DCP">DCP</a>是首次采用Transformer模型改善点云配准中特征提取的工作，它将Encoder模块引入到点云配准任务中。首先将未对齐的点云发送到Embedding模块（例如<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=8099499" title="PointNet">PointNet</a>和<a href="https://arxiv.org/pdf/1801.07829.pdf" title="DGCNN">DGCNN</a>），将3D坐标变换到特征空间中；接着应用标准Encoder对两个feature embedding进行上下文聚合；最后利用可微分的<a href="https://zhuanlan.zhihu.com/p/29846048" title="SVD">SVD</a>（奇异值分解）层计算刚性变换矩阵。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/36.png"/>
+<p>图46 DCP Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2103.04256.pdf" title="RGM">RGM</a>首次提出利用基于深度图匹配的框架来进行稳健的点云配准。在深度图构建的过程中，采用Encoder来获取深度图中两个节点的软边，该软边可以在点云配准时为重叠部分获得更好的对应关系。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/37.png"/>
+<p>图47 RGM Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2203.14517.pdf" title="REGTR">REGTR</a>采用注意力机制替代传统点云配准中使用RANSAC模块实现的特征匹配和异常值过滤，其设计了一个用于直接查找点云对应关系的端到端Transformer框架。在采用<a href="https://arxiv.org/pdf/1904.08889.pdf" title="KPConv">KPConv</a>作为backbone生成点的特征之后，将该特征输入到多个多头自注意力层和交叉注意力层中，实现源点云和目标点云之间的比较。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/38.png"/>
+<p>图48 REGTR Pipeline</p>
+</div>
+<h4><a id="4-1-5-pointcloud-video-understanding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1.5 Pointcloud Video Understanding</h4>
+<p>以固定帧速率捕获的一组点称为点云视频，他可能是现实世界中动态场景下有前途的数据表示之一。由于点云视频理解涉及处理3D点云的时间序列，因此可以通过Transformer架构对其进行操作。</p>
+<p><a href="https://openaccess.thecvf.com/content/CVPR2021/papers/Fan_Point_4D_Transformer_Networks_for_Spatio-Temporal_Modeling_in_Point_Cloud_CVPR_2021_paper.pdf" title="P4Transformer">P4Transformer</a>对点云视频进行处理以进行动作识别。输入数据首先通过一组时空局部区域表示来得到局部时空特征；然后使用点4D卷积对每个局部区域的特征进行编码；接着引入Encoder通过捕捉整个点云视频中的远程关系来接收和集成局部区域的特征，从而实现诸如动作识别等任务。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/40.png"/>
+<p>图49 P4Transformer Pipeline</p>
+</div>
+<h3><a id="4-2-low-level-task" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.2 Low-Level Task</h3>
+<p>低级任务的输入数据通常是存在遮挡、噪声、密度不均等情况的原始扫描点云，其目标是经过处理后获得高质量的点云。典型的低级任务包括点云下采样、上采样、去噪和补充等。</p>
+<h4><a id="4-2-1-downsampling" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.2.1 Downsampling</h4>
+<p>对于一个包含\(N\)个点的原始点云，下采样的目标是输出尺寸较小的包含\(M\)个点的点云，同时利用Transformer保留输入点云的几何信息。<a href="https://arxiv.org/pdf/2202.06263.pdf" title="LighTN">LightTN</a>以面向任务的方式对点云进行下采样。其首先删除了Poisition Embedding，并使用小尺寸共享线性层作为嵌入层；此外采取单头自相关层替代多头注意力层。使得仅需采样32个点便可获得86.18%的分类准确率。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/41.png"/>
+<p>图50 LightTN Pipeline</p>
+</div>
+<h4><a id="4-2-2-upsampling" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.2.2 Upsampling</h4>
+<p>与下采样相反，点云上采样的目的是通过输出比输入尺寸更大的点云来恢复丢失的细尺度几何信息，其输出点云会反映真实的几何形状。<a href="https://arxiv.org/abs/2111.12242.pdf" title="PU-Transformer">PU-Transformer</a>首次采用基于Transformer模型进行点云的上采样工作，有两个新颖的模块。第一个是位置融合快（PosFus），旨在捕获局部位置相关信息；第二个是偏移通道多头自注意力块（SC-MSA），旨在解决传统MSA中不同头的输出缺乏连接的问题。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/42.png"/>
+<p>图51 PU-Transformer Pipeline</p>
+</div>
+<h4><a id="4-2-3-denoising" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.2.3 Denoising</h4>
+<p>去躁以被噪声污染的点云作为输入，利用局部几何信息输出干净的点云。<a href="https://opg.optica.org/view_article.cfm?pdfKey=1beb1932-6765-42c4-9d342e8ff0597481_465997" title="TDNet">TDNet</a>首次将Transformer应用于点云去躁工作。其将每个点作为一个word token，并改进了Transformer结构，使其适合点云特征提取。Encoder将输入点云映射到高维特征空间并学习点云之间的语义关系；接着通过提取出来的特征获得含有噪声的输入点云的潜在流形；最后通过对每个面片流形进行采样即可得到干净的点云。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/43.png"/>
+<p>图52 TDNet Pipeline</p>
+</div>
+<p>针对某些激光雷达点云由于玻璃或其他反射材料而产生的大量虚拟噪声点，还可以通过直接从输入点云中将噪声点过滤掉。<a href="https://www.mdpi.com/2072-4292/14/3/577" title="RNF-PCT">RNF-PCT</a>首先将输入的3D Lidar点云投影到2D的range image汇总，接着采用基于Transformer的auto encoder网络来预测noise mask，以指示来自反射的点云。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/44.png"/>
+<p>图53 RNF-PCT Pipeline</p>
+</div>
+<h4><a id="4-2-4-completion" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.2.4 Completion</h4>
+<p>在大多数3D实际应用中，由于其他物体的遮挡或者自遮挡，通常很难获取到目标或场景的完整点云。因此点云补全是3D视觉领域重要的低级任务。</p>
+<p><a href="https://arxiv.org/pdf/2108.08839.pdf" title="PointTr">PointTr</a>首次将点云补全任务转换为set-to-set的转换任务。其认为输入点云可以由一组局部点群表示，称为“点代理”。该方法以一系列点代理作为输入，通过一个几何感知Transormer来生成缺失部件的点代理；接着通过<a href="https://arxiv.org/pdf/1712.07262.pdf" title="FoldingNet">FoldingNet</a>以从粗到细的方式根据预测的点代理生成点。在流程中，几何感知Transformer作为一个独立的模块可以捕获点之间的语义和几何关系。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/45.png"/>
+<p>图54 PointTr Pipeline</p>
+</div>
+<p>与PointTr不同，<a href="https://arxiv.org/pdf/2108.04444.pdf" title="SnowflakeNet">SnowflakeNet</a>采用让点云以雪花状增长的方式实现点云补全。其核心思想是将雪花点反卷积层（SPD）与skip-Transformer相结合，更好地指导点的分裂过程。SPD可以从任何一个点生成多个点；skip-Transformer能够从给定点和生成点捕获上下文和空间信息。通过对skip-Transformer的集成，SPD层可以对结构特征进行建模，从而产生更紧凑和结构化的点云。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/46.png"/>
+<p>图55  SnowflakeNet Pipeline</p>
+</div>
+<p><a href="https://arxiv.org/pdf/2201.10326.pdf" title="ShapeFormer">ShapeFormer</a>并不是直接在点云上操作，而是引入了一种新颖的3D稀疏表示，称为矢量量化深度隐式函数（VQDIF），它将3D点云转换为一组由坐标和量化特征索引组成的离散二元组。在此基础上，设计了VQDIF Encoder和Decoder进行3D点云和二元组的转换，VQDIF Encoder将输入的部分点云转换为二元组特征序列，接着部分二元组特征序列被送入到基于Transformer的自回归模型中，生成完整的特征序列，这些序列通过VQDIF Decoder投影到特征网格，最后通过<a href="https://arxiv.org/pdf/1606.06650.pdf" title="3D U-Net">3D-UNet</a>生成对象整体形状的局部深层隐式函数。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/47.png"/>
+<p>图56  ShapeFormer Pipeline</p>
+</div>
+<h2><a id="5-3d-self-attention-variants" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5. 3D Self-Attention Variants</h2>
+<p>基于标准的自注意力模块，许多变体旨在提高Transformer在3D点云处理中的性能。主要分为两大类：Point-wise Variants和Channel-wise Variants。</p>
+<h3><a id="5-1-point-wise-variants" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1 Point-wise Variants</h3>
+<div style="text-align: center">
+<img src="media/17119019748705/48.png"/>
+<p>图57 Architectures of Point-wise Variants</p>
+</div>
+<p><a href="https://www.sciencedirect.com/science/article/pii/S0031320320302491" title="Point Attention">P-A</a>（图57-a）和<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=8578582" title="Attentional ShapeContextNet">A-SCN</a>（图57-b）在Encoder结构中有着不同的残差结构。前者加强了模块输出和输入之间的关系，后者建立了模块输出和Value矩阵之间的关系。</p>
+<p>受到<a href="https://arxiv.org/pdf/1312.6203.pdf" title="Graph convolution networks">图卷积网络</a>中拉普拉斯矩阵\( L = D - E\)的启发，<a href="https://link.springer.com/article/10.1007/s41095-021-0229-5" title="Point Cloud Transformer">PCT</a>提出了Offset-Attention模块（图57-c），该模块通过矩阵减法计算自注意力（SA）特征和输入特征\(X\)之间的偏差，并用\(Softmax+L_{1} \; norm\)（SL）运算代替\(Scale + Softmax\)（SS）来改进相似性矩阵的归一化。该模块可以提高注意力权重并减少噪声的影响。基于Offset-Attention，<a href="https://arxiv.org/pdf/2112.02857.pdf" title="PTTR">PTTR</a>提出了一种关系注意力模块（RAM），首先通过线性层将Query，Key和Value矩阵投影到潜在特征空间中；接着在生成相似性矩阵前，对Query和Key矩阵应用\(L_2\)归一化，该操作可以防止少数具有极大幅度的特征通道削弱其他特征通道的作用。</p>
+<div style="text-align: center">
+<img src="media/17119019748705/49.png"/>
+<p>图58 PTTR Pipeline</p>
+</div>
 
                   </article>
                   <div class="comments-wrap">
