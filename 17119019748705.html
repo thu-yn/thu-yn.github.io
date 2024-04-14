@@ -200,7 +200,7 @@
 <p>为了解决局部 Transformer 捕获全局信息较弱的问题，SSA 为每个 query point 生成密集的局部 key point 和稀疏的远程 key point。其中前者在 key point 所属的窗口中生成，后者是通过对整个输入点云进行下采样后，在更大的窗口中生成的。此时 query point 的感受野就不再局限于局部窗口，使 SSA 可以捕获全局信息。另外要注意的是，Stratified Transformer 在初始的 Point Embedding 阶段执行了 <a href="https://arxiv.org/pdf/1904.08889.pdf" title="KPConv">KPConv</a> 嵌入，以便能更好的提取输入点云的局部几何信息。</p>
 <h3><a id="2-2-operating-space" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 Operating Space</h3>
 <p>在以操作规模分类的 Transformer 网络中，Point-wise Transformer 注重不同 <strong>point</strong> 之间的相似性；而 Channel-wise Transformer 沿 <strong>channel</strong> 分配权重。其 Query 与 Key 之间的 similarity 可以分别表示为如下形式：</p>
-<p>\( \begin{align}  \operatorname{Point-wise Simi}(Q, K)=\operatorname{Softmax}\left(\frac{Q K^{T}}{\sqrt{C_{K}}}\right)\end{align}\)</p>
+<p>\( \begin{align}  \operatorname{Point-wise Simi}(Q, K)=\operatorname{Softmax}\left(\frac{Q K^{T}}{\sqrt{C_{K}}}\right) \end{align}\)</p>
 <p>\( \begin{align}  \operatorname{Channel-wise Simi}(Q, K)=\operatorname{Softmax}\left(\frac{Q ^{T} K}{\sqrt{C_{K}}}\right)\end{align}\)</p>
 <p>其中 \(Point-wise \; Simi\in R^{N\times N}, Channel-wise \; Simi\in R^{C_{K}\times C_{K}}\)</p>
 <h4><a id="2-2-1-point-wise-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.1 Point-wise Transformer</h4>

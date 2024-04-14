@@ -107,7 +107,7 @@
                 </div>
                   <article class="markdown-body single-content">
                     <blockquote>
-<p>选择它的原因：在CT3D中作为RPN的backbone</p>
+<p>选择它的原因：在 CT3D 中作为 RPN 的 backbone</p>
 </blockquote>
 <h2><a id="1-advantages" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. Advantages</h2>
 <ol>
@@ -121,56 +121,92 @@
 <img src="media/17129124969573/4.png"/>
 <p>图 1 SECOND Pipeline</p>
 </div>
-<p>SECOND由三个部分构成：基于体素的特征提取器；稀疏卷积中间层；RPN网络。</p>
-<p>SECOND以原始点云作为输入，将其转化为体素的特征和坐标，通过两个VFE（体素特征编码）层和一个线性层进行特征提取；接着通过稀疏CNN层；最后通过RPN生成检测。</p>
+<p><a href="https://zhuanlan.zhihu.com/p/356892010" title="SECOND">SECOND</a> 由三个部分构成：基于体素的特征提取器；稀疏卷积中间层；RPN 网络。</p>
+<p>SECOND 以原始点云作为输入，将其转化为体素的特征和坐标，通过两个 VFE（体素特征编码）层和一个线性层进行特征提取；接着通过稀疏 CNN 层；最后通过 RPN 生成检测。</p>
 <h3><a id="2-2-point-cloud-grouping" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 Point Cloud Grouping</h3>
 <ol>
 <li>根据体素的数量限制来预分配缓冲区；</li>
-<li>迭代点云，将点云中的点分配给他们相关的体素（通过Hash表判断是否应该新加体素，或者放到已有体素中），并记录体素的坐标以及体素内点云数量；</li>
+<li>迭代点云，将点云中的点分配给他们相关的体素（通过 Hash 表判断是否应该新加体素，或者放到已有体素中），并记录体素的坐标以及体素内点云数量；</li>
 <li>当体素数量达到阈值时，停止迭代。获得每个体素的坐标以及其中点云的数量。</li>
 <li>根据需要提取的目标的维度特征信息，对点云进行裁剪。裁剪区域需要根据体素大小稍微调整，以确保生成的特征图的大小可以在后续网络中正确下采样。</li>
 </ol>
 <h3><a id="2-3-voxelwise-feature-extractor" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3 Voxelwise Feature Extractor</h3>
-<p>体素特征提取器由多个VFE层和一个FCN层构成。</p>
+<p>体素特征提取器由多个 VFE 层和一个 FCN 层构成。</p>
 <div style="text-align: center">
 <img src="media/17129124969573/6.png"/>
 <p>图 2 VFE Pipeline</p>
 </div>
-<p>采用<a href="https://arxiv.org/pdf/1711.06396.pdf" title="VAE">VFE</a>（体素特征编码层）对体素内的点云进行特征提取。</p>
+<p>采用 <a href="https://arxiv.org/pdf/1711.06396.pdf" title="VAE">VFE</a>（体素特征编码层）对体素内的点云进行特征提取。</p>
 <div style="text-align: center">
 <img src="media/17129124969573/5.png"/>
 <p>图 3 VFE Layer Pipeline</p>
 </div>
-<p>VFE将某一体素内的所有点统一作为输入，使用由线性层、\(BatchNorm\)层和\(ReLU\)层组成的FCN（全连接）层来提取点云特征；接着使用元素最大池化来获得每个体素的局部聚合特征；最后将局部聚合特征平铺，并与点云特征相连接。</p>
-<p>定义\( V=\{ p_i=[x_i,y_i,z_i,r_i]^T \in \mathbb{R}^4 \}_{i=1,...,t}\)为一个包含t个点云的非空体素，其中\( p_i\)包含了第\(i\)个点云的\(XYZ\)坐标和其反射强度\(r_i\)。对该体素\(V\)进行体素编码特征的具体流程如下：</p>
+<p>VFE 将某一体素内的所有点统一作为输入，使用由线性层、\(BatchNorm\) 层和 \(ReLU\) 层组成的 FCN（全连接）层来提取点云特征；接着使用元素最大池化来获得每个体素的局部聚合特征；最后将局部聚合特征平铺，并与点云特征相连接。</p>
+<p>定义 \( V=\{p_i=[x_i,y_i,z_i,r_i]^T \in \mathbb{R}^4 \}_{i=1,...,t}\) 为一个包含 t 个点云的非空体素，其中 \( p_i\) 包含了第 \(i\) 个点云的 \(XYZ\) 坐标和其反射强度 \(r_i\)。对该体素 \(V\) 进行体素编码特征的具体流程如下：</p>
 <ol>
-<li>计算局部均值\((v_x,v_y,v_z)\)作为\(V\)中所有点的质心；</li>
-<li>通过将相对偏移量加入到\(p_i\)表示中以补充每个点云表示，并得到输入特征集\( V_{in}=\{ \hat{p_i}=[x_i,y_i,z_i,r_i,x_i-v_x,y_i-v_y,z_i-v_z]^T \in \mathbb{R}^7 \}_{i=1,...,t}\)；</li>
-<li>将\(V\)中每个\(\hat{p_i}\)通过FCN网络，通过聚合来自点特征\(f_i \in R^m\)的信息来编码体素内物体表面的形状。</li>
-<li>在得到点特征表示\(f_i\)后，对\(V\)中所有\(f_i\)采用元素最大池化来得到\(V\)的局部特征\(\tilde{f} \in \mathbb{R}^m\)；</li>
-<li>将\(\tilde{f}\)补充到每个点云特征\(f_i\)中，形成逐点连接特征\(f^{out}_{i}=[f^T_i,\tilde{f}^T]^T \in \mathbb{R}^{2m}\)，并得到输出特征集合\( V_{out} = \{f^{out}_{i}\}_{i...t}\)。</li>
+<li>计算局部均值 \((v_x,v_y,v_z)\) 作为 \(V\) 中所有点的质心；</li>
+<li>通过将相对偏移量加入到 \(p_i\) 表示中以补充每个点云表示，并得到输入特征集 \( V_{in}=\{\hat{p_i}=[x_i,y_i,z_i,r_i,x_i-v_x,y_i-v_y,z_i-v_z]^T \in \mathbb{R}^7 \}_{i=1,...,t}\)；</li>
+<li>将 \(V\) 中每个 \(\hat{p_i}\) 通过 FCN 网络，通过聚合来自点特征 \(f_i \in R^m\) 的信息来编码体素内物体表面的形状。</li>
+<li>在得到点特征表示 \(f_i\) 后，对 \(V\) 中所有 \(f_i\) 采用元素最大池化来得到 \(V\) 的局部特征 \(\tilde{f} \in \mathbb{R}^m\)；</li>
+<li>将 \(\tilde{f}\) 补充到每个点云特征 \(f_i\) 中，形成逐点连接特征 \(f^{out}_{i}=[f^T_i,\tilde{f}^T]^T \in \mathbb{R}^{2m}\)，并得到输出特征集合 \( V_{out} = \{f^{out}_{i}\}_{i...t}\)。</li>
 </ol>
-<p>由于输出特征结合了逐点特征和局部聚合特征，因此堆叠 VFE 层对体素内的点交互进行编码，并使最终特征表示能够学习描述性形状信息。需要注意的是，所有非空体素在编码过程中的FCN中的参数都是共享的。</p>
+<p>由于输出特征结合了逐点特征和局部聚合特征，因此堆叠 VFE 层对体素内的点交互进行编码，并使最终特征表示能够学习描述性形状信息。需要注意的是，所有非空体素在编码过程中的 FCN 中的参数都是共享的。</p>
 <h3><a id="2-4-sparse-convolutional-middle-extractor" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4 Sparse Convolutional Middle Extractor</h3>
-<h4><a id="2-4-1-sparse-convolution-algorithm" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.1 Sparse Convolution Algorithm</h4>
-<p>首先思考2D稠密卷积算法。用\(W_{u,v,l,m}\)表示过滤后的元素，\(D_{u,v,l}\)表示图像元素。其中\(u 和 v\)是空间位置索引，\(l\)表示输入通道，\(m\)表示输出通道。函数\(P(x,y)\)根据输出位置索引\(x和y\)生成输入空间索引\(u和v\)。卷积输出\(Y_{x,y,m}\)由以下公式给出：</p>
+<h4><a id="2-4-1-sparse-convolution-algorithm-2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.1 <a href="https://zhuanlan.zhihu.com/p/382365889" title="Sparse Convolution Algorithm">Sparse Convolution Algorithm</a></h4>
+<p>首先思考 2D 稠密卷积算法。用 \(W_{u,v,l,m}\) 表示过滤后的元素，\(D_{u,v,l}\) 表示图像元素。其中 \(u 和 v\) 是空间位置索引，\(l\) 表示输入通道，\(m\) 表示输出通道。函数 \(P(x,y)\) 根据输出位置索引 \(x 和 y\) 生成输入空间索引 \(u 和 v\)。卷积输出 \(Y_{x,y,m}\) 由以下公式给出：</p>
 <p>\( \begin{align}  Y_{x,y,m}=\sum_{u,v \in P_{(x,y)}} \sum_{l} W_{u-u_0,v-v_0,l,m} D_{u,v,l} \end{align}\)</p>
-<p>其中\( u-u_0和v-v_0\)分别表示加上内核偏移量的\(u和v\)坐标。通过基于<a href="https://no5-aaron-wu.github.io/2021/12/09/AI-Algorithm-12-GEMM/" title="GEMM">GEMM</a>（通用矩阵乘法）的算法可以得到\(\tilde{D}_{P(x,y),l}\)所需的全部数据，接着使用GEMM得到\(Y_{x,y,m}\):</p>
+<p>其中 \( u-u_0 和 v-v_0\) 分别表示加上内核偏移量的 \(u 和 v\) 坐标。通过基于 <a href="https://no5-aaron-wu.github.io/2021/12/09/AI-Algorithm-12-GEMM/" title="GEMM">GEMM</a>（通用矩阵乘法）的算法可以得到 \(\tilde{D}_{P(x,y),l}\) 所需的全部数据，接着使用 GEMM 得到 \(Y_{x,y,m}\):</p>
 <p>\( \begin{align}  Y_{x,y,m}=\sum_{l} W_{*,l,m} \tilde{D}_{P(x,y),l} \end{align}\)</p>
-<p>这里\(W_{*,l,m}\)是\(W_{u-u_0,v-v_0,l,m} \)的GEMM形式。对于稀疏数据\(D'_{i,l}\)和相关输出\( Y'_{j,m}\)，直接计算如下：</p>
+<p>这里 \(W_{*,l,m}\) 是 \(W_{u-u_0,v-v_0,l,m} \) 的 GEMM 形式。对于稀疏数据 \(D'_{i,l}\) 和相关输出 \( Y'_{j,m}\)，直接计算如下：</p>
 <p>\( \begin{align}  Y'_{j,m}=\sum_{i \in P'(j)}\sum_{l} W_{k,l,m} D'_{i,l} \end{align}\)</p>
-<p>这里\(P'(j)\)是用于获取输入索引\(i\)和滤波器偏移量的函数。下标\(k\)代表\( u-u_0和v-v_0\)，下标\(i\)代表\(u和v\)。式3的GEMM形式如下：</p>
+<p>这里 \(P'(j)\) 是用于获取输入索引 \(i\) 和滤波器偏移量的函数。下标 \(k\) 代表 \( u-u_0 和 v-v_0\)，下标 \(i\) 代表 \(u 和 v\)。式 3 的 GEMM 形式如下：</p>
 <p>\( \begin{align}  Y'_{j,m}=\sum_{l} W_{*,l,m} \tilde{D}'_{P'(j),l} \end{align}\)</p>
-<p>所收集的稀疏数据矩阵\(\tilde{D}'_{P'(j),l}\)仍然包含许多不需要计算的零。因此将式3重写如下：</p>
+<p>所收集的稀疏数据矩阵 \(\tilde{D}'_{P'(j),l}\) 仍然包含许多不需要计算的零。因此将式 3 重写如下：</p>
 <p>\( \begin{align}  Y'_{j,m}=\sum_{k}\sum_{l} W_{k,l,m} \tilde{D}'_{R_{k,j},k,l} \end{align}\)</p>
-<p>这里\(R_{k,j}\)是一个Rule矩阵，指定给定内核偏移量\(k\)的输入索引\(i\)和输出索引\(j\)。由于式5中的内和无法用GEMM计算，因此我们需要gather数据以构造适合GEMM计算的矩阵，在计算后再将数据scatter。</p>
-<p>在实践中，可以使用预先构造的输入输出索引Rule矩阵从原始稀疏数据中进行gather操作，从而加快速度。构建维度为\(K \times N_{in} \times 2\)的规则矩阵表\( R_{k,i,t}=R[k,i,t]\)，其中\(K\)是核大小，\(N_{in}\)是输入特征的数量，\(t\)是输入和输出的索引。\(R[:,:,0]\)储存了用于gather的输入索引，\(R[:,:,1]\)储存了用于scatter的输出索引。</p>
+<p>这里 \(R_{k,j}\) 是一个 Rule 矩阵，指定给定内核偏移量 \(k\) 的输入索引 \(i\) 和输出索引 \(j\)。由于式 5 中的内和无法用 GEMM 计算，因此我们需要 gather 数据以构造适合 GEMM 计算的矩阵，在计算后再将数据 scatter。</p>
+<p>在实践中，可以使用预先构造的输入输出索引 Rule 矩阵从原始稀疏数据中进行 gather 操作，从而加快速度。构建维度为 \(K \times N_{in} \times 2\) 的规则矩阵表 \( R_{k,i,t}=R[k,i,t]\)，其中 \(K\) 是核大小，\(N_{in}\) 是输入特征的数量，\(t\) 是输入和输出的索引。\(R[:,:,0]\) 储存了用于 gather 的输入索引，\(R[:,:,1]\) 储存了用于 scatter 的输出索引。</p>
 <div style="text-align: center">
 <img src="media/17129124969573/8.png"/>
-<p>图 3 Sparse Convolution Algorithm(above) and the GPU Rule Generation Algorithm(below)</p>
+<p>图 4 Sparse Convolution Algorithm(above) and the GPU Rule Generation Algorithm(below)</p>
 </div>
 <h4><a id="2-4-2-rule-generation-algorithm" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.2 Rule Generation Algorithm</h4>
-<p>规则生成的直接方法是迭代输入点以查找与每个输入点相关的输出并将相应的索引存储到规则中。 在迭代过程中，需要一个表来检查每个输出位置是否存在，以决定是否使用全局输出索引计数器来累积数据。</p>
+<p>规则生成的直接方法是迭代输入点以查找与每个输入点相关的输出，并将相应的索引存储到规则中。 在迭代过程中，需要一个表来检查每个输出位置是否存在，以决定是否使用全局输出索引计数器来累积数据。</p>
+<div style="text-align: center">
+<img src="media/17129124969573/10.png"/>
+<p>图 5 Rule Generation Algorithm</p>
+</div>
+<p>设计的算法如下：</p>
+<ol>
+<li>首先收集输入索引和与其相关的空间索引，而非输入索引和输出索引，在其阶段获得重复的输出位置；</li>
+<li>对空间索引数据执行独特的并行算法，获得输出索引和其相关的空间索引；</li>
+<li>根据之前结果生成与稀疏数据具有相同空间维度的缓冲区，用于下一步的表查找；</li>
+<li>迭代规则并使用存储的空间索引来获取每个输入索引的输出索引。</li>
+</ol>
+<div style="text-align: center">
+<img src="media/17129124969573/9.png"/>
+<p>Alg.1 3D Rule Generation</p>
+</div>
+<h4><a id="2-4-3-sparse-convolutional-middle-extractor" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.3 Sparse Convolutional Middle Extractor</h4>
+<p>中间提取器用于学习有关 z 轴的信息并将稀疏 3D 数据转换为 2D BEV 图像。其结构由稀疏卷积的两个阶段组成。 每个阶段包含多个子流形卷积层和一个普通稀疏卷积，用于在 z 轴上执行下采样。 将 z 维下采样到一维或二维后，稀疏数据将转换为密集特征图。 然后，数据被简单地重新整形为类似图像的二维数据。</p>
+<div style="text-align: center">
+<img src="media/17129124969573/11.png"/>
+<p>图 6 Sparse middle feature extractor</p>
+</div>
+<p>其中白色框代表子流形卷积，黄色框代表稀疏卷积，红色框代表 sparse-to-dense 层。</p>
+<h4><a id="2-4-4-region-proposal-network-4" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.4 <a href="https://chillstepp.github.io/2021/07/18/RPN-Region-Proposal-Network-%E4%BB%8B%E7%BB%8D/" title="RPN">Region Proposal Network</a></h4>
+<p>使用类似 <a href="https://arxiv.org/pdf/1512.02325.pdf%22source%22" title="SSD">SSD</a>（单次多盒检测器）来构建 RPN 架构。 RPN 的输入由稀疏卷积中间提取器的特征图组成。 RPN 架构由三个阶段组成。 每个阶段都从下采样卷积层开始，然后是几个卷积层。 在每个卷积层之后，应用 BatchNorm 和 ReLU 层。 然后，我们将每个阶段的输出上采样为相同大小的特征图，并将这些特征图连接成一个特征图。 最后，应用三个 1 × 1 卷积来预测类别、回归偏移量和方向。</p>
+<div style="text-align: center">
+<img src="media/17129124969573/12.png"/>
+<p>图 7 SSD Pipeline</p>
+</div>
+<h4><a id="2-4-5-anchors-6-and-targets" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.5 <a href="https://zhuanlan.zhihu.com/p/112574936" title="Anchor">Anchors</a> and Targets</h4>
+<p>由于要检测的物体大小大致固定，因此我们使用固定大小的锚点，该锚点是根据 KITTI 训练集中所有地面实况的大小和中心位置的平均值确定的，旋转角度为 0 度和 90 度。 对于汽车，我们使用尺寸为 \(w = 1.6 \times l = 3.9 \times h = 1.56 m\) 的锚，中心位于 \(z = −1.0 m\)。 对于行人，我们使用尺寸为 \(w = 0.6 \times l = 0.8 \times h = 1.73 m\) 的锚点，对于骑自行车的人，锚点的尺寸为 \(w = 0.6 \times l = 1.76 \times h = 1.73 m\)； 两者均以 \(z = −0.6 m\) 为中心。</p>
+<p>每个锚点都分配有一个分类目标的 one-hot 向量、一个框回归目标的 7 向量和一个方向分类目标的 one-hot 向量。 不同的类别有不同的匹配和不匹配阈值。 对于汽车，锚点使用 0.6 的交并集 (IoU) 阈值分配给地面实况对象，如果 IoU 小于 0.45，则将锚点分配给背景（负）。 IoU 在 0.45 到 0.6 之间的锚点在训练过程中会被忽略。 对于行人和骑自行车的人，我们使用 0.35 作为不匹配阈值，使用 0.5 作为匹配阈值。</p>
+<p>对于回归目标，我们使用以下框编码函数：</p>
+<p>\( \begin{align}  x_t=\frac {x_g-x_a} {d_a}, y_t=\frac {y_g-y_a} {d_a}, z_t=\frac {z_g-z_a} {h_a} \end{align}\)</p>
+<p>\( \begin{align}  w_t=log(\frac {w_g} {w_a}), l_t=log(\frac {l_g} {l_a}), h_t=log(\frac {h_g} {h_a})  \end{align}\)</p>
+<p>\( \begin{align}  \theta_t=\theta_g-\theta_a \end{align}\)</p>
+<p>其中 \(x、y 和 z\) 是中心坐标； \(w、l、h\) 分别是宽度、长度、高度； \(θ\) 是绕 \(z\) 轴的偏航旋转； 下标\(t、a、g\) 分别表示编码值、anchor、groundtruth； \( d^a = \sqrt{(l^a)^2+(w^a)^2}\) 是锚框底边的对角线。</p>
 
                   </article>
                   <div class="comments-wrap">

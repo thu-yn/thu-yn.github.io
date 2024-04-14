@@ -129,8 +129,29 @@
 <p>原始点首先被输入到 RPN 中以生成 3D proposal。 然后，原始点以及相应的 proposal 由 proposal-to-point 编码模块和 channel-wise 解码模块组成的通道 Transformer 进行处理。 具体来说，proposal-to-point 编码模块是用全局 proposal 感知上下文信息来调制每个点特征。 之后，编码后的点特征通过 channel-wise 解码模块转换为有效的 proposal 特征表示，用于置信度预测和框回归。</p>
 <h3><a id="2-2-rpn-module" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 RPN Module</h3>
 <h4><a id="2-2-1-goal" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.1 Goal</h4>
-<p>对一个拥有 \(C\) 维特征和三维坐标的点云 \(P\)，经过 RPN 网络后，生成 3D 边界框。其中边界框包括：中心坐标 \(p^c = [x^c, y^c, z^c]\)，长度 \(l^c\), 宽度 \(w^c\)，高度 \(h^c\) 以及方向 \(\theta^c\)。</p>
-<p>在本文中，采用 <a href="https://www.mdpi.com/1424-8220/18/10/3337?ref=https://codemonkey.link" title="SECOND">SECOND</a> 的 3D voxel CNN 作为 default RPN。</p>
+<p>对一个拥有 \(C\) 维特征和三维坐标的点云 \(\mathbf{P}\)，经过 RPN 网络后，生成 3D 边界框。其中边界框包括：中心坐标 \(\mathbf{p}^c = [x^c, y^c, z^c]\)，长度 \(l^c\), 宽度 \(w^c\)，高度 \(h^c\) 以及方向 \(\theta^c\)。</p>
+<p>在本文中，采用 <a href="https://www.mdpi.com/1424-8220/18/10/3337?ref=https://codemonkey.link" title="SECOND">SECOND</a> 的 3D voxel CNN 作为 default <a href="https://thu-yn.github.io/17129124969573.html" title="RPN">RPN</a>。</p>
+<h3><a id="2-2-2-proposal-to-point-encoding-module" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2 Proposal-to-point Encoding Module</h3>
+<h4><a id="2-2-2-1-goal" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2.1 Goal</h4>
+<p>为了增强 RPN 提出的 proposals，采用一个两步战略：首先采用 proposal-to-point embedding，将 proposal 映射为点特征；其次采用自注意力编码，通过对相应 proposal 内点之间的相对关系进行建模来细化点特征。</p>
+<div style="text-align: center">
+<img src="media/17129107819642/13.png"/>
+<p>图 2 Proposal-to-point encoding Pipeline</p>
+</div>
+<h4><a id="2-2-2-2-proposal-to-point-embedding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2.2 Proposal-to-point Embedding</h4>
+<p>得到 RPN 生成的 Proposal 后，根据 proposal 在点云中划分出按比例缩放的 RoI 区域，目的是希望通过尽可能多的对象点来补偿 proposal 和相应的地面实况框之间的误差。</p>
+<p>具体的，缩放后的 RoI 区域是一个无限高度，半径为 \( r=\alpha \sqrt{(\frac{l^c}{2})^2+(\frac{w^c}{2})^2}\) 的圆柱体，其中\(\alpha\)是超参数，\( l^c、w^c\)分别表示proposal的长度和宽度。接着从经过缩放的RoI区域中随机采样\(N=256\)个点用作后续处理。\((N=\{ \mathbf{p}_1,...\mathbf{p}_N \})\)</p>
+<p>首先计算每个采样点和proposal中心点之间的相对坐标，以统一输入距离特征，表示为\(\Delta \mathbf{p}^c_i=\mathbf{p}_i-\mathbf{p}^c, \forall \mathbf{p}_i \in \mathcal{N}\)。接着可以将proposal信息与每个点特征相结合，如第\(i\)个点的特征可以表示为：\([\Delta \mathbf{p}^c_i,l^c,w^c,h^c,\theta ^c,f^r_i]\)，这里\(f^r_i\)表示诸如反射率等原始点云特征。</p>
+<p>本文提出一种新颖的关键点减法策略计算每个点和其所在proposal的八个角点的差。计算相对坐标的方式为：\(\Delta \mathbf{p}^j_i=\mathbf{p}_i-\mathbf{p}^j, j=1,...,8\)，这里\(\mathbf{p}^j\)表示第\(j\)个角点的坐标。此时前文提到的一些特征信息（例如\(l^c,w^c,h^c以及\theta ^c\)）可以体现在不同维度的距离信息中。通过这种方式，新生成的相对坐标\(\Delta \mathbf{p}^j_i\)可以视为对proposal信息更好的表示。对每个点云\(\mathbf{p}_i\)，proposal-guided特征可以表示为：</p>
+<p>\( \begin{align}  \mathbf{f}_i = \mathcal{A} ([\Delta \mathbf{p}^c_i, \Delta \mathbf{p}^1_i, ..., \Delta \mathbf{p}^8_i, f^r_i]) \in \mathbb{R}^D \end{align}\)</p>
+<p>这里\(\mathcal{A}(·)\)是线性投影层，将点云特征投影到一个高维度的Embedding层中。</p>
+<h4><a id="2-2-2-3-self-attention-encoding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2.3 Self-attention Encoding</h4>
+<p>经过Proposal-to-point Encoding Module后的点云特征随后被送入多头自注意力层中，接着是具有残差结构的FCN中，用来编码丰富的上下文关系和proposal中点的依赖性，以细化点特征。</p>
+<p>多头自注意力层与标准Transformer中相比，缺少了位置编码环节，原因是位置信息已经包含在点云特征中。定义\(\mathbf{X}=[\mathbf{f}^T_1,...\mathbf{f}^T_N]^T \in \mathbb{R}^{N \times D}\)作为具有D个维度的嵌入点特征。则有\( \mathbf{Q}=\mathbf{W}_q \mathbf{X}; \mathbf{K}=\mathbf{W}_k \mathbf{X}; \mathbf{V}=\mathbf{W}_v \mathbf{X}\)，这里\( \mathbf{W}_q, \mathbf{W}_k, \mathbf{W}_v \in \mathbb{R}^{N \times N}\)是线性投影，\(\mathbf{Q}, \mathbf{K}, \mathbf{V}\)称作query，key和value嵌入，这三个嵌入将作为多头自注意力的输入进行处理。在一个具有\(H\)个head的注意力模块中，\(\mathbf{Q}, \mathbf{K}, \mathbf{V}\)可以进一步被分为\(\mathbf{Q}=[\mathbf{Q}_1,...,\mathbf{Q}_H], \mathbf{K}=[\mathbf{K}_1,...,\mathbf{K}_H], \mathbf{V}=[\mathbf{V}_1,...,\mathbf{V}_H]\)，这里\(\mathbf{Q}_h, \mathbf{K}_h, \mathbf{V}_h \in \mathbb{R}^{N \times D'}, \forall h=1,...,H, D'=\frac{D}{H}\)。多头自注意力的输出可以表示为：</p>
+<p>\( \begin{align}  S^{(att)}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = [\sigma (\frac {\mathbf{Q}_h \mathbf{K}^T_h} {\sqrt{D'}}) · \mathbf{V}_h], h=1,...,H \end{align}\)</p>
+<p>这里\(\sigma (·) \)是\(softmax\)函数。接着通过一个简单的FFN层和残差算子，得到的结果如下：</p>
+<p>\( \begin{align}  S^{(att)}(\mathbf{X}) = \mathcal{Z}(\mathcal{F}(\mathcal{Z}(S^{(att)}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) ))) \end{align}\)</p>
+<p>这里\(\mathcal{Z}(·)\)表示add and norm，\(\mathcal{F}(·)\)表示具有两个线性层和一个\(ReLU\)激活层的FFN。最终选取3个Self-attention Encoding的框架堆叠起来得到Proposal-to-point Encoding Module的后半部分。</p>
 
                   </article>
                   <div class="comments-wrap">
