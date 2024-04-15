@@ -131,27 +131,82 @@
 <h4><a id="2-2-1-goal" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.1 Goal</h4>
 <p>对一个拥有 \(C\) 维特征和三维坐标的点云 \(\mathbf{P}\)，经过 RPN 网络后，生成 3D 边界框。其中边界框包括：中心坐标 \(\mathbf{p}^c = [x^c, y^c, z^c]\)，长度 \(l^c\), 宽度 \(w^c\)，高度 \(h^c\) 以及方向 \(\theta^c\)。</p>
 <p>在本文中，采用 <a href="https://www.mdpi.com/1424-8220/18/10/3337?ref=https://codemonkey.link" title="SECOND">SECOND</a> 的 3D voxel CNN 作为 default <a href="https://thu-yn.github.io/17129124969573.html" title="RPN">RPN</a>。</p>
-<h3><a id="2-2-2-proposal-to-point-encoding-module" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2 Proposal-to-point Encoding Module</h3>
-<h4><a id="2-2-2-1-goal" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2.1 Goal</h4>
-<p>为了增强 RPN 提出的 proposals，采用一个两步战略：首先采用 proposal-to-point embedding，将 proposal 映射为点特征；其次采用自注意力编码，通过对相应 proposal 内点之间的相对关系进行建模来细化点特征。</p>
+<h3><a id="2-3-proposal-to-point-encoding-module" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3 Proposal-to-point Encoding Module</h3>
+<h4><a id="2-3-1-goal" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3.1 Goal</h4>
+<p>为了增强 RPN 提出的 proposals，采用两步战略：首先采用 proposal-to-point embedding，将 proposal 映射为点特征；其次采用自注意力编码，通过对相应 proposal 内点之间的相对关系进行建模来细化点特征。</p>
 <div style="text-align: center">
 <img src="media/17129107819642/13.png"/>
 <p>图 2 Proposal-to-point encoding Pipeline</p>
 </div>
-<h4><a id="2-2-2-2-proposal-to-point-embedding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2.2 Proposal-to-point Embedding</h4>
+<h4><a id="2-3-2-proposal-to-point-embedding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3.2 Proposal-to-point Embedding</h4>
 <p>得到 RPN 生成的 Proposal 后，根据 proposal 在点云中划分出按比例缩放的 RoI 区域，目的是希望通过尽可能多的对象点来补偿 proposal 和相应的地面实况框之间的误差。</p>
-<p>具体的，缩放后的 RoI 区域是一个无限高度，半径为 \( r=\alpha \sqrt{(\frac{l^c}{2})^2+(\frac{w^c}{2})^2}\) 的圆柱体，其中\(\alpha\)是超参数，\( l^c、w^c\)分别表示proposal的长度和宽度。接着从经过缩放的RoI区域中随机采样\(N=256\)个点用作后续处理。\((N=\{ \mathbf{p}_1,...\mathbf{p}_N \})\)</p>
-<p>首先计算每个采样点和proposal中心点之间的相对坐标，以统一输入距离特征，表示为\(\Delta \mathbf{p}^c_i=\mathbf{p}_i-\mathbf{p}^c, \forall \mathbf{p}_i \in \mathcal{N}\)。接着可以将proposal信息与每个点特征相结合，如第\(i\)个点的特征可以表示为：\([\Delta \mathbf{p}^c_i,l^c,w^c,h^c,\theta ^c,f^r_i]\)，这里\(f^r_i\)表示诸如反射率等原始点云特征。</p>
-<p>本文提出一种新颖的关键点减法策略计算每个点和其所在proposal的八个角点的差。计算相对坐标的方式为：\(\Delta \mathbf{p}^j_i=\mathbf{p}_i-\mathbf{p}^j, j=1,...,8\)，这里\(\mathbf{p}^j\)表示第\(j\)个角点的坐标。此时前文提到的一些特征信息（例如\(l^c,w^c,h^c以及\theta ^c\)）可以体现在不同维度的距离信息中。通过这种方式，新生成的相对坐标\(\Delta \mathbf{p}^j_i\)可以视为对proposal信息更好的表示。对每个点云\(\mathbf{p}_i\)，proposal-guided特征可以表示为：</p>
-<p>\( \begin{align}  \mathbf{f}_i = \mathcal{A} ([\Delta \mathbf{p}^c_i, \Delta \mathbf{p}^1_i, ..., \Delta \mathbf{p}^8_i, f^r_i]) \in \mathbb{R}^D \end{align}\)</p>
-<p>这里\(\mathcal{A}(·)\)是线性投影层，将点云特征投影到一个高维度的Embedding层中。</p>
-<h4><a id="2-2-2-3-self-attention-encoding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2.2.3 Self-attention Encoding</h4>
-<p>经过Proposal-to-point Encoding Module后的点云特征随后被送入多头自注意力层中，接着是具有残差结构的FCN中，用来编码丰富的上下文关系和proposal中点的依赖性，以细化点特征。</p>
-<p>多头自注意力层与标准Transformer中相比，缺少了位置编码环节，原因是位置信息已经包含在点云特征中。定义\(\mathbf{X}=[\mathbf{f}^T_1,...\mathbf{f}^T_N]^T \in \mathbb{R}^{N \times D}\)作为具有D个维度的嵌入点特征。则有\( \mathbf{Q}=\mathbf{W}_q \mathbf{X}; \mathbf{K}=\mathbf{W}_k \mathbf{X}; \mathbf{V}=\mathbf{W}_v \mathbf{X}\)，这里\( \mathbf{W}_q, \mathbf{W}_k, \mathbf{W}_v \in \mathbb{R}^{N \times N}\)是线性投影，\(\mathbf{Q}, \mathbf{K}, \mathbf{V}\)称作query，key和value嵌入，这三个嵌入将作为多头自注意力的输入进行处理。在一个具有\(H\)个head的注意力模块中，\(\mathbf{Q}, \mathbf{K}, \mathbf{V}\)可以进一步被分为\(\mathbf{Q}=[\mathbf{Q}_1,...,\mathbf{Q}_H], \mathbf{K}=[\mathbf{K}_1,...,\mathbf{K}_H], \mathbf{V}=[\mathbf{V}_1,...,\mathbf{V}_H]\)，这里\(\mathbf{Q}_h, \mathbf{K}_h, \mathbf{V}_h \in \mathbb{R}^{N \times D'}, \forall h=1,...,H, D'=\frac{D}{H}\)。多头自注意力的输出可以表示为：</p>
+<p>具体的，缩放后的 RoI 区域是一个无限高度，半径为 \( r=\alpha \sqrt{(\frac{l^c}{2})^2+(\frac{w^c}{2})^2}\) 的圆柱体，其中 \(\alpha\) 是超参数，\( l^c、w^c\) 分别表示 proposal 的长度和宽度。接着从经过缩放的 RoI 区域中随机采样 \(N=256\) 个点用作后续处理。\((N=\{ \mathbf{p}_1,...\mathbf{p}_N \})\)</p>
+<p>首先计算每个采样点和 proposal 中心点之间的相对坐标，以统一输入距离特征，表示为 \(\Delta \mathbf{p}^c_i=\mathbf{p}_i-\mathbf{p}^c, \forall \mathbf{p}_i \in \mathcal{N}\)。接着可以将 proposal 信息与每个点特征相结合，如第 \(i\) 个点的特征可以表示为：\([\Delta \mathbf{p}^c_i,l^c,w^c,h^c,\theta ^c,f^r_i]\)，这里 \(f^r_i\) 表示诸如反射率等原始点云特征。</p>
+<p>本文提出一种新颖的关键点减法策略计算每个点和其所在 proposal 的八个角点的差。计算相对坐标的方式为：\(\Delta \mathbf{p}^j_i=\mathbf{p}_i-\mathbf{p}^j, j=1,...,8\)，这里 \(\mathbf{p}^j\) 表示第 \(j\) 个角点的坐标。此时前文提到的一些特征信息（例如 \(l^c,w^c,h^c 以及 \theta ^c\)）可以体现在不同维度的距离信息中。通过这种方式，新生成的相对坐标 \(\Delta \mathbf{p}^j_i\) 可以视为对 proposal 信息更好的表示。对每个点云 \(\mathbf{p}_i\)，proposal-guided 特征可以表示为：</p>
+<p>\( \begin{align}  \mathbf{f}_i = \mathcal{A} ([\Delta \mathbf{p}^c_i, \Delta \mathbf{p}^1_i, ..., \Delta \mathbf{p}^8_i, f^r_i])\in \mathbb{R}^D \end{align}\)</p>
+<p>这里 \(\mathcal{A}(·)\) 是线性投影层，将点云特征投影到一个高维度的 Embedding 层中。</p>
+<h4><a id="2-3-3-self-attention-encoding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3.3 Self-attention Encoding</h4>
+<p>经过 Proposal-to-point Encoding Module 后的点云特征随后被送入多头自注意力层中，接着是具有残差结构的 FCN 中，用来编码丰富的上下文关系和 proposal 中点的依赖性，以细化点特征。</p>
+<p>多头自注意力层与标准 Transformer 中相比，缺少了位置编码环节，原因是位置信息已经包含在点云特征中。定义 \(\mathbf{X}=[\mathbf{f}^T_1,...\mathbf{f}^T_N]^T \in \mathbb{R}^{N \times D}\) 作为具有 D 个维度的嵌入点特征。则有 \( \mathbf{Q}=\mathbf{W}_q \mathbf{X}; \mathbf{K}=\mathbf{W}_k \mathbf{X}; \mathbf{V}=\mathbf{W}_v \mathbf{X}\)，这里 \( \mathbf{W}_q, \mathbf{W}_k, \mathbf{W}_v \in \mathbb{R}^{N \times N}\) 是线性投影，\(\mathbf{Q}, \mathbf{K}, \mathbf{V}\) 称作 query，key 和 value 嵌入，这三个嵌入将作为多头自注意力的输入进行处理。在一个具有 \(H\) 个 head 的注意力模块中，\(\mathbf{Q}, \mathbf{K}, \mathbf{V}\) 可以进一步被分为 \(\mathbf{Q}=[\mathbf{Q}_1,...,\mathbf{Q}_H], \mathbf{K}=[\mathbf{K}_1,...,\mathbf{K}_H], \mathbf{V}=[\mathbf{V}_1,...,\mathbf{V}_H]\)，这里 \(\mathbf{Q}_h, \mathbf{K}_h, \mathbf{V}_h \in \mathbb{R}^{N \times D'}, \forall h=1,...,H, D'=\frac{D}{H}\)。多头自注意力的输出可以表示为：</p>
 <p>\( \begin{align}  S^{(att)}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = [\sigma (\frac {\mathbf{Q}_h \mathbf{K}^T_h} {\sqrt{D'}}) · \mathbf{V}_h], h=1,...,H \end{align}\)</p>
-<p>这里\(\sigma (·) \)是\(softmax\)函数。接着通过一个简单的FFN层和残差算子，得到的结果如下：</p>
-<p>\( \begin{align}  S^{(att)}(\mathbf{X}) = \mathcal{Z}(\mathcal{F}(\mathcal{Z}(S^{(att)}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) ))) \end{align}\)</p>
-<p>这里\(\mathcal{Z}(·)\)表示add and norm，\(\mathcal{F}(·)\)表示具有两个线性层和一个\(ReLU\)激活层的FFN。最终选取3个Self-attention Encoding的框架堆叠起来得到Proposal-to-point Encoding Module的后半部分。</p>
+<p>这里 \(\sigma (·) \) 是 \(softmax\) 函数。接着通过一个简单的 FFN 层和残差算子，得到的结果如下：</p>
+<p>\( \begin{align}  S^{(att)}(\mathbf{X}) = \mathcal{Z}(\mathcal{F}(\mathcal{Z}(S^{(att)}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) )))\end{align}\)</p>
+<p>这里 \(\mathcal{Z}(·)\) 表示 add and norm，\(\mathcal{F}(·)\) 表示具有两个线性层和一个 \(ReLU\) 激活层的 FFN。最终选取 3 个 Self-attention Encoding 的框架堆叠起来得到 Proposal-to-point Encoding Module 的后半部分。</p>
+<h3><a id="2-4-channel-wise-decoding-module" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4 Channel-wise Decoding Module</h3>
+<h4><a id="2-4-1-goal" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.1 Goal</h4>
+<p>本模块计划对经过上一编码模块中得到的点特征 \(\hat{\mathbf{X}}\) 进行解码，以得到全局表示，并由 FFN 进一步处理，进行最终检测预测。</p>
+<p>标准 Transformer 中 Decoder 使用交叉注意力机制对 \(M\) 个 Query Embedding 进行转换，而本文的 Decoder 仅根据以下两个事实对 1 个 Query Embedding 进行操作：</p>
+<ol>
+<li>\(M\) 个 Query Embedding 会产生较高的内存延迟，特别是在处理大量的 proposal 时；</li>
+<li>\(M\) 个 Query Embedding 通常会独立的转化为 \(M\) 个单词或对象，而 proposal 的细化模型只需要一个预测。</li>
+</ol>
+<p>通常，解码器的输出的 proposal 表示可以被视为所有点特征的加权和，因此关键是确定专用于每个点的解码权重。</p>
+<h4><a id="2-4-2-standard-decoding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.2 Standard Decoding</h4>
+<p>标准解码方案利用 \(D\) 维可学习向量（Query Embedding）来聚合所有通道的点特征。每个注意力头中所有点特征的最终解码权重向量为：</p>
+<p>\( \begin{align}  \mathcal{w}^{(S)}_h=\sigma (\frac{\hat {\mathbf {q}}_h \hat {\mathbf {K}}^T_h}{\sqrt {D'}}), \  h=1,...,H \end{align}\)</p>
+<p>这里 \(\hat {\mathbf {K}}_h\) 是通过 Encoder 输出的投影计算出的第 \(h\) 个头的 key embedding，\(\hat {\mathbf {q}}_h\) 是与之相关的 query embedding。注意到 \(\hat {\mathbf {q}}_h \hat {\mathbf {K}}^T_h\) 向量的每个值可以视为每个单独点（或 key embedding）的全局聚合，并且后续的 \(softmax\) 函数根据归一化向量中的概率为每个点分配 Decoder 的值。</p>
+<div style="text-align: center">
+<img src="media/17129107819642/14.png"/>
+<p>图 3 Standard Decoding Pipeline</p>
+</div>
+<p>因此，在标准 Transformer 中，Decoder 权重向量中的值是从简单的全局聚合导出的，缺乏局部通道建模。** 由于不同的通道通常在点云中表现出很强的几何关系，因此局部通道建模对于学习点云的 3D 表面结构至关重要。**</p>
+<h4><a id="2-4-3-channel-wise-re-weighting" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.3 Channel-wise Re-weighting</h4>
+<p>为了强调 key embedding（即 \(\hat {\mathbf {K}}^T_h\)）中的通道信息，一个简单的解决方案是：基于 \(\hat {\mathbf {K}}^T_h\) 的所有通道计算点的 Decoder 权重向量，以获得 \(D\) 个 Decoder 值。并且对于这 \(D\) 个值，引入线性投影以生成统一的 channel-wise 解码向量。具体的 Decoder 中权重向量的 channel-wise 加权方式为：</p>
+<p>\( \begin{align}  \mathcal{w}^{(C)}_h= \mathbf{s}· \hat{\sigma} (\frac{\hat {\mathbf {K}}^T_h}{\sqrt {D'}}), \  h=1,...,H \end{align}\)</p>
+<p>其中 \(\mathbf{s}\) 是将 \(D'\) 个 Decoder 值压缩为 Re-weighting 的线性投影，\(\hat{\sigma} (·)\) 沿着 \(N\) 维度计算 \(softmax\)。</p>
+<div style="text-align: center">
+<img src="media/17129107819642/15.png"/>
+<p>图 4 Channel-wise Re-weighting Pipeline</p>
+</div>
+<p>然而，由 \(\hat{\sigma} (·)\) 计算的解码权重忽略了每个点的全局聚合。因此，可以得到 ** 标准 Decoder 方案侧重于全局聚合，Channel-wise Re-weighting Decoder 方案侧重于通道方式局部聚合。** 基于以上两点，可以将其侧重点结合起来，得到一种 extended channel-wise re-weighting 的方案。</p>
+<h4><a id="2-4-4-extended-channel-wise-re-weighting" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4.4 Extended Channel-wise Re-weighting</h4>
+<div style="text-align: center">
+<img src="media/17129107819642/16.png"/>
+<p>图 5 Entended Channel-wise Re-weighting Pipeline</p>
+</div>
+<p>首先重复 query embedding 和 key embedding 的矩阵乘积，将空间信息（全局聚合）传播到每个通道中；然后将输出以 element-wise 的形式与 key embedding 相乘以获取局部聚合，保持通道差异。其 decoder 的权重向量如下所示：</p>
+<p>\( \begin{align}  \mathcal{w}^{(EC)}_h= \mathbf{s}· \hat{\sigma} (\frac{ \rho (\hat {\mathbf {q}}_h \hat {\mathbf {K}}^T_h)\odot  \hat {\mathbf {K}}^T_h}{\sqrt {D'}}), \  h=1,...,H \end{align}\)</p>
+<p>其中 \(\rho (·)\) 是重复算子，使得 \(\hat {\mathbf {q}}_h \hat {\mathbf {K}}^T_h\) 的维度从 \(\mathbb{R} ^ {1 \times N} \to \mathbb{R} ^ {D' \times N}\)。此时，该权重向量不仅可以保持全局信息的捕捉，也可以丰富详细的局部通道交互。并且该方法仅带来 1K+(Bytes) 的增加。最终 Decoding 后的 proposal 可以描述如下：</p>
+<p>\( \begin{align}  \mathcal {y} = [\mathcal {w}^{EC}_1 · \hat {V}_1, ... , \mathcal {w}^{EC}_H · \hat {V}_H ] \end{align}\)</p>
+<p>这里 value embedding，也即 \(\hat {V}\)，是由 \(\hat {X}\) 经过线性投影得到。</p>
+<h3><a id="2-5-detect-head-and-training-targets" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.5 Detect head and Training Targets</h3>
+<p>经过先前步骤后，输入点特征被汇总为 \(D\) 维向量 \( \mathcal{y}\)，然后将其送入到两个 FFN 中，分别预测相对于输入 3D proposal 的置信度和框残差。</p>
+<p>为了输出置信度，训练目标设置为 3D proposal 与其相应的地面实况框之间的 3D IoU。给定 3D proposal 的 IoU 以及相应的地面实况框，置信度预测目标如下所示：</p>
+<p>\( \begin{align}  c^t = \min (1, \max (0, \frac {IoU - \alpha _B} {\alpha _F - \alpha _B})) \end{align}\)</p>
+<p>这里 \(\alpha _F 和 \alpha _B\) 分别表示前景和后景的 IoU 阈值。</p>
+<p>此外，回归目标（上标 \(t\)）由 proposal 和其相关的地面实况框（上标 \(g\)）得到：</p>
+<p>\( \begin{align}  x^t=\frac {x^g-x^c} {d}, y^t=\frac {y^g-y^c} {d}, z^t=\frac {z^g-z^c} {h^c} \end{align}\)</p>
+<p>\( \begin{align}  w^t=log(\frac {w^g} {w^c}), l^t=log(\frac {l^g} {l^c}), h^t=log(\frac {h^g} {h^c})  \end{align}\)</p>
+<p>\( \begin{align}  \theta^t=\theta^g-\theta^c \end{align}\)</p>
+<p>这里 \(d = \sqrt {(l^c)^2 + (w^c)^2}\) 是 proposal 底部的对角线。</p>
+<h3><a id="2-6-training-losses" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.6 Training Losses</h3>
+<p>采用端到端的策略来训练CT3D。总的training loss是RPN loss，置信度预测loss和框回归loss的总和，如下所示：</p>
+<p>\( \begin{align}  \mathcal{L} = \mathcal{L}_{RPN} + \mathcal{L}_{conf} + \mathcal{L}_{reg} \end{align}\)</p>
+<p>对预测置信度\(c\)采用二元交叉熵损失来计算置信度loss：</p>
+<p>\( \begin{align}  \mathcal{L}_{conf} = -c^t \log {c} - (1 - c^t) \log {(1 - c)} \end{align}\)</p>
+<p>对于框回归loss计算：</p>
+<p>\( \begin{align}  \mathcal{L}_{reg} = \mathbb{I} (IoU \ge \alpha _R) \sum _{\mu \in x,y,z,l,w,h,\theta} \mathcal{L}_{smooth-L1} (\mu, \mu ^t) \end{align}\)</p>
+<p>这里 \(\mathbb{I} (IoU \ge \alpha _R)\)表示只有\(IoU \ge \alpha _R\)的proposal才会被用来计算框回归loss。</p>
 
                   </article>
                   <div class="comments-wrap">
