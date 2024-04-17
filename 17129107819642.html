@@ -319,13 +319,13 @@ zipp-3.18.1
 <h3><a id="3-3-dataset-preparation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.3 Dataset Preparation</h3>
 <p>通过 <a href="https://blog.csdn.net/u013086672/article/details/103910266" title="web_2">web_2</a> 下载 Kitti 数据集，并通过 <a href="https://drive.google.com/file/d/1d5mq0RXRnvHPVeKx6Q612z0YRO1t2wAp/view" title="web_3">web_3</a> 下载补充的 planes 数据集，并将其转化成如下形式。</p>
 <pre><code class="language-shell"># Download KITTI &amp; Planes and organize them into the following form:
-├── data
-│   ├── kitti
-│   │   │── ImageSets
-│   │   │── training
-│   │   │   ├──calib &amp; velodyne &amp; label_2 &amp; image_2 &amp; (optional: planes)
-│   │   │── testing
-│   │   │   ├──calib &amp; velodyne &amp; image_2
+├── Kitti
+│   │── ImageSets
+│   │   ├──train.txt &amp; test.txt &amp; val.txt
+│   │── training
+│   │   ├──calib &amp; velodyne &amp; label_2 &amp; image_2 &amp; (optional: planes)
+│   │── testing
+│   │   ├──calib &amp; velodyne &amp; image_2
 </code></pre>
 <p>需要注意的是 kitti 数据集中的 ImageSets 是在 OpenPCDet 的 <a href="https://github.com/open-mmlab/OpenPCDet" title="OpenPCDet source code">源码</a> 中的以下路径存放：data/kitti/ImageSets。此外，由于在服务器上运行，因此数据集无法和代码放到一起。</p>
 <table>
@@ -526,6 +526,141 @@ train sample_idx: 000010
 train sample_idx: 000011
 train sample_idx: 000012
 ···
+</code></pre>
+<p>代码运行结束后，发现在kitti数据集路径<code>/home/share/nanyang/Kitti</code>下面多了几个文件，此时数据集由以下部分组成：</p>
+<pre><code class="language-shell">├── data
+│   ├── kitti
+│   │   │── ImageSets
+│   │   │── training
+│   │   │── testing
+│   │   │── kitti_dbinfos_train.pkl
+│   │   │── kitti_infos_test.pkl
+│   │   │── kitti_infos_train.pkl
+│   │   │── kitti_infos_trainval.pkl
+│   │   │── kitti_infos_val.pkl
+</code></pre>
+<h3><a id="3-5-train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.5 Train</h3>
+<p>首先对 <code>home/workspace/nanyang/CT3D/tools/cfgs/dataset_configs/kitti_dataset.yaml</code>中的<code>DATA_PATH</code>进行修改：<code>DATA_PATH: '../../../../share/nanyang/Kitti'</code>，这样kitti数据集的位置正确的修改为<code>/home/share/nanyang/Kitti</code>。接着运行以下命令：</p>
+<pre><code class="language-shell">python train.py --cfg_file /home/workspace/nanyang/CT3D/tools/cfgs/kitti_models/second_ct3d.yaml 
+</code></pre>
+<p><br />
+报错如下：</p>
+<pre><code class="language-shell">Traceback (most recent call last):                                                                                                                                                 | 0/1238 [00:00&lt;?, ?it/s]
+  File &quot;train.py&quot;, line 204, in &lt;module&gt;
+    main()
+  File &quot;train.py&quot;, line 159, in main
+    train_model(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 86, in train_model
+    accumulated_iter = train_one_epoch(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 19, in train_one_epoch
+    batch = next(dataloader_iter)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 435, in __next__
+    data = self._next_data()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in &lt;listcomp&gt;
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 380, in __getitem__
+    data_dict = self.prepare_data(data_dict=input_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 141, in prepare_data
+    data_dict = self.data_processor.forward(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 129, in forward
+    data_dict = cur_processor(data_dict=data_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 66, in transform_points_to_voxels
+    voxel_output = voxel_generator.generate(points)
+AttributeError: 'spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel' object has no attribute 'generate'
+</code></pre>
+<p><br />
+发现原因是因为采用<code>Point2VoxelGPU3d as VoxelGenerator</code>后，其Point2Voxel类并没有generate函数，在<code>home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/spconv/core_cc/csrc/sparse/all/ops3d.pyi</code>中发现Point2Voxel类相应的函数为point_to_voxel_hash，对<code>home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py</code>的第66行作以下修改：</p>
+<pre><code class="language-shell"># 原始代码
+voxel_output = voxel_generator.generate(points)
+
+# 修改后代码
+voxel_output = voxel_generator.point_to_voxel_hash(points)
+</code></pre>
+<p><br />
+修改后继续运行train.py，报错如下：</p>
+<pre><code class="language-shell">Traceback (most recent call last):                                                                                                                                                 | 0/1238 [00:00&lt;?, ?it/s]
+  File &quot;train.py&quot;, line 204, in &lt;module&gt;
+    main()
+  File &quot;train.py&quot;, line 159, in main
+    train_model(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 86, in train_model
+    accumulated_iter = train_one_epoch(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 19, in train_one_epoch
+    batch = next(dataloader_iter)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 435, in __next__
+    data = self._next_data()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in &lt;listcomp&gt;
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 380, in __getitem__
+    data_dict = self.prepare_data(data_dict=input_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 141, in prepare_data
+    data_dict = self.data_processor.forward(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 129, in forward
+    data_dict = cur_processor(data_dict=data_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 66, in transform_points_to_voxels
+    voxel_output = voxel_generator.point_to_voxel_hash(points)
+TypeError: point_to_voxel_hash(): incompatible function arguments. The following argument types are supported:
+    1. (self: spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel, points: cumm.core_cc.tensorview_bind.Tensor, clear_voxels: bool = True, empty_mean: bool = False, stream_int: int = 0) -&gt; Tuple[cumm.core_cc.tensorview_bind.Tensor, cumm.core_cc.tensorview_bind.Tensor, cumm.core_cc.tensorview_bind.Tensor]
+
+Invoked with: &lt;spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel object at 0x7fa80b9eb6f0&gt;, array([[ 8.025416  ,  2.3700118 , -1.7376146 ,  0.26      ],
+       [ 4.318642  ,  3.889347  , -0.92502284,  0.35      ],
+       [31.185736  , 12.291912  ,  0.3180823 ,  0.29      ],
+       ...,
+       [69.58629   , 30.494154  ,  1.3690922 ,  0.        ],
+       [10.36416   ,  0.56376034, -1.7129093 ,  0.11      ],
+       [10.482327  ,  2.805909  , -0.27278903,  0.        ]],
+      dtype=float32)
+</code></pre>
+<p><br />
+寻找原因：point_to_voxel_hash函数的入参类型不对。期望类型是cumm.core_cc.tensorview_bind.Tensor，而目前的类型是array。</p>
+<p>这个问题比较棘手，最终在<a href="https://github.com/traveller59/spconv/issues/476" title="cumm Tensor">web_5</a>找到可能的答案：采用<code>home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/cumm/core_cc/tensorview_bind.py</code>中Tensor类里的from_numpy函数，将points由array转化为cumm.core_cc.tensorview_bind.Tensor类型。</p>
+<pre><code class="language-shell"># 原始代码
+voxel_output = voxel_generator.generate(points)
+
+# 修改后代码
+from cumm.core_cc.tensorview_bind import from_numpy
+
+voxel_output = voxel_generator.point_to_voxel_hash(from_numpy(points))
+</code></pre>
+<p><br />
+接着报错：</p>
+<pre><code class="language-shell">2024-04-17 01:21:45,560   INFO  **********************Start training kitti_models/second_ct3d(default)**********************
+epochs:   0%|                                                                                                                                                                       | 0/100 [00:03&lt;?, ?it/s]
+Traceback (most recent call last):                                                                                                                                                 | 0/3712 [00:00&lt;?, ?it/s]
+  File &quot;train.py&quot;, line 204, in &lt;module&gt;
+    main()
+  File &quot;train.py&quot;, line 159, in main
+    train_model(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 86, in train_model
+    accumulated_iter = train_one_epoch(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 19, in train_one_epoch
+    batch = next(dataloader_iter)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 435, in __next__
+    data = self._next_data()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in &lt;listcomp&gt;
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 380, in __getitem__
+    data_dict = self.prepare_data(data_dict=input_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 141, in prepare_data
+    data_dict = self.data_processor.forward(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 131, in forward
+    data_dict = cur_processor(data_dict=data_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 68, in transform_points_to_voxels
+    voxel_output = voxel_generator.point_to_voxel_hash(from_numpy(points))
+RuntimeError: dev2host /tmp/pip-build-env-g7ks_t5y/overlay/lib/python3.8/site-packages/cumm/include/tensorview/cuda/driverops.h:105
+cuda failed with error 700 an illegal memory access was encountered. use CUDA_LAUNCH_BLOCKING=1 to get correct traceback.
 </code></pre>
 
                   </article>
