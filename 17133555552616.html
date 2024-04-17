@@ -151,7 +151,7 @@ pip install torch==1.7.0+cu110 torchvision==0.8.1+cu110 torchaudio==0.7.0 -f htt
 conda install -c anaconda cmake
 </code></pre>
 <h2><a id="2-spconv-downloading" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 SPCONV Downloading</h2>
-<p>根据[web_5][9]下载<code>spconv==1.2.1</code>。</p>
+<p>根据<a href="https://blog.csdn.net/weixin_44808890/article/details/125943654?spm=1001.2014.3001.5502" title="web_1">web_1</a>下载<code>spconv==1.2.1</code>。</p>
 <pre><code class="language-shell"># git spconv1.2.1版本，此版本是修复版（针对无编译环境直接pip安装.whl文件时报错缺少libcuhash.so问题）
 git clone -b build_bug_fix https://github.com/ExpeditionTechnology/spconv.git --recursive
 
@@ -211,7 +211,7 @@ python setup.py bdist_wheel
 │   ├── ···
 </code></pre>
 <p><br />
-出于[死马当作活马医][10]的缘故，尝试将<code>/home/workspace/nanyang/spconv/setup.py</code>中作如下修改：</p>
+出于<a href="https://baike.baidu.com/item/%E6%AD%BB%E9%A9%AC%E5%BD%93%E6%B4%BB%E9%A9%AC%E5%8C%BB/4516476" title="死马当作活马医">死马当作活马医</a>的缘故，尝试将<code>/home/workspace/nanyang/spconv/setup.py</code>中作如下修改：</p>
 <pre><code class="language-shell"># 原始代码
 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-11.0/bin/nvcc
 
@@ -340,8 +340,135 @@ Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;licen
 <p><br />
 验证成功！</p>
 <h2><a id="5-source-code-requirements-installation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 Source Code Requirements Installation</h2>
-<p>下载CT3D 源码，将 CT3D-master 改名为 CT3D 放到 <code>home/workspace/nanyang/</code> 路径下，即代码路径为 <code>home/workspace/nanyang/CT3D</code>。同时将spconv放入该路径下，变为<code>home/workspace/nanyang/CT3D/spconv</code>。</p>
+<p>下载<a href="https://github.com/hlsheng1/CT3D" title="github: CT3D">CT3D 源码</a>，将 CT3D-master 改名为 CT3D 放到 <code>home/workspace/nanyang/</code> 路径下，即代码路径为 <code>home/workspace/nanyang/CT3D</code>。同时将spconv放入该路径下，变为<code>home/workspace/nanyang/CT3D/spconv</code>。</p>
 <p>安装依赖项：<code>pip install -r requirements.txt</code>，下载的相关包如下：</p>
+<pre><code class="language-shell">PyWavelets-1.3.0 
+easydict-1.13 
+imageio-2.31.2 
+importlib-metadata-6.7.0 
+llvmlite-0.39.1 
+networkx-2.6.3 
+numba-0.56.4 
+packaging-24.0 
+protobuf-4.24.4 
+pyyaml-6.0.1 
+scikit-image-0.19.3 
+scipy-1.7.3 
+tensorboardX-2.6.2.2 
+tifffile-2021.11.2 
+tqdm-4.66.2 
+zipp-3.15.0
+</code></pre>
+<h2><a id="6-pcdet-installation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6 PCDet Installation</h2>
+<p>通过 <code>python setup.py develop</code> 编译库。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Name</th>
+<th style="text-align: center">Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">pcdet</td>
+<td style="text-align: center">0.3.0+0</td>
+</tr>
+</tbody>
+</table>
+<h2><a id="7-generate-data-information" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>7 Generate Data Information</h2>
+<p>在路径为 <code>home/workspace/nanyang/CT3D</code> 下，采用如下的代码产生数据信息：</p>
+<pre><code class="language-shell">python -m pcdet.datasets.kitti.kitti_dataset create_kitti_infos tools/cfgs/dataset_configs/kitti_dataset.yaml
+</code></pre>
+<p>首先要对 <code>home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py</code> 中数据集的路径进行修改，将其 432-439 行修改为：</p>
+<pre><code class="language-shell"># 原始代码
+dataset_cfg = EasyDict(yaml.load(open(sys.argv[2])))
+ROOT_DIR = (Path(__file__).resolve().parent / '../../../').resolve()
+create_kitti_infos(
+    dataset_cfg=dataset_cfg,
+    class_names=['Car', 'Pedestrian', 'Cyclist'],
+    data_path=ROOT_DIR / 'data' / 'kitti',
+    save_path=ROOT_DIR / 'data' / 'kitti'
+)
+
+# 修改后代码
+# 此时路径为 home/share/nanyang/Kitti  
+dataset_cfg = EasyDict(yaml.load(open(sys.argv[2]), Loader = yaml.FullLoader))
+ROOT_DIR = (Path(__file__).resolve().parent / '../../../../../../share/nanyang/Kitti').resolve()
+create_kitti_infos(
+    dataset_cfg=dataset_cfg,
+    class_names=['Car', 'Pedestrian', 'Cyclist'],
+    data_path=ROOT_DIR,
+    save_path=ROOT_DIR
+)
+</code></pre>
+<p><br />
+一次成功！！！命令行展示如下：</p>
+<pre><code class="language-shell">/home/workspace/nanyang/anaconda3/envs/ct3d/lib/python3.7/runpy.py:125: RuntimeWarning: 'pcdet.datasets.kitti.kitti_dataset' found in sys.modules after import of package 'pcdet.datasets.kitti', but prior to execution of 'pcdet.datasets.kitti.kitti_dataset'; this may result in unpredictable behaviour
+  warn(RuntimeWarning(msg))
+---------------Start to generate data infos---------------
+train sample_idx: 000000
+train sample_idx: 000003
+train sample_idx: 000007
+train sample_idx: 000009
+train sample_idx: 000010
+train sample_idx: 000011
+train sample_idx: 000012
+train sample_idx: 000013
+train sample_idx: 000014
+train sample_idx: 000016
+train sample_idx: 000017
+···
+gt_database sample: 3709/3712
+gt_database sample: 3710/3712
+gt_database sample: 3711/3712
+gt_database sample: 3712/3712
+Database Pedestrian: 2207
+Database Car: 14357
+Database Cyclist: 734
+Database Van: 1297
+Database Truck: 488
+Database Tram: 224
+Database Misc: 337
+Database Person_sitting: 56
+---------------Data preparation Done---------------
+</code></pre>
+<p><br />
+代码运行结束后，发现在kitti数据集路径<code>/home/share/nanyang/Kitti</code>下面多了几个文件，此时数据集由以下部分组成：</p>
+<pre><code class="language-shell">├── Kitti
+│   │── ImageSets
+│   │   ├── train.txt &amp; test.txt &amp; val.txt
+│   │── training
+│   │   ├── calib &amp; velodyne &amp; label_2 &amp; image_2 &amp; (optional: planes)
+│   │── testing
+│   │   ├── calib &amp; velodyne &amp; image_2
+│   │── gt_database
+│   │   ├── 000000_Pedestrian_0.bin
+│   │   ├── ···
+│   │── kitti_dbinfos_train.pkl
+│   │── kitti_infos_test.pkl
+│   │── kitti_infos_train.pkl
+│   │── kitti_infos_trainval.pkl
+│   │── kitti_infos_val.pkl
+</code></pre>
+<h2><a id="8-train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>8 Train</h2>
+<p>此时最激动人心的时刻要来了，首先对部分代码做以下修改：</p>
+<pre><code class="language-shell"># modify_path: home/workspace/nanyang/CT3D/tools/cfgs/dataset_configs/kitti_dataset.yaml (line 2)
+
+# 原始代码
+DATA_PATH: '../data/kitti'
+
+# 修改后代码
+DATA_PATH: '../../../../share/nanyang/Kitti'
+</code></pre>
+<p><br />
+这样kitti数据集的位置正确的修改为<code>/home/share/nanyang/Kitti</code>。接着在<code>/home/workspace/nanyang/CT3D/tools</code>路径下运行以下命令：</p>
+<pre><code class="language-shell">python train.py --cfg_file /home/workspace/nanyang/CT3D/tools/cfgs/kitti_models/second_ct3d.yaml 
+</code></pre>
+<p>但是产生段存储错误：</p>
+<pre><code class="language-shell">2024-04-18 00:13:21,538   INFO  **********************Start training kitti_models/second_ct3d(default)**********************
+epochs:   0%|                                                                                                                                                                       | 0/100 [00:00&lt;?, ?it/s
+Segmentation fault (core dumped)  
+</code></pre>
 
                   </article>
                   <div class="comments-wrap">

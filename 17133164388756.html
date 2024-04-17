@@ -228,11 +228,11 @@ zipp-3.18.1
 <pre><code class="language-shell"># Download KITTI &amp; Planes and organize them into the following form:
 ├── Kitti
 │   │── ImageSets
-│   │   ├──train.txt &amp; test.txt &amp; val.txt
+│   │   ├── train.txt &amp; test.txt &amp; val.txt
 │   │── training
-│   │   ├──calib &amp; velodyne &amp; label_2 &amp; image_2 &amp; (optional: planes)
+│   │   ├── calib &amp; velodyne &amp; label_2 &amp; image_2 &amp; (optional: planes)
 │   │── testing
-│   │   ├──calib &amp; velodyne &amp; image_2
+│   │   ├── calib &amp; velodyne &amp; image_2
 </code></pre>
 <p>需要注意的是 kitti 数据集中的 ImageSets 是在 OpenPCDet 的 <a href="https://github.com/open-mmlab/OpenPCDet" title="OpenPCDet source code">源码</a> 中的以下路径存放：data/kitti/ImageSets。此外，由于在服务器上运行，因此数据集无法和代码放到一起。</p>
 <table>
