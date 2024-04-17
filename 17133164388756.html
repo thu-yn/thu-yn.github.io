@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    CT3D Reproduction - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            CT3D Reproduction   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/17</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_Reproduction.html'>#Reproduction</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <h2><a id="1-system-environment" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 System Environment</h2>
+<p>Ubuntu 20.04.6 LTS</p>
+<p>Conda 虚拟环境创建：在 <code>/home/workspace/nanyang</code> 的路径下激活 Conda 环境：</p>
+<pre><code class="language-shell">source .bashrc      # conda init
+
+conda create -n &quot;CT3D&quot; python=3.8   # 创建新 conda 环境
+
+conda activate CT3D # 此时 conda 的环境是嵌套的，为(base(CT3D))
+
+conda deactivate    # 此时是(base)
+
+conda deactivate    # 此时没有 conda 环境
+
+conda activate CT3D # 此时 conda 的环境不是嵌套的，为(CT3D)
+
+# 安装 pytorch
+pip install torch==1.7.0+cu110 torchvision==0.8.1+cu110 torchaudio==0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
+</code></pre>
+<p>Conda 环境基本信息：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Name</th>
+<th style="text-align: center">Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">python</td>
+<td style="text-align: center">3.8</td>
+</tr>
+<tr>
+<td style="text-align: center">cuda</td>
+<td style="text-align: center">11.0</td>
+</tr>
+<tr>
+<td style="text-align: center">pytorch</td>
+<td style="text-align: center">1.7.0</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>选择低版本 pytorch+cuda 原因：在安装 spconv 包时，由于 <code>pytorch&gt;=1.11</code> 后会删除 THC.h 文件，而 spconv 包的安装又需要该文件，若采用高版本的 pytorch 会导致安装失败。同时鉴于实验室的显卡 <code>GTX 3090</code> 仅支持 <code>CUDA &gt;= 11.0</code>，因此选择 <code>torch==1.7.0+cu110</code> 的版本</p>
+</blockquote>
+<h2><a id="2-package-installation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 Package Installation</h2>
+<h3><a id="2-1-spconv-installation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.1 SPCONV Installation</h3>
+<p>根据<a href="https://blog.csdn.net/weixin_44808890/article/details/125387862" title="wen_1">web_1</a>，在 Conda 环境中安装相关包如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Name</th>
+<th style="text-align: center">Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><a href="https://github.com/traveller59/spconv" title="spconv install">spconv</a></td>
+<td style="text-align: center">2.3.6</td>
+</tr>
+<tr>
+<td style="text-align: center">pcdet</td>
+<td style="text-align: center">0.3.0</td>
+</tr>
+</tbody>
+</table>
+<p>其中，使用 <code>pip install spconv-cu113</code> 安装 spconv 时下载的相关的包如下：</p>
+<pre><code class="language-shell">ccimport-0.4.2 
+certifi-2024.2.2 
+charset-normalizer-3.3.2 
+cumm-cu113-0.4.11 
+fire-0.6.0 
+idna-3.7 
+lark-1.1.9 
+ninja-1.11.1.1 
+pccm-0.4.11 
+portalocker-2.8.2 
+pybind11-2.12.0 
+requests-2.31.0 
+six-1.16.0 
+spconv-cu113-2.3.6 
+termcolor-2.4.0 
+urllib3-2.2.1
+</code></pre>
+<h3><a id="2-2-source-code-requirements-installation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 Source Code Requirements Installation</h3>
+<p>下载[CT3D 源码][0]，将 <code>CT3D-master</code> 改名为 <code>CT3D</code> 放到 <code>home/workspace/nanyang/</code> 路径下，即代码路径为 <code>home/workspace/nanyang/CT3D</code>。</p>
+<p>安装依赖项：<code>pip install -r requirements.txt</code>，下载的相关包如下：</p>
+<pre><code class="language-shell">PyWavelets-1.4.1 
+easydict-1.13 
+imageio-2.34.0 
+importlib-metadata-7.1.0 
+lazy_loader-0.4 
+llvmlite-0.41.1 
+networkx-3.1 
+numba-0.58.1 
+packaging-24.0 
+protobuf-5.26.1 
+pyyaml-6.0.1 
+scikit-image-0.21.0 
+scipy-1.10.1 
+tensorboardX-2.6.2.2 
+tifffile-2023.7.10 
+tqdm-4.66.2 
+zipp-3.18.1
+</code></pre>
+<p>同时，利用 <code>conda install -c anaconda cmake</code> 安装 Cmake 库。</p>
+<h3><a id="2-3-pcdet-installation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3 PCDet Installation</h3>
+<p>通过 <code>python setup.py develop</code> 编译库。</p>
+<h2><a id="3-dataset-preparation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 Dataset Preparation</h2>
+<p>通过 <a href="https://blog.csdn.net/u013086672/article/details/103910266" title="web_2">web_2</a> 下载 Kitti 数据集，并通过 <a href="https://drive.google.com/file/d/1d5mq0RXRnvHPVeKx6Q612z0YRO1t2wAp/view" title="web_3">web_3</a> 下载补充的 planes 数据集，并将其转化成如下形式。</p>
+<pre><code class="language-shell"># Download KITTI &amp; Planes and organize them into the following form:
+├── Kitti
+│   │── ImageSets
+│   │   ├──train.txt &amp; test.txt &amp; val.txt
+│   │── training
+│   │   ├──calib &amp; velodyne &amp; label_2 &amp; image_2 &amp; (optional: planes)
+│   │── testing
+│   │   ├──calib &amp; velodyne &amp; image_2
+</code></pre>
+<p>需要注意的是 kitti 数据集中的 ImageSets 是在 OpenPCDet 的 <a href="https://github.com/open-mmlab/OpenPCDet" title="OpenPCDet source code">源码</a> 中的以下路径存放：data/kitti/ImageSets。此外，由于在服务器上运行，因此数据集无法和代码放到一起。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Name</th>
+<th style="text-align: left">Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">Dataset</td>
+<td style="text-align: left">home/share/nanyang/Kitti</td>
+</tr>
+<tr>
+<td style="text-align: center">Code</td>
+<td style="text-align: left">home/workspace/nanyang/CT3D</td>
+</tr>
+</tbody>
+</table>
+<p>这将为后面训练时会需要对代码进行一些修改。</p>
+<h2><a id="4-generate-data-information" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 Generate Data Information</h2>
+<p>在路径为 <code>home/workspace/nanyang/CT3D</code> 下，采用如下的代码产生数据信息：</p>
+<pre><code class="language-shell">python -m pcdet.datasets.kitti.kitti_dataset create_kitti_infos tools/cfgs/dataset_configs/kitti_dataset.yaml
+</code></pre>
+<p>首先要对 <code>home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py</code> 中数据集的路径进行修改，将其 433-439 行修改为：</p>
+<pre><code class="language-shell"># 原始代码
+ROOT_DIR = (Path(__file__).resolve().parent / '../../../').resolve()
+create_kitti_infos(
+    dataset_cfg=dataset_cfg,
+    class_names=['Car', 'Pedestrian', 'Cyclist'],
+    data_path=ROOT_DIR / 'data' / 'kitti',
+    save_path=ROOT_DIR / 'data' / 'kitti'
+)
+
+# 修改后代码
+# 此时路径为 home/share/nanyang/Kitti  
+ROOT_DIR = (Path(__file__).resolve().parent / '../../../../../../share/nanyang/Kitti').resolve()
+create_kitti_infos(
+    dataset_cfg=dataset_cfg,
+    class_names=['Car', 'Pedestrian', 'Cyclist'],
+    data_path=ROOT_DIR,
+    save_path=ROOT_DIR
+)
+</code></pre>
+<p>在修改完地址后，运行会出现以下报错：</p>
+<pre><code class="language-shell">/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py:127: RuntimeW
+arning: 'pcdet.datasets.kitti.kitti
+_dataset'found in sys.modules after import of package'podet datasets.kitti', but prior to execution of'pcdet.datasets.kitt i.kitti_dataset'; this may result in unpredictable behaviour warn (RuntimeWarning(msg))
+Traceback (most recent call last):
+File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py&quot;, lin e 194, in _run_module_as_main
+return _run_code(code, main_globals, None,
+File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy-py&quot;, lin e 87, in _run_code
+exec (code, run_globals)
+File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 432, in ‹module &gt;
+dataset_cfg = EasyDict(yaml.load(open(sys.argv[2])))
+TypeError: load() missing 1 required positional argument: 'Loader'
+</code></pre>
+<p>在 <a href="https://blog.csdn.net/qq_44824148/article/details/122337056" title="web_4">web_4</a> 上得知，yaml 在 5.1 版本后便不再使用 <code>yaml.load(file)</code>，观察到我们的 Conda 环境中 <code>PyYAML==6.0.1</code>，因此需要修改部分代码。</p>
+<p>找到 <code>/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py</code>   , 将其 432 行的代码修改为：</p>
+<pre><code class="language-shell">dataset_cfg = EasyDict(yaml.load(open(sys.argv[2])))    # 原始代码
+
+dataset_cfg = EasyDict(yaml.load(open(sys.argv[2]), Loader = yaml.FullLoader))  # 修改后代码
+</code></pre>
+<p>但是会产生新的报错如下。主要是在 <code>spconv.utils</code> 中未能找到 <code>VoxelGenerator</code> 或 <code>VoxelGeneratorV2</code></p>
+<pre><code class="language-shell">/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py:127: RuntimeWarning: 'pcdet.datasets.kitti.kitti_dataset' found in sys.modules after import of package 'pcdet.datasets.kitti', but prior to execution of 'pcdet.datasets.kitti.kitti_dataset'; this may result in unpredictable behaviour
+  warn(RuntimeWarning(msg))
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 46, in transform_points_to_voxels
+    from spconv.utils import VoxelGeneratorV2 as VoxelGenerator
+ImportError: cannot import name 'VoxelGeneratorV2' from 'spconv.utils' (/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/spconv/utils/__init__.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py&quot;, line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py&quot;, line 87, in _run_code
+    exec(code, run_globals)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 434, in &lt;module&gt;
+    create_kitti_infos(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 387, in create_kitti_infos
+    dataset = KittiDataset(dataset_cfg=dataset_cfg, class_names=class_names, root_path=data_path, training=False)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 22, in __init__
+    super().__init__(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 33, in __init__
+    self.data_processor = DataProcessor(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 16, in __init__
+    cur_processor = getattr(self, cur_cfg.NAME)(config=cur_cfg)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 48, in transform_points_to_voxels
+    from spconv.utils import VoxelGenerator
+ImportError: cannot import name 'VoxelGenerator' from 'spconv.utils' (/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/spconv/utils/__init__.py)
+</code></pre>
+<p>寻找原因：在 <a href="https://github.com/traveller59/spconv/issues/452" title="spconv issue">web_5</a> 中找到。将 <code>home/workspace/nanyang/CT3D</code> 中所有出现的以下代码均作修改：</p>
+<pre><code class="language-shell"># 原始代码
+import spconv
+
+from spconv.utils import VoxelGenerator
+(from spconv.utils import VoxelGeneratorV2 as VoxelGenerator)
+
+# 修改后代码
+import spconv.pytorch as spconv
+
+from spconv.utils import Point2VoxelGPU3d as VoxelGenerator
+</code></pre>
+<p>此时报错如下：</p>
+<pre><code class="language-shell">/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py:127: RuntimeWarning: 'pcdet.datasets.kitti.kitti_dataset' found in sys.modules after import of package 'pcdet.datasets.kitti', but prior to execution of 'pcdet.datasets.kitti.kitti_dataset'; this may result in unpredictable behaviour
+  warn(RuntimeWarning(msg))
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py&quot;, line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py&quot;, line 87, in _run_code
+    exec(code, run_globals)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 434, in &lt;module&gt;
+    create_kitti_infos(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 387, in create_kitti_infos
+    dataset = KittiDataset(dataset_cfg=dataset_cfg, class_names=class_names, root_path=data_path, training=False)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 22, in __init__
+    super().__init__(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 33, in __init__
+    self.data_processor = DataProcessor(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 16, in __init__
+    cur_processor = getattr(self, cur_cfg.NAME)(config=cur_cfg)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 47, in transform_points_to_voxels
+    voxel_generator = VoxelGenerator(TypeError: __init__(): incompatible constructor arguments. The following argument types are supported:
+    1. spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel(vsize_xyz: List[float[3]], coors_range_xyz: List[float[6]], num_point_features: int, max_num_voxels: int, max_num_points_per_voxel: int)Invoked with: kwargs: voxel_size=[0.05, 0.05, 0.1], point_cloud_range=array([0. , -40. ,  -3. ,  70.4,  40. ,   1.], dtype=float32), max_num_points=5, max_voxels=40000
+</code></pre>
+<p>可以看到是由于使用 2.x 版本的 spconv 后，其丢弃了 1.x 版本中的 VoxelGenerator 函数，变为了 Point2VoxelGPU3d 函数，其参数名称、数据类型和参数数量也会相应地改变。具体和之前变化如下：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>VoxelGenerator(before)</th>
+<th>Point2Voxel(after)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>param</td>
+<td>voxel_size(list)</td>
+<td>vsize_xyz(list)</td>
+</tr>
+<tr>
+<td></td>
+<td>point_cloud_range(array)</td>
+<td>coors_range_xyz(list)</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>num_point_features(int)</td>
+</tr>
+<tr>
+<td></td>
+<td>max_num_points(int)</td>
+<td>max_num_points_per_voxel(int)</td>
+</tr>
+<tr>
+<td></td>
+<td>max_voxels(int)</td>
+<td>max_num_voxels(int)</td>
+</tr>
+<tr>
+<td>param.cnt</td>
+<td>4</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>因此我们需要将其变量名称、变量类型、标亮数量均进行修改。注意我们在 <code>home/workspace/nanyang/CT3D/tools/cfgs/dataset_configs/kitti_dataset.yaml</code> 中找到 <code>NUM_POINT_FEATURES: 4</code> 并将其添加到 <code>DATA_PROCESSOR</code> 里面的 <code>- NAME: transform_points_to_voxels</code> 中，并在代码里进行调用。找到 <code>home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py</code> 中的 47-52 行，将其修改如下：</p>
+<pre><code class="language-shell"># 原始代码
+voxel_generator = VoxelGenerator(
+    voxel_size=config.VOXEL_SIZE,
+    point_cloud_range=self.point_cloud_range,
+    max_num_points=config.MAX_POINTS_PER_VOXEL,   
+    max_voxels=config.MAX_NUMBER_OF_VOXELS[self.mode]
+)
+
+# 修改后代码
+voxel_generator = VoxelGenerator(
+    vsize_xyz=config.VOXEL_SIZE,
+    coors_range_xyz=self.point_cloud_range.tolist(),
+    num_point_features=config.NUM_POINT_FEATURES
+    max_num_points_per_voxel=config.MAX_POINTS_PER_VOXEL,   
+    max_num_voxels=config.MAX_NUMBER_OF_VOXELS[self.mode]
+)
+</code></pre>
+<p>此时在运行代码<code>python -m pcdet.datasets.kitti.kitti_dataset create_kitti_infos tools/cfgs/dataset_configs/kitti_dataset.yaml</code>，发现运行成功！！！</p>
+<pre><code class="language-shell">(CT3D) nanyang@vclab-gpuserver-57:/home/workspace/nanyang/CT3D$ python -m pcdet.datasets.kitti.kitti_dataset create_kitti_infos tools/cfgs/dataset_configs/kitti_dataset.yaml
+/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/runpy.py:127: RuntimeWarning: 'pcdet.datasets.kitti.kitti_dataset' found in sys.modules after import of package 'pcdet.datasets.kitti', but prior to execution of 'pcdet.datasets.kitti.kitti_dataset'; this may result in unpredictable behaviour
+  warn(RuntimeWarning(msg))
+---------------Start to generate data infos---------------
+train sample_idx: 000000
+train sample_idx: 000003
+train sample_idx: 000007
+train sample_idx: 000009
+train sample_idx: 000010
+train sample_idx: 000011
+train sample_idx: 000012
+···
+</code></pre>
+<p>代码运行结束后，发现在kitti数据集路径<code>/home/share/nanyang/Kitti</code>下面多了几个文件，此时数据集由以下部分组成：</p>
+<pre><code class="language-shell">├── data
+│   ├── kitti
+│   │   │── ImageSets
+│   │   │── training
+│   │   │── testing
+│   │   │── kitti_dbinfos_train.pkl
+│   │   │── kitti_infos_test.pkl
+│   │   │── kitti_infos_train.pkl
+│   │   │── kitti_infos_trainval.pkl
+│   │   │── kitti_infos_val.pkl
+</code></pre>
+<h2><a id="5-train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 Train</h2>
+<p>首先对 <code>home/workspace/nanyang/CT3D/tools/cfgs/dataset_configs/kitti_dataset.yaml</code>中的<code>DATA_PATH</code>进行修改：<code>DATA_PATH: '../../../../share/nanyang/Kitti'</code>，这样kitti数据集的位置正确的修改为<code>/home/share/nanyang/Kitti</code>。接着运行以下命令：</p>
+<pre><code class="language-shell">python train.py --cfg_file /home/workspace/nanyang/CT3D/tools/cfgs/kitti_models/second_ct3d.yaml 
+</code></pre>
+<p><br />
+报错如下：</p>
+<pre><code class="language-shell">Traceback (most recent call last):                                                                                                                                                 | 0/1238 [00:00&lt;?, ?it/s]
+  File &quot;train.py&quot;, line 204, in &lt;module&gt;
+    main()
+  File &quot;train.py&quot;, line 159, in main
+    train_model(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 86, in train_model
+    accumulated_iter = train_one_epoch(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 19, in train_one_epoch
+    batch = next(dataloader_iter)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 435, in __next__
+    data = self._next_data()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in &lt;listcomp&gt;
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 380, in __getitem__
+    data_dict = self.prepare_data(data_dict=input_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 141, in prepare_data
+    data_dict = self.data_processor.forward(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 129, in forward
+    data_dict = cur_processor(data_dict=data_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 66, in transform_points_to_voxels
+    voxel_output = voxel_generator.generate(points)
+AttributeError: 'spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel' object has no attribute 'generate'
+</code></pre>
+<p><br />
+发现原因是因为采用<code>Point2VoxelGPU3d as VoxelGenerator</code>后，其Point2Voxel类并没有generate函数，在<code>home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/spconv/core_cc/csrc/sparse/all/ops3d.pyi</code>中发现Point2Voxel类相应的函数为point_to_voxel_hash，对<code>home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py</code>的第66行作以下修改：</p>
+<pre><code class="language-shell"># 原始代码
+voxel_output = voxel_generator.generate(points)
+
+# 修改后代码
+voxel_output = voxel_generator.point_to_voxel_hash(points)
+</code></pre>
+<p><br />
+修改后继续运行train.py，报错如下：</p>
+<pre><code class="language-shell">Traceback (most recent call last):                                                                                                                                                 | 0/1238 [00:00&lt;?, ?it/s]
+  File &quot;train.py&quot;, line 204, in &lt;module&gt;
+    main()
+  File &quot;train.py&quot;, line 159, in main
+    train_model(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 86, in train_model
+    accumulated_iter = train_one_epoch(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 19, in train_one_epoch
+    batch = next(dataloader_iter)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 435, in __next__
+    data = self._next_data()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in &lt;listcomp&gt;
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 380, in __getitem__
+    data_dict = self.prepare_data(data_dict=input_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 141, in prepare_data
+    data_dict = self.data_processor.forward(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 129, in forward
+    data_dict = cur_processor(data_dict=data_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 66, in transform_points_to_voxels
+    voxel_output = voxel_generator.point_to_voxel_hash(points)
+TypeError: point_to_voxel_hash(): incompatible function arguments. The following argument types are supported:
+    1. (self: spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel, points: cumm.core_cc.tensorview_bind.Tensor, clear_voxels: bool = True, empty_mean: bool = False, stream_int: int = 0) -&gt; Tuple[cumm.core_cc.tensorview_bind.Tensor, cumm.core_cc.tensorview_bind.Tensor, cumm.core_cc.tensorview_bind.Tensor]
+
+Invoked with: &lt;spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel object at 0x7fa80b9eb6f0&gt;, array([[ 8.025416  ,  2.3700118 , -1.7376146 ,  0.26      ],
+       [ 4.318642  ,  3.889347  , -0.92502284,  0.35      ],
+       [31.185736  , 12.291912  ,  0.3180823 ,  0.29      ],
+       ...,
+       [69.58629   , 30.494154  ,  1.3690922 ,  0.        ],
+       [10.36416   ,  0.56376034, -1.7129093 ,  0.11      ],
+       [10.482327  ,  2.805909  , -0.27278903,  0.        ]],
+      dtype=float32)
+</code></pre>
+<p><br />
+寻找原因：point_to_voxel_hash函数的入参类型不对。期望类型是cumm.core_cc.tensorview_bind.Tensor，而目前的类型是array。</p>
+<p>这个问题比较棘手，最终在<a href="https://github.com/traveller59/spconv/issues/476" title="cumm Tensor">web_5</a>找到可能的答案：采用<code>home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/cumm/core_cc/tensorview_bind.py</code>中Tensor类里的from_numpy函数，将points由array转化为cumm.core_cc.tensorview_bind.Tensor类型。</p>
+<pre><code class="language-shell"># 原始代码
+voxel_output = voxel_generator.generate(points)
+
+# 修改后代码
+from cumm.core_cc.tensorview_bind import from_numpy
+
+voxel_output = voxel_generator.point_to_voxel_hash(from_numpy(points))
+</code></pre>
+<p><br />
+接着报错：</p>
+<pre><code class="language-shell">2024-04-17 01:21:45,560   INFO  **********************Start training kitti_models/second_ct3d(default)**********************
+epochs:   0%|                                                                                                                                                                       | 0/100 [00:03&lt;?, ?it/s]
+Traceback (most recent call last):                                                                                                                                                 | 0/3712 [00:00&lt;?, ?it/s]
+  File &quot;train.py&quot;, line 204, in &lt;module&gt;
+    main()
+  File &quot;train.py&quot;, line 159, in main
+    train_model(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 86, in train_model
+    accumulated_iter = train_one_epoch(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 19, in train_one_epoch
+    batch = next(dataloader_iter)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 435, in __next__
+    data = self._next_data()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 44, in &lt;listcomp&gt;
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/kitti/kitti_dataset.py&quot;, line 380, in __getitem__
+    data_dict = self.prepare_data(data_dict=input_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 141, in prepare_data
+    data_dict = self.data_processor.forward(
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 131, in forward
+    data_dict = cur_processor(data_dict=data_dict)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 68, in transform_points_to_voxels
+    voxel_output = voxel_generator.point_to_voxel_hash(from_numpy(points))
+RuntimeError: dev2host /tmp/pip-build-env-g7ks_t5y/overlay/lib/python3.8/site-packages/cumm/include/tensorview/cuda/driverops.h:105
+cuda failed with error 700 an illegal memory access was encountered. use CUDA_LAUNCH_BLOCKING=1 to get correct traceback.
+</code></pre>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script><script>!function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;var l=a.element.classList;if(l.contains('language-mermaid') || l.contains('language-echarts') || l.contains('language-plantuml')){return;} if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.css"><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><style>div.code-toolbar > .toolbar > .toolbar-item > a, div.code-toolbar > .toolbar > .toolbar-item > button, div.code-toolbar > .toolbar > .toolbar-item > span {padding: 4px .5em; background: #f5f2f0; background: rgba(224, 224, 224, 0.4);}</style>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>
