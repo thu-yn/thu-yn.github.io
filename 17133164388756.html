@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    CT3D Reproduction - Prepare for the FUTURE
+    CT3D Reproduction (spconv==2.3.6) - Prepare for the FUTURE
     
     </title>
     
@@ -77,7 +77,7 @@
                   <div class="post-body single-content">
                     
                     <h1 class="title">
-                            CT3D Reproduction   
+                            CT3D Reproduction (spconv==2.3.6)   
                       </h1>
                      
                     
@@ -121,6 +121,12 @@ conda deactivate    # 此时没有 conda 环境
 
 conda activate CT3D # 此时 conda 的环境不是嵌套的，为(CT3D)
 
+# 安装cuda
+conda install cudatoolkit=11.0 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+
+# 安装cudnn
+conda install cudnn-8.9.2 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+
 # 安装 pytorch
 pip install torch==1.7.0+cu110 torchvision==0.8.1+cu110 torchaudio==0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
 </code></pre>
@@ -140,6 +146,10 @@ pip install torch==1.7.0+cu110 torchvision==0.8.1+cu110 torchaudio==0.7.0 -f htt
 <tr>
 <td style="text-align: center">cuda</td>
 <td style="text-align: center">11.0</td>
+</tr>
+<tr>
+<td style="text-align: center">cudnn</td>
+<td style="text-align: center">8.9.2</td>
 </tr>
 <tr>
 <td style="text-align: center">pytorch</td>
@@ -190,7 +200,7 @@ termcolor-2.4.0
 urllib3-2.2.1
 </code></pre>
 <h3><a id="2-2-source-code-requirements-installation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 Source Code Requirements Installation</h3>
-<p>下载[CT3D 源码][0]，将 <code>CT3D-master</code> 改名为 <code>CT3D</code> 放到 <code>home/workspace/nanyang/</code> 路径下，即代码路径为 <code>home/workspace/nanyang/CT3D</code>。</p>
+<p>下载<a href="https://github.com/hlsheng1/CT3D" title="github: CT3D">CT3D 源码</a>，将 <code>CT3D-master</code> 改名为 <code>CT3D</code> 放到 <code>home/workspace/nanyang/</code> 路径下，即代码路径为 <code>home/workspace/nanyang/CT3D</code>。</p>
 <p>安装依赖项：<code>pip install -r requirements.txt</code>，下载的相关包如下：</p>
 <pre><code class="language-shell">PyWavelets-1.4.1 
 easydict-1.13 
@@ -316,7 +326,7 @@ Traceback (most recent call last):
     from spconv.utils import VoxelGenerator
 ImportError: cannot import name 'VoxelGenerator' from 'spconv.utils' (/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/spconv/utils/__init__.py)
 </code></pre>
-<p>寻找原因：在 <a href="https://github.com/traveller59/spconv/issues/452" title="spconv issue">web_5</a> 中找到。将 <code>home/workspace/nanyang/CT3D</code> 中所有出现的以下代码均作修改：</p>
+<p>寻找原因：在 <a href="https://github.com/traveller59/spconv/issues/452" title="spconv issue">web_5</a> 中找到。将 <code>home/workspace/nanyang/CT3D</code> 中所有出现的以下代码均作修改：（通常位于<code>/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py</code>中）</p>
 <pre><code class="language-shell"># 原始代码
 import spconv
 
@@ -348,7 +358,8 @@ Traceback (most recent call last):
     cur_processor = getattr(self, cur_cfg.NAME)(config=cur_cfg)
   File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py&quot;, line 47, in transform_points_to_voxels
     voxel_generator = VoxelGenerator(TypeError: __init__(): incompatible constructor arguments. The following argument types are supported:
-    1. spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel(vsize_xyz: List[float[3]], coors_range_xyz: List[float[6]], num_point_features: int, max_num_voxels: int, max_num_points_per_voxel: int)Invoked with: kwargs: voxel_size=[0.05, 0.05, 0.1], point_cloud_range=array([0. , -40. ,  -3. ,  70.4,  40. ,   1.], dtype=float32), max_num_points=5, max_voxels=40000
+    1. spconv.core_cc.csrc.sparse.all.ops3d.Point2Voxel(vsize_xyz: List[float[3]], coors_range_xyz: List[float[6]], num_point_features: int, max_num_voxels: int, max_num_points_per_voxel: int)
+    2. Invoked with: kwargs: voxel_size=[0.05, 0.05, 0.1], point_cloud_range=array([0. , -40. ,  -3. ,  70.4,  40. ,   1.], dtype=float32), max_num_points=5, max_voxels=40000
 </code></pre>
 <p>可以看到是由于使用 2.x 版本的 spconv 后，其丢弃了 1.x 版本中的 VoxelGenerator 函数，变为了 Point2VoxelGPU3d 函数，其参数名称、数据类型和参数数量也会相应地改变。具体和之前变化如下：</p>
 <table>
@@ -436,7 +447,7 @@ train sample_idx: 000012
 │   │   │── kitti_infos_trainval.pkl
 │   │   │── kitti_infos_val.pkl
 </code></pre>
-<h2><a id="5-train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 Train</h2>
+<h2><a id="5-train-in-spconv-2-3-6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 Train in spconv==2.3.6</h2>
 <p>首先对 <code>home/workspace/nanyang/CT3D/tools/cfgs/dataset_configs/kitti_dataset.yaml</code>中的<code>DATA_PATH</code>进行修改：<code>DATA_PATH: '../../../../share/nanyang/Kitti'</code>，这样kitti数据集的位置正确的修改为<code>/home/share/nanyang/Kitti</code>。接着运行以下命令：</p>
 <pre><code class="language-shell">python train.py --cfg_file /home/workspace/nanyang/CT3D/tools/cfgs/kitti_models/second_ct3d.yaml 
 </code></pre>
@@ -559,6 +570,102 @@ Traceback (most recent call last):                                              
 RuntimeError: dev2host /tmp/pip-build-env-g7ks_t5y/overlay/lib/python3.8/site-packages/cumm/include/tensorview/cuda/driverops.h:105
 cuda failed with error 700 an illegal memory access was encountered. use CUDA_LAUNCH_BLOCKING=1 to get correct traceback.
 </code></pre>
+<p><br />
+尝试在各种网站上查找原因，均无果。思考重新安装<code>spconv=1.2.1</code>的环境重试。</p>
+<p>另外，如果在<code>/home/workspace/nanyang/CT3D/pcdet/datasets/processor/data_processor.py</code>中将代码改为：</p>
+<pre><code class="language-shell"># 原始代码
+import spconv
+
+from spconv.utils import VoxelGenerator
+(from spconv.utils import VoxelGeneratorV2 as VoxelGenerator)
+
+voxel_output = voxel_generator.point_to_voxel_hash(points_tensor)
+
+# 修改后代码
+import spconv.pytorch as spconv
+
+from spconv.utils import Point2VoxelCPU3d as VoxelGenerator
+
+voxel_output = voxel_generator.point_to_voxel(points_tensor)
+</code></pre>
+<p><br />
+即采用Point2VoxelCPU3d作为函数，则会产生以下错误：</p>
+<pre><code class="language-shell">Error in collate_batch: key=voxels                                                                                                           
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 160, in collate_batch
+    ret[key] = np.concatenate(val, axis=0)
+  File &quot;&lt;__array_function__ internals&gt;&quot;, line 200, in concatenate
+ValueError: zero-dimensional arrays cannot be concatenated
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &quot;train.py&quot;, line 204, in &lt;module&gt;
+    main()
+  File &quot;train.py&quot;, line 159, in main
+    train_model(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 86, in train_model
+    accumulated_iter = train_one_epoch(
+  File &quot;/home/workspace/nanyang/CT3D/tools/train_utils/train_utils.py&quot;, line 19, in train_one_epoch
+    batch = next(dataloader_iter)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 435, in __next__
+    data = self._next_data()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/dataloader.py&quot;, line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CT3D/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py&quot;, line 47, in fetch
+    return self.collate_fn(data)
+  File &quot;/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py&quot;, line 177, in collate_batch
+    raise TypeError
+</code></pre>
+<p><br />
+定位到错误<code>/home/workspace/nanyang/CT3D/pcdet/datasets/dataset.py</code>中第160行，打印出此时的data_dict，形式如下：</p>
+<pre><code class="language-shell">defaultdict(
+&lt;class 'list'&gt;, 
+{
+'points': [array([[ 13.126883  ,  -3.2404664 ,  -0.14193426,   0.39      ],
+       [ 13.983856  ,  -2.150572  ,  -0.7652108 ,   0.43      ],
+       [  7.2673936 ,  -0.19264758,  -0.8248643 ,   0.        ],
+       ...,
+       [  9.102002  , -14.015053  ,   0.08022372,   0.18      ],
+       [  5.136553  ,  -7.970829  ,  -1.6240159 ,   0.17      ],
+       [  5.9716835 , -10.208348  ,  -1.3905444 ,   0.11      ]],
+      dtype=float32)], 
+'frame_id': ['003838'], 
+'gt_boxes': [array([[ 14.966295  , -16.331568  ,  -0.79469126,   4.7825675 ,
+          1.8307463 ,   1.4090575 ,   2.6177936 ,   1.        ],
+       [ 20.349575  , -12.53572   ,  -0.68597734,   3.8877645 ,
+          1.6661848 ,   1.6558998 ,  -0.64220625,   1.        ],
+       [  8.533559  , -26.662266  ,  -0.61798745,   4.299168  ,
+          1.8101761 ,   1.6044742 ,   2.4577937 ,   1.        ],
+       [ 25.943493  , -17.103659  ,  -0.5955868 ,   4.0009007 ,
+          1.686755  ,   1.686755  ,  -0.70220625,   1.        ],
+       [ 28.56103   ,  -4.647484  ,  -0.7255221 ,   3.6820626 ,
+          1.7690357 ,   1.6661848 ,  -0.7422063 ,   1.        ],
+       [ 29.88159   , -24.967829  ,  -0.49353108,   3.5792117 ,
+          1.4913383 ,   1.686755  ,   2.8077936 ,   1.        ],
+       [ 27.700705  , -37.37336   ,  -0.39806935,   3.970045  ,
+          1.7690357 ,   1.6353296 ,   2.4777937 ,   1.        ],
+       [ 14.928803  , -37.301277  ,  -0.46455774,   3.9906156 ,
+          1.686755  ,   1.6250445 ,   2.4777937 ,   1.        ],
+       [ 33.93561   ,  -4.9104295 ,  -0.7383798 ,   3.6203523 ,
+          1.6147594 ,   1.583904  ,  -0.1522063 ,   1.        ],
+       [  7.9387302 , -12.940128  ,  -0.6634241 ,   4.278598  ,
+          1.7896059 ,   1.8101761 ,  -1.5622063 ,   1.        ],
+       [ 19.694368  , -23.802286  ,  -0.51307076,   4.134607  ,
+          1.7278953 ,   1.7690357 ,   0.9977937 ,   1.        ],
+       [ 25.883978  , -12.159017  ,  -0.7254277 ,   4.381449  ,
+          1.6147594 ,   1.5324786 ,   0.9777937 ,   1.        ]],
+      dtype=float32)], 
+'use_lead_xyz': [True], 
+'voxels': [&lt;cumm.core_cc.tensorview_bind.Tensor object at 0x7f4f39ce7ef0&gt;], 
+'voxel_coords': [&lt;cumm.core_cc.tensorview_bind.Tensor object at 0x7f4f39cf2eb0&gt;], 
+'voxel_num_points': [&lt;cumm.core_cc.tensorview_bind.Tensor object at 0x7f4f39cf2df0&gt;], 
+'image_shape': [array([ 370, 1224], dtype=int32)]
+}
+)
+</code></pre>
+<p><br />
+可以得知，是由于采用诸如<code>from spconv.utils import Point2VoxelGPU3d as VoxelGenerator</code>的形式后，导致生成的Voxel格式无法被data_dict正确识别，导致错误。因此考虑安装<code>spconv=1.2.1</code>版本的进行试验。</p>
 
                   </article>
                   <div class="comments-wrap">
