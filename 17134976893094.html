@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    Frontend Pipeline (add eval_module) - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            Frontend Pipeline (add eval_module)   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/19</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_Dynamic%20Object%20Removal.html'>#Dynamic Object Removal</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <blockquote>
+<p>在原有前端的基于Removert的基础上增加评估模块，用来定量评估动态点剔除的效果。</p>
+</blockquote>
+<h2><a id="1-introduction" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 Introduction</h2>
+<p>目前为止，关于动态点剔除的各种论文里的各种方法中，并没有一个很好的对动态点剔除效果进行评估的指标，通常会采用<a href="https://zhuanlan.zhihu.com/p/88805121" title="mIoU">mIoU</a>进行衡量，但是其本质是衡量目标检测时估计的Bounding Box和真实Bounding Box之间的差异，对于真实世界的环境下，动态点不可能都是以某种确定的Object进行存在（例如：静止的人挥舞着自己的手臂，此时只有手臂的点云是动态点云，而Bounding Box标注的是这个人的边框信息），因此，采用mIoU作为标准衡量动态点剔除的效果是不够宽泛的，我们需要将衡量指标的尺度落在具体的某一个点上，而非某个移动的物体上。</p>
+<div style="text-align: center">
+<img src="media/17134976893094/1.png"/>
+<p>图 1 SemanticKitti Dataset (Sequence 00-09, Red represents dynamic point, White represents static point)</p>
+</div>
+<p>我们进行动态点剔除，采用的数据集是具有语义信息标注的<a href="http://www.semantic-kitti.org/" title="SemanticKitti">SemanticKitti</a>数据集。利用这个数据集进行动态点云剔除的优势在于该数据集对每个点标注了语义信息，并将其存放在了对应的labels文件夹下（每帧点云的标签文件为类似于<code>000000.label</code>的二进制文件）。进一步的，SemanticKitti数据集提供了<strong>9</strong>类动态点云的标签，分别对应label的数值为{251, 252, 253, 254, 255, 256, 257, 258, 259}，因此，我们可以根据这个label进行点云的动/静态真实分类，从而在动态点云剔除结果生成之后，与真实值进行对比，得到具体的动点剔除的准确性。</p>
+<h2><a id="2-read-label-info" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 Read Label Info</h2>
+<p>为了进行动点剔除效果的评估，首先第一步应该<strong>在最初的原始bin数据读取时，将点云的label信息同时进行读取</strong>。因此分为两步：</p>
+<ol>
+<li>创建一个函数readLabel用于读取点云的label信息；</li>
+<li>将readLabel函数与readBin函数放在一起。</li>
+</ol>
+<p>注：之所以要一起读取的原因是：在点云的XYZI数据读取后，会将其进行下采样等预处理操作，这将改变原始点云的顺序，而label文件里的数据顺序是严格按照bin文件的数据顺序的，因此我们需要在readBin的同时readLabel。</p>
+<h3><a id="2-1-readlabel-creation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.1 readLabel Creation</h3>
+<p>由于在代码<code>Removert.cpp</code>的<code>readValidScans</code>函数中，只用了<code>readBin</code>函数读取了存储每帧点云的XYZI数据的二进制bin文件，因此我们需要额外的增加一个<code>readLabel</code>函数对存储每帧点云的语义数据的二进制label文件进行label信息的读取，我们将其添加在<code>utility.cpp</code>中：</p>
+<pre><code class="language-cpp">// 定义了一个名为readLabel的函数，它接受一个字符串（标签文件的路径）和一个指向pcl::PointCloud&lt;PointType&gt;的智能指针作为参数。
+void readLabel(std::string _label_path, pcl::PointCloud&lt;PointType&gt;::Ptr _pcd_ptr)
+{
+    // ##################### load label ########################
+    
+    // 用std库的fstream打开一个文件流input，以二进制读取模式打开路径为_label_path的文件。
+    std::fstream input(_label_path.c_str(), ios::in | ios::binary);
+    
+    // 定义了一个uint32_t类型的向量label，用于存储从文件中读取的标签数据。
+    std::vector&lt;uint32_t&gt; label;
+    
+    //  检查文件是否成功打开，如果没有，则输出错误信息并退出程序。
+    if(!input.good()){
+	   cerr &lt;&lt; &quot;Could not read file: &quot; &lt;&lt; _label_path &lt;&lt; endl;
+	   exit(EXIT_FAILURE);
+	}
+    
+    // 将文件读取指针移动到文件的开头位置
+    input.seekg(0, ios::beg);  
+    
+    // 这个循环读取文件中的每个uint32_t数据，直到文件结束，并将这些数据存储到label向量中。
+    for (int i = 0; input.good() &amp;&amp; !input.eof(); i++)
+    {
+        uint32_t data;
+        input.read(reinterpret_cast&lt;char *&gt;(&amp;data), sizeof(data));
+        label.push_back(data);
+    }
+    
+    // 定义了两个uint16_t类型的向量，分别用于存储实例标签和语义标签。
+    std::vector&lt;uint16_t&gt; instance;
+    std::vector&lt;uint16_t&gt; semantic_label;
+    
+    // 遍历label向量，将每个uint32_t值分割为两个uint16_t值：一个是实例标签，另一个是语义标签，并将它们分别存储到instance和semantic_label向量中。
+    for (int i = 0; i &lt; label.size(); ++i)
+    {
+        // 低16位代表类别，用label与0xFFFF进行与操作，得到低16位
+        uint16_t slabel = label[i] &amp; 0xFFFF;
+        // 高16位代表编码id，用右移运算符获取高16位。
+        uint16_t inst   = label[i] &gt;&gt; 16;
+        instance.push_back(inst);
+        semantic_label.push_back(slabel);
+        
+        // 循环遍历DYNAMIC_CLASSES（一个包含动态类别标签的向量），如果当前的语义标签是动态对象的一部分，则将对应点云中的点的强度设置为1
+        for (int class_num : DYNAMIC_CLASSES)
+        {
+            if (slabel == class_num)
+            { // check it is in the moving object classes
+                _pcd_ptr-&gt;points[i].intensity = 1;         
+            }
+        }
+    }
+}
+</code></pre>
+<p><br />
+需要注意的是，SemanticKitti数据集的label文件中（以<code>000000.label</code>为例），每一个数据代表一个点的语义信息，类型是uint32_t，其中低 16 位对应于类别。高 16 位对实例 id 进行编码，该实例 id 在整个序列上是时间一致的，即，两次不同扫描中的同一对象获得相同的 id。然而我们只需要其类别，所以需要将其低16位提取出来，用于后续处理。</p>
+<p>在得到低16位的类别后，将其与<code>DYNAMIC_CLASS</code>中的类别进行比较，如果在其中，则将该点的<code>intensity</code>标志位记为1（默认为0）。</p>
+<p>对000000.labei进行readLabel处理，输出相隔为1000的10个标签，示例如下：</p>
+<pre><code class="language-shell">Point 0: Label = 70
+Point 1000: Label = 70
+Point 2000: Label = 70
+Point 3000: Label = 70
+Point 4000: Label = 71
+Point 5000: Label = 70
+Point 6000: Label = 70
+Point 7000: Label = 70
+Point 8000: Label = 70
+Point 9000: Label = 40
+</code></pre>
+<h3><a id="2-2-readlabel-insertation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 readLabel Insertation</h3>
+<p>在有了readLabel函数后，我们需要将其正确的放入Removert的流程中，以便给正确顺序的点云赋以label值。观察到readBin函数是在<code>readValidScans</code>函数中，形式如下：</p>
+<pre><code class="language-shell">for(auto&amp; _scan_path : sequence_valid_scan_paths_) 
+{
+    // read bin files and save  
+    pcl::PointCloud&lt;PointType&gt;::Ptr points (new pcl::PointCloud&lt;PointType&gt;); 
+    if( isScanFileKITTIFormat_ /*true*/) {
+        // 获取每一帧的点云数据（x,y,z,intensity）
+        readBin(_scan_path, points); // For KITTI (.bin)
+    } else {    
+        pcl::io::loadPCDFile&lt;PointType&gt; (_scan_path, *points); // saved from SC-LIO-SAM's pcd binary (.pcd)
+    }
+    ···
+}
+</code></pre>
+<blockquote>
+<p>PointType是我们自己定义的点云格式，通过给原始的pcl::PointXYZI进行多个标志位的扩充得到，其定义的结构体在<code>utility.h</code>中，如下所示：</p>
+</blockquote>
+<pre><code class="language-cpp">// 构建新的结构体，包括点云的三维坐标和六个标志位
+struct PointXYZIWithFlag : public pcl::PointXYZI
+{
+    int     global_id;      // 管理removert环节，默认是0
+    int     grid_id;        // 标志自己在地面点筛选时所在的grid的id。默认是0
+    uint8_t is_dynamic;     // 标志是否被算法识别为动态点/静态点。0默认为静态点
+    uint8_t is_ignored;     // 标志是否不参与revert环节。0默认为参与revert环节
+    uint8_t is_ground;      // 标志是否是地面点/非地面点/无效点。0默认为非地面点，1代表地面点，2代表无效点
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+
+POINT_CLOUD_REGISTER_POINT_STRUCT
+(PointXYZIWithFlag,
+    (float,     x,          x)
+    (float,     y,          y)
+    (float,     z,          z)
+    (float,     intensity,  intensity)  // 标志该点的动态标签真实值。默认为0，代表是静态点。
+    (int,       global_id,  global_id)
+    (int,       grid_id,    grid_id)
+    (uint8_t,   is_dynamic, is_dynamic)
+    (uint8_t,   is_ignored, is_ignored)
+    (uint8_t,   is_ground, is_ground)
+)
+
+using PointType = PointXYZIWithFlag;
+</code></pre>
+<blockquote>
+<p>这里选择用intensity来存储点云的真实标签值而不用诸如is_dynamic的自定义标志位来获得点云的真实标签值的原因后面会提到。</p>
+</blockquote>
+<p>我们可以看到，原始的代码里，是对有效的bin文件的vector（即sequence_valid_scan_paths_）进行遍历，直接对其中的每个具体的bin文件（即_scan_path）进行数据XYZI的读取，并存放到<code>pcl::PointCloud&lt;PointType&gt;::Ptr</code>类型的<code>points</code>中。因此若想要将readLabel函数加到readBin函数后面，需要对for循环的条件进行修改（因为_scan_path是<code>*.bin</code>文件的路径，而非<code>*.label</code>文件的路径），因此我们需要找到sequence_valid_scan_paths_是如何构建的。观察其在<code>Removert.cpp</code>中的<code>parseValidScanInfo</code>函数中，主要实现在如下一行代码：</p>
+<pre><code class="language-cpp">sequence_valid_scan_paths_.emplace_back(sequence_scan_paths_.at(curr_idx));
+</code></pre>
+<p><br />
+这里<code>curr_idx</code>是经过筛选后的有效的<code>*.bin</code>文件索引，因此我们思考：可以将<code>curr_idx</code>的个数保存下来到<code>valid_scan_cnt</code>中，用遍历该参数来代替原始的for循环内的条件。</p>
+<p>接下来要顺藤摸瓜，理清<code>*.bin</code>文件是如何经过Removert被读取的，对<code>sequence_scan_paths_</code>进行搜索，发现其在<code>RosParamServer.cpp</code>中的<code>RosParamServer</code>构造函数中，代码如下：</p>
+<pre><code class="language-cpp">// parsing bin file paths 
+nh.param&lt;std::string&gt;(&quot;removert/sequence_scan_dir&quot;, sequence_scan_dir_, &quot;/use/your/directory/having/*.bin&quot;);
+for(auto&amp; _entry : fs::directory_iterator(sequence_scan_dir_)) {
+    sequence_scan_names_.emplace_back(_entry.path().filename());
+    sequence_scan_paths_.emplace_back(_entry.path());
+}
+
+std::sort(sequence_scan_names_.begin(), sequence_scan_names_.end());
+std::sort(sequence_scan_paths_.begin(), sequence_scan_paths_.end());
+
+num_total_scans_of_sequence_ = sequence_scan_paths_.size();
+ROS_INFO_STREAM(&quot;\033[1;32m Total : &quot; &lt;&lt; num_total_scans_of_sequence_ &lt;&lt; &quot; scans in the directory.\033[0m&quot;);
+</code></pre>
+<p><br />
+可以看到，首先通过ros的节点句柄NodeHandle获得config文件中的<code>params_kitti.yaml</code>的参数<code>sequence_scan_dir</code>，该参数是存放有<code>*.bin</code>文件的位置（这里为<code>&quot;/home/ubuntu/yn/SLAM/Dynamic_Object_Removing/SemanticKitti/09-odometry/velodyne/&quot;</code>），并将其传入到参数<code>sequence_scan_dir_</code>中；接着通过<code>std::filesystem::directory_iterator</code>对该路径下的<code>*.bin</code>文件路径进行迭代，将其路径逐个存放到<code>sequence_scan_paths_</code><br />
+中，并进行一些后处理操作。</p>
+<p>了解到此，我们就可以同样的将<code>*.label</code>信息读取到<code>points</code>中。首先在config文件中的<code>params_kitti.yaml</code>的参数里添加存放<code>*.label</code>的路径<code>sequence_scan_label_dir</code>，添加后<code>params_kitti.yaml</code>的部分信息如下：</p>
+<pre><code class="language-yaml">sequence_scan_dir:  &quot;/home/ubuntu/yn/SLAM/Dynamic_Object_Removing/SemanticKitti/09-odometry/velodyne/&quot;
+sequence_pose_path:  &quot;/home/ubuntu/yn/SLAM/Dynamic_Object_Removing/SemanticKitti/09-gt/poses.txt&quot;
+sequence_scan_label_dir: &quot;/home/ubuntu/yn/SLAM/Dynamic_Object_Removing/SemanticKitti/09-gt/labels/&quot;
+</code></pre>
+<p><br />
+接着在<code>RosParamServer.cpp</code>中的<code>RosParamServer</code>构造函数中，添加如下代码，将<code>params_kitti.yaml</code>的参数<code>sequence_scan_label_dir</code>赋给<code>sequence_scan_label_dir_</code>，并对其中每个<code>*.label</code>文件，将其路径添加到<code>sequence_scan_label_paths_</code>中，并做一些后处理。</p>
+<pre><code class="language-cpp">// parsing label file paths
+nh.param&lt;std::string&gt;(&quot;removert/sequence_scan_label_dir&quot;, sequence_scan_label_dir_, &quot;/use/your/directory/having/*.label&quot;);
+for(auto&amp; _entry : fs::directory_iterator(sequence_scan_label_dir_)) {
+    sequence_scan_label_paths_.emplace_back(_entry.path());
+}
+std::sort(sequence_scan_label_paths_.begin(), sequence_scan_label_paths_.end());
+num_total_label_scans_of_sequence_ = sequence_scan_label_paths_.size();
+ROS_INFO_STREAM(&quot;\033[1;32m Total : &quot; &lt;&lt; num_total_label_scans_of_sequence_ &lt;&lt; &quot; label scans in the directory.\033[0m&quot;);
+</code></pre>
+<p><br />
+得到<code>sequence_scan_label_paths_</code>后，在<code>Removert.cpp</code>中的<code>parseValidScanInfo</code>函数中，添加以下代码，完成对有效索引为<code>curr_idx</code>的帧的<code>label</code>文件的提取，同时会提取有效帧的数量，记为<code>valid_scan_cnt</code>。</p>
+<pre><code class="language-cpp">sequence_valid_label_paths_.emplace_back(sequence_scan_label_paths_.at(curr_idx));
+</code></pre>
+<p><br />
+接着，在<code>Removert.cpp</code>中的<code>readValidScans</code>函数中，修改for循环如下：实现将有效索引<code>curr_idx</code>对应的帧的XYZI数据和对应的真实语义标签数据一同存入<code>points</code>中：</p>
+<pre><code class="language-cpp">for(int i = 0; i &lt; valid_scan_cnt; ++i) 
+{   
+    std::string _scan_path = sequence_valid_scan_paths_[i];
+    std::string _label_path = sequence_valid_label_paths_[i];
+
+    pcl::PointCloud&lt;PointType&gt;::Ptr points_ (new pcl::PointCloud&lt;PointType&gt;); 
+
+    // 对每一个i对应的有效帧进行x,y,z,intensity,的读取
+    if( isScanFileKITTIFormat_ /*true*/) {
+        // 获取每一帧的点云数据（x,y,z,intensity）
+        readBin(_scan_path, points_);       // For KITTI (.bin)     注：虽然在这里也获得了点云的intensity，但是我们要将其是否是gt_dynamic写在intensity上，因此在下一行重写intensity
+        readLabel(_label_path, points_);    // For KITTI (.label)
+    } else {    
+        pcl::io::loadPCDFile&lt;PointType&gt; (_scan_path, *points_); // saved from SC-LIO-SAM's pcd binary (.pcd)
+    }
+    ···
+}
+</code></pre>
+<p><br />
+可以看到，我们只需要得知有效帧的个数后，便可以通过遍历<code>i</code>来得到对应有效索引的帧的<code>_scan_path</code>和<code>_label_path</code>，接着分别将对应的数据送入<code>points</code>中，从而实现点云XYZI数据和标签数据的有效赋值。</p>
+<p>下面说明为什么要将点云数据的真实类别标签label在<code>readLabel</code>中赋给点云的<code>intensity</code>属性而非自定义的一个例如<code>gt_dynamic</code>属性：</p>
+<blockquote>
+<p>由于在点云接下来的操作中，会进行<code>pcl::VoxelGrid&lt;PointType&gt;</code>类型的下采样操作，而pcl自带的下采样操作，只会保留pcl自带的点云类型中的数据。</p>
+<p>例如对于pcl自带的<code>pcl::PointXYZI</code>类型，经过下采样后，采样后的每个点的XYZI的属性值都不会发生变化，但是对于自定义的<code>PointType</code>来讲，经过下采样后，除了XYZI外自定义的标志位都会发生无法预计的错误。</p>
+<p>因此我们将点云真实标签值赋予<code>intensity</code>标志位，这样可以保证其采样不变性。</p>
+</blockquote>
+<h2><a id="3-design-evaluation-module" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 Design Evaluation Module</h2>
+<p>在得到每个点的真实标签值后，设计评估模块就变得简单了：只需要对算法输出的动态点云地图进行遍历，提取出其中具有真实动态标签的点云数量，并除以具有真实动态标签的点云总数，我们就可以得到一个初步的动态点剔除准确率。用\(gt\_orig\_dynamic\_cnt\)表示原始点云地图中具有真实动态标签的点云总数，用\(gt\_curr\_dynamic\_cnt\)表示当前动态地图中具有真实动态标签的点云总数，\(dynamic\_classify\_acc\)表示动态点剔除准确率，用公式表示为：</p>
+<p>\( \begin{align}  dynamic\_classify\_acc = \frac {gt\_curr\_dynamic\_cnt} {gt\_orig\_dynamic\_cnt} \end{align}\)</p>
+<p>其代码实现也很简单：</p>
+<pre><code class="language-cpp">float dyna_classify_acc = 0.0;
+int gt_orig_dyna_cnt = 0; 
+int gt_curr_dyna_cnt = 0;
+
+for (auto&amp; point : map_global_curr_-&gt;points) {
+    if (point.intensity == 1) ++gt_orig_dyna_cnt;
+}
+
+for (auto&amp; point : map_global_curr_dynamic_-&gt;points) {
+    if (point.intensity == 1) ++gt_curr_dyna_cnt;
+}
+
+dyna_classify_acc = static_cast&lt;float&gt;(cnt_local) / cnt_global; 
+
+ROS_INFO_STREAM(&quot;\033[1;32m -- the number of dynamic points in original(GT): &quot; &lt;&lt; gt_orig_dyna_cnt &lt;&lt; &quot;\033[0m&quot;);  
+ROS_INFO_STREAM(&quot;\033[1;32m -- the number of dynamic  points in current(GT): &quot; &lt;&lt; gt_curr_dyna_cnt  &lt;&lt; &quot;\033[0m&quot;);    
+cout &lt;&lt; endl;
+</code></pre>
+<p><br />
+需要注意的是，在做除法运算时，需要将其中一个<code>int</code>类型的数强制转换为<code>float</code>类型的数，否则得到的将会是截断小数的结果（若<code>gt_curr_dyna_cnt &lt; gt_orig_dyna_cnt</code>，则<code>dyna_classify_acc = 0.00000</code>将会一直不变）</p>
+<h2><a id="4-ground-filter-evaluation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 Ground Filter Evaluation</h2>
+<p>将设计好的验证模块加入到<code>Removert.cpp</code>中的<code>removeOnce</code>和<code>revertOnce</code>中，分别计算每一步得到的动态点云地图的动点剔除准确率。为了测试之前写的对原始点云地图进行地面点筛选的有效性，选择了不同的地面点的grid_size进行实验，得到结果如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Grid size</th>
+<th style="text-align: center"></th>
+<th style="text-align: center">0.5</th>
+<th style="text-align: center"></th>
+<th style="text-align: center">1</th>
+<th style="text-align: center"></th>
+<th style="text-align: center">3</th>
+<th style="text-align: center"></th>
+<th style="text-align: center">5</th>
+<th style="text-align: center"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">Process</td>
+<td style="text-align: center">Res</td>
+<td style="text-align: center">Acc</td>
+<td style="text-align: center">Cnt</td>
+<td style="text-align: center">Acc</td>
+<td style="text-align: center">Cnt</td>
+<td style="text-align: center">Acc</td>
+<td style="text-align: center">Cnt</td>
+<td style="text-align: center">Acc</td>
+<td style="text-align: center">Cnt</td>
+</tr>
+<tr>
+<td style="text-align: center">remove</td>
+<td style="text-align: center">2.5</td>
+<td style="text-align: center">0.622950</td>
+<td style="text-align: center">141,772</td>
+<td style="text-align: center">0.686233</td>
+<td style="text-align: center">153,074</td>
+<td style="text-align: center">0.771057</td>
+<td style="text-align: center">170,022</td>
+<td style="text-align: center">0.748211</td>
+<td style="text-align: center">175,171</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">2.0</td>
+<td style="text-align: center">0.786039</td>
+<td style="text-align: center">224,206</td>
+<td style="text-align: center">0.828749</td>
+<td style="text-align: center">239,476</td>
+<td style="text-align: center">0.888752</td>
+<td style="text-align: center">262,377</td>
+<td style="text-align: center">0.866875</td>
+<td style="text-align: center">270,493</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">1.5</td>
+<td style="text-align: center">0.865906</td>
+<td style="text-align: center">264,804</td>
+<td style="text-align: center">0.892665</td>
+<td style="text-align: center">281,028</td>
+<td style="text-align: center">0.934109</td>
+<td style="text-align: center">305,634</td>
+<td style="text-align: center">0.915325</td>
+<td style="text-align: center">314,698</td>
+</tr>
+<tr>
+<td style="text-align: center">revert</td>
+<td style="text-align: center">1.0</td>
+<td style="text-align: center">0.838365</td>
+<td style="text-align: center">234,989</td>
+<td style="text-align: center">0.864006</td>
+<td style="text-align: center">250384</td>
+<td style="text-align: center">0.902616</td>
+<td style="text-align: center">273,424</td>
+<td style="text-align: center">0.884951</td>
+<td style="text-align: center">282,217</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">0.9</td>
+<td style="text-align: center">0.826178</td>
+<td style="text-align: center">217,246</td>
+<td style="text-align: center">0.850738</td>
+<td style="text-align: center">231,846</td>
+<td style="text-align: center">0.888417</td>
+<td style="text-align: center">254,022</td>
+<td style="text-align: center">0.871236</td>
+<td style="text-align: center">262,715</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">0.8</td>
+<td style="text-align: center">0.818165</td>
+<td style="text-align: center">205,445</td>
+<td style="text-align: center">0.842576</td>
+<td style="text-align: center">219,598</td>
+<td style="text-align: center">0.879174</td>
+<td style="text-align: center">240,956</td>
+<td style="text-align: center">0.862403</td>
+<td style="text-align: center">249,562</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">0.7</td>
+<td style="text-align: center">0.813618</td>
+<td style="text-align: center">197,844</td>
+<td style="text-align: center">0.837843</td>
+<td style="text-align: center">211,587</td>
+<td style="text-align: center">0.874255</td>
+<td style="text-align: center">232,533</td>
+<td style="text-align: center">0.857521</td>
+<td style="text-align: center">241.005</td>
+</tr>
+</tbody>
+</table>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script><script>!function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;var l=a.element.classList;if(l.contains('language-mermaid') || l.contains('language-echarts') || l.contains('language-plantuml')){return;} if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.css"><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><style>div.code-toolbar > .toolbar > .toolbar-item > a, div.code-toolbar > .toolbar > .toolbar-item > button, div.code-toolbar > .toolbar > .toolbar-item > span {padding: 4px .5em; background: #f5f2f0; background: rgba(224, 224, 224, 0.4);}</style><script>window.MathJax = {     tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } ,     startup: {     pageReady() {       return MathJax.startup.defaultPageReady().then(function () {          window.mweb_mathjax_ready_val = 'yes';          if(window.mweb_mathjax_ready !== undefined){ mweb_mathjax_ready(); }       });     }   }};document.addEventListener('DOMContentLoaded', function(event) {    if (typeof Prism != 'undefined') {         Prism.highlightAll();     }});window.mweb_mathjax_ready_val = '';function theMWebMathJaxRenderIsReady(key){ return window.mweb_mathjax_ready_val; }</script><script>window.MathJax = { tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } }; </script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>
