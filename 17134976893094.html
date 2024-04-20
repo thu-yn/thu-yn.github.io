@@ -350,7 +350,8 @@ calc_dyna_classify_acc(map_global_curr_, map_global_curr_dynamic_);
 </code></pre>
 <p><br />
 将设计好的验证模块加入到<code>Removert.cpp</code>中的<code>removeOnce</code>和<code>revertOnce</code>中，分别计算每一步得到的动态点云地图的动点剔除准确率。为了测试之前写的对原始点云地图进行地面点筛选的有效性，选择了不同的地面点的grid_size进行实验，得到结果如下表所示：</p>
-<table>
+<div style="width: 100%; overflow:auto;">
+<table style="width: 100%">
 <thead>
 <tr>
 <th style="text-align: center">Grid size</th>
@@ -482,6 +483,7 @@ calc_dyna_classify_acc(map_global_curr_, map_global_curr_dynamic_);
 </tr>
 </tbody>
 </table>
+</div>
 <p>这个表反映了采用不同的gird_size做地面点筛选时对应的动点剔除效果变化。其中第一行表明本实验采用的grid_size为：无（不进行地面点筛选），0.5m，1m，3m，5m。其余部分，对每一个grid_size，我们会在Removert的过程中的每一步（包含remove和revert两部分）都记录当前过程下得到的动态点分类的准确率Acc和当前全局动态点云地图的点云数量Cnt。</p>
 <p>然而我们可以看到，仅通过Acc来判断动态点云剔除的好坏是不够的，因为这个指标存在一个漏洞：它并没有考虑到构造的动态点云地图有多大。举一个极端的例子：如果我们将原始点云地图里所有的点都用来构造点云地图，那得到的Acc一定是1，但是此时静态点云地图中一个点也没有，根本无法达到我们的构建高精静态地图的目标。</p>
 <p>从上面的表中我们也可以举出例子来证明：以最后一行的final指标为例：在没有进行地面点筛选时，其Acc最终为0.909101；而采用grid_size=0.5时，最终的Acc为0.813618。乍一看这两个指标相差了10%，不加地面点剔除的效果要比加地面点剔除的效果好得多；然而仔细看却能发现：采用地面点剔除的最终的动态点云地图只有197,844的点云数量，而未采用地面点剔除的最终的动态点云地图有316,290数量的点云。<strong>这表明对于未采用地面点剔除的方法来讲：相比于采用grid_size=0.5的地面点剔除方法，未采用地面点剔除的方法增加了59.87%的错误点云，换来的准确率只增加了11.74%，这显然是不划算的。</strong></p>
@@ -534,7 +536,8 @@ calc_dyna_classify_acc(map_global_curr_, map_global_curr_dynamic_);
 </code></pre>
 <p><br />
 经过<code>calc_dyna_filter_acc</code>函数得到的不同grid_size的动态点云剔除效果如下表所示：</p>
-<table>
+<div style="width: 100%; overflow:auto;">
+<table style="width: 100%">
 <thead>
 <tr>
 <th style="text-align: center">Grid size</th>
@@ -711,6 +714,7 @@ calc_dyna_classify_acc(map_global_curr_, map_global_curr_dynamic_);
 </tr>
 </tbody>
 </table>
+</div>
 
                   </article>
                   <div class="comments-wrap">
