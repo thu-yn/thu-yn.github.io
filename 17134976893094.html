@@ -311,35 +311,51 @@ ROS_INFO_STREAM(&quot;\033[1;32m Total : &quot; &lt;&lt; num_total_label_scans_o
 <p>因此我们将点云真实标签值赋予<code>intensity</code>标志位，这样可以保证其采样不变性。</p>
 </blockquote>
 <h2><a id="3-design-evaluation-module" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 Design Evaluation Module</h2>
+<h3><a id="3-1-dynamic-classify-acc" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.1 dynamic_classify_acc</h3>
 <p>在得到每个点的真实标签值后，设计评估模块就变得简单了：只需要对算法输出的动态点云地图进行遍历，提取出其中具有真实动态标签的点云数量，并除以具有真实动态标签的点云总数，我们就可以得到一个初步的动态点剔除准确率。用\(gt\_orig\_dynamic\_cnt\)表示原始点云地图中具有真实动态标签的点云总数，用\(gt\_curr\_dynamic\_cnt\)表示当前动态地图中具有真实动态标签的点云总数，\(dynamic\_classify\_acc\)表示动态点剔除准确率，用公式表示为：</p>
 <p>\( \begin{align}  dynamic\_classify\_acc = \frac {gt\_curr\_dynamic\_cnt} {gt\_orig\_dynamic\_cnt} \end{align}\)</p>
-<p>其代码实现也很简单：</p>
-<pre><code class="language-cpp">float dyna_classify_acc = 0.0;
-int gt_orig_dyna_cnt = 0; 
-int gt_curr_dyna_cnt = 0;
+<p>其代码实现也很简单，构造<code>calc_dyna_classify_acc</code>函数如下：</p>
+<pre><code class="language-cpp">void calc_dyna_classify_acc(const pcl::PointCloud&lt;PointType&gt;::Ptr&amp; _orig_cloud, const pcl::PointCloud&lt;PointType&gt;::Ptr&amp; _curr_cloud)
+{
+    float dyna_classify_acc = 0.0;
+    int gt_orig_dyna_cnt = 0; 
+    int gt_curr_dyna_cnt = 0;
 
-for (auto&amp; point : map_global_curr_-&gt;points) {
-    if (point.intensity == 1) ++gt_orig_dyna_cnt;
+    for (auto&amp; point : _orig_cloud-&gt;points) {
+        if (point.intensity == 1) ++gt_orig_dyna_cnt;
+    }
+
+    for (auto&amp; point : _curr_cloud-&gt;points) {
+        if (point.intensity == 1) ++gt_curr_dyna_cnt;
+    }
+
+    // notice there
+    dyna_classify_acc = static_cast&lt;float&gt;(cnt_local) / cnt_global; 
+
+    ROS_INFO_STREAM(&quot;\033[1;32m -- the number of dynamic points in original(GT): &quot; &lt;&lt; gt_orig_dyna_cnt &lt;&lt; &quot;\033[0m&quot;);  
+    ROS_INFO_STREAM(&quot;\033[1;32m -- the number of dynamic  points in current(GT): &quot; &lt;&lt; gt_curr_dyna_cnt  &lt;&lt; &quot;\033[0m&quot;);    
+    ROS_INFO_STREAM(&quot;\033[1;32m -- the dynamic_classify_accurancy: &quot; &lt;&lt; dyna_classify_acc  &lt;&lt; &quot;\033[0m&quot;);    
+    cout &lt;&lt; endl;
 }
-
-for (auto&amp; point : map_global_curr_dynamic_-&gt;points) {
-    if (point.intensity == 1) ++gt_curr_dyna_cnt;
-}
-
-dyna_classify_acc = static_cast&lt;float&gt;(cnt_local) / cnt_global; 
-
-ROS_INFO_STREAM(&quot;\033[1;32m -- the number of dynamic points in original(GT): &quot; &lt;&lt; gt_orig_dyna_cnt &lt;&lt; &quot;\033[0m&quot;);  
-ROS_INFO_STREAM(&quot;\033[1;32m -- the number of dynamic  points in current(GT): &quot; &lt;&lt; gt_curr_dyna_cnt  &lt;&lt; &quot;\033[0m&quot;);    
-cout &lt;&lt; endl;
 </code></pre>
 <p><br />
 需要注意的是，在做除法运算时，需要将其中一个<code>int</code>类型的数强制转换为<code>float</code>类型的数，否则得到的将会是截断小数的结果（若<code>gt_curr_dyna_cnt &lt; gt_orig_dyna_cnt</code>，则<code>dyna_classify_acc = 0.00000</code>将会一直不变）</p>
-<h2><a id="4-ground-filter-evaluation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 Ground Filter Evaluation</h2>
-<p>将设计好的验证模块加入到<code>Removert.cpp</code>中的<code>removeOnce</code>和<code>revertOnce</code>中，分别计算每一步得到的动态点云地图的动点剔除准确率。为了测试之前写的对原始点云地图进行地面点筛选的有效性，选择了不同的地面点的grid_size进行实验，得到结果如下表所示：</p>
+<p>将其加入到<code>Removert.cpp</code>中的<code>removeOnce</code>和<code>revertOnce</code>中，均加入到获得当前全局动态点云地图的模块后面，如下所示：</p>
+<pre><code class="language-cpp">// 分别得到当前动/静态全局点云地图。
+parseMapPointcloudUsingPtIdx(map_global_curr_, dynamic_point_indices_in_removert_vec_, map_global_curr_dynamic_);
+parseMapPointcloudUsingPtIdx(map_global_curr_, static_point_indices_in_removert_vec_,  map_global_curr_static_);
+
+// 计算动态点剔除的准确率
+calc_dyna_classify_acc(map_global_curr_, map_global_curr_dynamic_);
+</code></pre>
+<p><br />
+将设计好的验证模块加入到<code>Removert.cpp</code>中的<code>removeOnce</code>和<code>revertOnce</code>中，分别计算每一步得到的动态点云地图的动点剔除准确率。为了测试之前写的对原始点云地图进行地面点筛选的有效性，选择了不同的地面点的grid_size进行实验，得到结果如下表所示：</p>
 <table>
 <thead>
 <tr>
 <th style="text-align: center">Grid size</th>
+<th style="text-align: center"></th>
+<th style="text-align: center">None</th>
 <th style="text-align: center"></th>
 <th style="text-align: center">0.5</th>
 <th style="text-align: center"></th>
@@ -354,19 +370,23 @@ cout &lt;&lt; endl;
 <tbody>
 <tr>
 <td style="text-align: center">Process</td>
-<td style="text-align: center">Res</td>
-<td style="text-align: center">Acc</td>
-<td style="text-align: center">Cnt</td>
-<td style="text-align: center">Acc</td>
-<td style="text-align: center">Cnt</td>
-<td style="text-align: center">Acc</td>
-<td style="text-align: center">Cnt</td>
-<td style="text-align: center">Acc</td>
-<td style="text-align: center">Cnt</td>
+<td style="text-align: center">RES</td>
+<td style="text-align: center">ACC</td>
+<td style="text-align: center">CNT</td>
+<td style="text-align: center">ACC</td>
+<td style="text-align: center">CNT</td>
+<td style="text-align: center">ACC</td>
+<td style="text-align: center">CNT</td>
+<td style="text-align: center">ACC</td>
+<td style="text-align: center">CNT</td>
+<td style="text-align: center">ACC</td>
+<td style="text-align: center">CNT</td>
 </tr>
 <tr>
 <td style="text-align: center">remove</td>
 <td style="text-align: center">2.5</td>
+<td style="text-align: center">0.863894</td>
+<td style="text-align: center">222,612</td>
 <td style="text-align: center">0.622950</td>
 <td style="text-align: center">141,772</td>
 <td style="text-align: center">0.686233</td>
@@ -379,6 +399,8 @@ cout &lt;&lt; endl;
 <tr>
 <td style="text-align: center"></td>
 <td style="text-align: center">2.0</td>
+<td style="text-align: center">0.949985</td>
+<td style="text-align: center">347,222</td>
 <td style="text-align: center">0.786039</td>
 <td style="text-align: center">224,206</td>
 <td style="text-align: center">0.828749</td>
@@ -391,6 +413,8 @@ cout &lt;&lt; endl;
 <tr>
 <td style="text-align: center"></td>
 <td style="text-align: center">1.5</td>
+<td style="text-align: center">0.971340</td>
+<td style="text-align: center">403,222</td>
 <td style="text-align: center">0.865906</td>
 <td style="text-align: center">264,804</td>
 <td style="text-align: center">0.892665</td>
@@ -403,10 +427,12 @@ cout &lt;&lt; endl;
 <tr>
 <td style="text-align: center">revert</td>
 <td style="text-align: center">1.0</td>
+<td style="text-align: center">0.938693</td>
+<td style="text-align: center">365,065</td>
 <td style="text-align: center">0.838365</td>
 <td style="text-align: center">234,989</td>
 <td style="text-align: center">0.864006</td>
-<td style="text-align: center">250384</td>
+<td style="text-align: center">250,384</td>
 <td style="text-align: center">0.902616</td>
 <td style="text-align: center">273,424</td>
 <td style="text-align: center">0.884951</td>
@@ -415,6 +441,8 @@ cout &lt;&lt; endl;
 <tr>
 <td style="text-align: center"></td>
 <td style="text-align: center">0.9</td>
+<td style="text-align: center">0.923785</td>
+<td style="text-align: center">341,960</td>
 <td style="text-align: center">0.826178</td>
 <td style="text-align: center">217,246</td>
 <td style="text-align: center">0.850738</td>
@@ -427,6 +455,8 @@ cout &lt;&lt; endl;
 <tr>
 <td style="text-align: center"></td>
 <td style="text-align: center">0.8</td>
+<td style="text-align: center">0.914132</td>
+<td style="text-align: center">326,398</td>
 <td style="text-align: center">0.818165</td>
 <td style="text-align: center">205,445</td>
 <td style="text-align: center">0.842576</td>
@@ -437,8 +467,10 @@ cout &lt;&lt; endl;
 <td style="text-align: center">249,562</td>
 </tr>
 <tr>
-<td style="text-align: center"></td>
+<td style="text-align: center">final</td>
 <td style="text-align: center">0.7</td>
+<td style="text-align: center">0.909101</td>
+<td style="text-align: center">316,290</td>
 <td style="text-align: center">0.813618</td>
 <td style="text-align: center">197,844</td>
 <td style="text-align: center">0.837843</td>
@@ -446,7 +478,236 @@ cout &lt;&lt; endl;
 <td style="text-align: center">0.874255</td>
 <td style="text-align: center">232,533</td>
 <td style="text-align: center">0.857521</td>
-<td style="text-align: center">241.005</td>
+<td style="text-align: center">241,005</td>
+</tr>
+</tbody>
+</table>
+<p>这个表反映了采用不同的gird_size做地面点筛选时对应的动点剔除效果变化。其中第一行表明本实验采用的grid_size为：无（不进行地面点筛选），0.5m，1m，3m，5m。其余部分，对每一个grid_size，我们会在Removert的过程中的每一步（包含remove和revert两部分）都记录当前过程下得到的动态点分类的准确率Acc和当前全局动态点云地图的点云数量Cnt。</p>
+<p>然而我们可以看到，仅通过Acc来判断动态点云剔除的好坏是不够的，因为这个指标存在一个漏洞：它并没有考虑到构造的动态点云地图有多大。举一个极端的例子：如果我们将原始点云地图里所有的点都用来构造点云地图，那得到的Acc一定是1，但是此时静态点云地图中一个点也没有，根本无法达到我们的构建高精静态地图的目标。</p>
+<p>从上面的表中我们也可以举出例子来证明：以最后一行的final指标为例：在没有进行地面点筛选时，其Acc最终为0.909101；而采用grid_size=0.5时，最终的Acc为0.813618。乍一看这两个指标相差了10%，不加地面点剔除的效果要比加地面点剔除的效果好得多；然而仔细看却能发现：采用地面点剔除的最终的动态点云地图只有197,844的点云数量，而未采用地面点剔除的最终的动态点云地图有316,290数量的点云。<strong>这表明对于未采用地面点剔除的方法来讲：相比于采用grid_size=0.5的地面点剔除方法，未采用地面点剔除的方法增加了59.87%的错误点云，换来的准确率只增加了11.74%，这显然是不划算的。</strong></p>
+<p>因此我们需要创造更能反映静态建图质量的指标。</p>
+<h3><a id="3-2-a-new-metric" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.2 A New Metric</h3>
+<p>由3.1节我们可以得知，仅凭动态点云地图中的带有ground truth的动态标签的点在全部ground truth动态标签的点中的比例，来评估建图好坏是不够的。我们不仅要考虑有多少具有真实动态标签的点，也要考虑得到这些点，用了多大size的动态点云地图。我们希望的目标是：**在获得具有真实动态标签的点的数量尽可能多的同时，让动态点云地图的点的数量尽可能少。**只有这样才能使我们静态点云地图更加稠密和准确。</p>
+<p>因此我们创造了另一种评估动态点剔除的新指标。其计算流程如下：</p>
+<ol>
+<li>首先，通过动态点云地图中的带有ground truth的动态标签的点的数量<code>curr_dyna_cnt</code>，和全部ground truth动态标签的点的数量<code>orig_dyna_cnt</code>，得到动态点云地图中的带有ground truth的动态标签的点的比例<code>curr_dyna_ratio</code>：</li>
+</ol>
+<p>\( \begin{align}  curr\_dyna\_ratio = \frac {curr\_dyna\_cnt} {orig\_dyna\_cnt} \end{align}\)</p>
+<ol start="2">
+<li>接着，通过当前动态点云地图的点云数量<code>curr_map_cnt</code>，和原始点云地图的点云数量<code>orig_map_cnt</code>，得到当前动态点云地图的点云数量的比例<code>curr_map_ratio</code>：</li>
+</ol>
+<p>\( \begin{align}  curr\_map\_ratio = \frac {curr\_map\_cnt} {orig\_map\_cnt} \end{align}\)</p>
+<ol start="3">
+<li>最后，由于我们希望在<code>curr_dyna_ratio</code>尽可能大的同时，让<code>curr_map_ratio</code>尽可能小，因此我们得到指标<code>dyna_filter_ratio</code>：</li>
+</ol>
+<p>\( \begin{align}  dyna\_filter\_ratio = \frac {curr\_dyna\_ratio} {curr\_map\_ratio} \end{align}\)</p>
+<p>我们可以看到，<code>dyna_filter_ratio</code>越大，表明动态点云地图中拥有的具有真实动态标签的点越多的同时，该动态点云地图的size还很小，这符合我们的直觉上的稠密静态高精地图的原则。将3.1节中设计的<code>calc_dyna_classify_acc</code>函数重新设计修改如下：</p>
+<pre><code class="language-cpp">void calc_dyna_filter_acc(const pcl::PointCloud&lt;PointType&gt;::Ptr&amp; _orig_cloud, const pcl::PointCloud&lt;PointType&gt;::Ptr&amp; _curr_cloud)
+{
+    float curr_dyna_ratio = 0.0, curr_map_ratio = 0.0, dyna_filter_ratio = 0.0;
+    int curr_dyna_cnt= 0, orgi_dyna_cnt = 0; 
+    int curr_map_cnt = 0, orig_map_cnt = 0;
+
+    for (auto&amp; point : _orig_cloud-&gt;points) {
+        ++orig_map_cnt;
+        if (point.intensity == 1) ++orgi_dyna_cnt;
+    }
+
+    for (auto&amp; point : _curr_cloud-&gt;points) {
+        ++curr_map_cnt;
+        if (point.intensity == 1) ++curr_dyna_cnt;
+    }
+
+    curr_dyna_ratio = static_cast&lt;float&gt;(curr_dyna_cnt) / orgi_dyna_cnt; 
+    curr_map_ratio = static_cast&lt;float&gt;(curr_map_cnt) / orig_map_cnt;
+    dyna_filter_ratio = curr_dyna_ratio / curr_map_ratio;
+
+    ROS_INFO_STREAM(&quot;\033[1;32m -- the number of dynamic  points in current(GT): &quot; &lt;&lt; curr_dyna_cnt  &lt;&lt; &quot;\033[0m&quot;);    
+    ROS_INFO_STREAM(&quot;\033[1;32m -- the number of dynamic points in original(GT): &quot; &lt;&lt; orgi_dyna_cnt &lt;&lt; &quot;\033[0m&quot;);  
+    cout &lt;&lt; endl;
+
+    ROS_INFO_STREAM(&quot;\033[1;32m -- the current dynamic ratio : &quot; &lt;&lt; curr_dyna_ratio &lt;&lt; &quot;\033[0m&quot;);   
+    ROS_INFO_STREAM(&quot;\033[1;32m -- the current map ratio : &quot; &lt;&lt; curr_map_ratio &lt;&lt; &quot;\033[0m&quot;);   
+    ROS_INFO_STREAM(&quot;\033[1;32m -- the dynamic filter ratio : &quot; &lt;&lt; dyna_filter_ratio &lt;&lt; &quot;\033[0m&quot;);   
+    cout &lt;&lt; endl;
+}
+</code></pre>
+<p><br />
+经过<code>calc_dyna_filter_acc</code>函数得到的不同grid_size的动态点云剔除效果如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Grid size</th>
+<th style="text-align: center"></th>
+<th style="text-align: center">None</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+<th style="text-align: center">5</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+<th style="text-align: center">3</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+<th style="text-align: center">1</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+<th style="text-align: center">0.5</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">Process</td>
+<td style="text-align: center">RES</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFR</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFR</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFR</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFR</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFR</td>
+</tr>
+<tr>
+<td style="text-align: center">remove</td>
+<td style="text-align: center">2.5</td>
+<td style="text-align: center">0.863894</td>
+<td style="text-align: center">0.0541015</td>
+<td style="text-align: center">15.968</td>
+<td style="text-align: center">0.748211</td>
+<td style="text-align: center">0.0425716</td>
+<td style="text-align: center">17.5753</td>
+<td style="text-align: center">0.771094</td>
+<td style="text-align: center">0.04132</td>
+<td style="text-align: center">18.6615</td>
+<td style="text-align: center">0.686233</td>
+<td style="text-align: center">0.0372019</td>
+<td style="text-align: center">18.4462</td>
+<td style="text-align: center">0.62172</td>
+<td style="text-align: center">0.0344129</td>
+<td style="text-align: center">18.0665</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">2.0</td>
+<td style="text-align: center">0.949985</td>
+<td style="text-align: center">0.084386</td>
+<td style="text-align: center">11.2576</td>
+<td style="text-align: center">0.867919</td>
+<td style="text-align: center">0.0657375</td>
+<td style="text-align: center">13.2028</td>
+<td style="text-align: center">0.888305</td>
+<td style="text-align: center">0.0637512</td>
+<td style="text-align: center">13.9339</td>
+<td style="text-align: center">0.828749</td>
+<td style="text-align: center">0.0582004</td>
+<td style="text-align: center">14.2396</td>
+<td style="text-align: center">0.785443</td>
+<td style="text-align: center">0.0544271</td>
+<td style="text-align: center">14.4311</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">1.5</td>
+<td style="text-align: center">0.97134</td>
+<td style="text-align: center">0.0979957</td>
+<td style="text-align: center">9.91207</td>
+<td style="text-align: center">0.916965</td>
+<td style="text-align: center">0.0764768</td>
+<td style="text-align: center">11.9901</td>
+<td style="text-align: center">0.933587</td>
+<td style="text-align: center">0.0742506</td>
+<td style="text-align: center">12.5735</td>
+<td style="text-align: center">0.891883</td>
+<td style="text-align: center">0.0683064</td>
+<td style="text-align: center">13.0571</td>
+<td style="text-align: center">0.866391</td>
+<td style="text-align: center">0.0642563</td>
+<td style="text-align: center">13.4834</td>
+</tr>
+<tr>
+<td style="text-align: center">revert</td>
+<td style="text-align: center">1.0</td>
+<td style="text-align: center">0.938693</td>
+<td style="text-align: center">0.0887219</td>
+<td style="text-align: center">10.5802</td>
+<td style="text-align: center">0.88715</td>
+<td style="text-align: center">0.0686264</td>
+<td style="text-align: center">12.9272</td>
+<td style="text-align: center">0.902057</td>
+<td style="text-align: center">0.0663986</td>
+<td style="text-align: center">13.5855</td>
+<td style="text-align: center">0.863186</td>
+<td style="text-align: center">0.0608461</td>
+<td style="text-align: center">14.1864</td>
+<td style="text-align: center">0.838514</td>
+<td style="text-align: center">0.0569926</td>
+<td style="text-align: center">14.7127</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">0.9</td>
+<td style="text-align: center">0.923785</td>
+<td style="text-align: center">0.0831062</td>
+<td style="text-align: center">11.1157</td>
+<td style="text-align: center">0.873248</td>
+<td style="text-align: center">0.0638531</td>
+<td style="text-align: center">13.6759</td>
+<td style="text-align: center">0.887485</td>
+<td style="text-align: center">0.0616986</td>
+<td style="text-align: center">14.3842</td>
+<td style="text-align: center">0.849955</td>
+<td style="text-align: center">0.0563558</td>
+<td style="text-align: center">15.0819</td>
+<td style="text-align: center">0.82588</td>
+<td style="text-align: center">0.0526861</td>
+<td style="text-align: center">15.6755</td>
+</tr>
+<tr>
+<td style="text-align: center"></td>
+<td style="text-align: center">0.8</td>
+<td style="text-align: center">0.914132</td>
+<td style="text-align: center">0.0793241</td>
+<td style="text-align: center">11.524</td>
+<td style="text-align: center">0.864304</td>
+<td style="text-align: center">0.0606604</td>
+<td style="text-align: center">14.2482</td>
+<td style="text-align: center">0.87828</td>
+<td style="text-align: center">0.0585234</td>
+<td style="text-align: center">15.0073</td>
+<td style="text-align: center">0.841272</td>
+<td style="text-align: center">0.0533632</td>
+<td style="text-align: center">15.765</td>
+<td style="text-align: center">0.818053</td>
+<td style="text-align: center">0.0498356</td>
+<td style="text-align: center">16.415</td>
+</tr>
+<tr>
+<td style="text-align: center">final</td>
+<td style="text-align: center">0.7</td>
+<td style="text-align: center">0.909101</td>
+<td style="text-align: center">0.0768676</td>
+<td style="text-align: center">11.8268</td>
+<td style="text-align: center">0.859422</td>
+<td style="text-align: center">0.0585885</td>
+<td style="text-align: center">14.6688</td>
+<td style="text-align: center">0.873397</td>
+<td style="text-align: center">0.0564647</td>
+<td style="text-align: center">15.468</td>
+<td style="text-align: center">0.836613</td>
+<td style="text-align: center">0.0514298</td>
+<td style="text-align: center">16.2671</td>
+<td style="text-align: center">0.813581</td>
+<td style="text-align: center">0.0480024</td>
+<td style="text-align: center">16.9488</td>
 </tr>
 </tbody>
 </table>
