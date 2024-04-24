@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    Prompt - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            Prompt   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/25</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_LLM.html'>#LLM</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <h2><a id="1%E7%9B%AE%E7%9A%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 目的</h2>
+<p>一种为了更好的使用预训练语言模型的知识，采用在输入段添加额外的文本的技术。</p>
+<h2><a id="2%E6%96%B9%E6%B3%95%E5%88%86%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 方法分类</h2>
+<p><img src="media/17139758469559/17139758852591.jpg" alt="" /></p>
+<h2><a id="3%E5%92%8C-pretraing-fine-tuning%E7%9A%84%E5%8C%BA%E5%88%AB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 和Pretraing+Fine-tuning的区别</h2>
+<p><img src="media/17139758469559/17139759091632.jpg" alt="" /></p>
+<p>Pretrain+Fine-tuning：改变模型结构，使模型适配下游任务。传统的 Model Tuning 的范式：对于不同的任务，都需要将整个预训练语言模型进行精调，每个任务都有自己的一整套参数。</p>
+<ul>
+<li>少样本学习效果差，容易过拟合；</li>
+<li>每一个下游任务都需要进行Fine-tuning，造成部署资源的极大浪费。</li>
+</ul>
+<p>Prompt：重构任务描述，使下游任务适配模型<br />
+对于不同的任务，仅需要插入不同的prompt 参数，每个任务都单独训练Prompt 参数，不训练预训练语言模型，这样子可以大大缩短训练时间，也极大的提升了模型的使用率。</p>
+<h2><a id="4%E6%B5%81%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 流程</h2>
+<p><img src="media/17139758469559/17139759556817.jpg" alt="" /></p>
+<p><strong>1.</strong> template构建：</p>
+<ul>
+<li>本质：完形填空。</li>
+<li>两个slots：x——输入文本；z——模型经过学习后得到的适合该空的词。</li>
+<li>方式：shape；生成形式。</li>
+</ul>
+<p><strong>2.</strong> mapping构建</p>
+<ul>
+<li>方式：shape；生成形式。</li>
+</ul>
+<h2><a id="5-prompt-template-engineering" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 Prompt Template Engineering</h2>
+<h3><a id="5-1-handmade-template" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1 handmade template</h3>
+<h4><a id="5-1-1-cloze-template%EF%BC%9A%E5%A1%AB%E7%A9%BA%E6%8F%90%E7%A4%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1.1 cloze template：填空提示</h4>
+<ul>
+<li>z在template中间;</li>
+<li>更适合Masked LM预训练模型。</li>
+</ul>
+<h4><a id="5-1-2-prefix-template%EF%BC%9A%E5%89%8D%E7%BC%80%E6%8F%90%E7%A4%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1.2 prefix template：前缀提示</h4>
+<ul>
+<li>z在template的末尾；</li>
+<li>更适合生成任务或自回归模型。</li>
+</ul>
+<h3><a id="5-2-auto-template-learning" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2 auto template learning</h3>
+<p>让大模型自己去学习如何构造合适的prompt。</p>
+<h4><a id="5-2-1-autoprompt" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2.1 AutoPrompt</h4>
+<ul>
+<li>search in discrete space；</li>
+<li>不在意prompt是否可读，只要可以完成任务即可。</li>
+</ul>
+<h4><a id="5-2-2-p-tuning" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2.2 P-Tuning</h4>
+<ul>
+<li>保留关键词和MASK，将其他词替换为隐向量。</li>
+</ul>
+<h4><a id="5-2-3-p-tuning-v2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2.3 P-Tuning v2</h4>
+<ul>
+<li>search in continues space。</li>
+</ul>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>
