@@ -501,7 +501,17 @@ calc_dyna_classify_acc(map_global_curr_, map_global_curr_dynamic_);
 <li>最后，由于我们希望在<code>curr_dyna_ratio</code>尽可能大的同时，让<code>curr_map_ratio</code>尽可能小，因此我们得到指标<code>dyna_filter_ratio</code>：</li>
 </ol>
 <p>\( \begin{align}  dyna\_filter\_ratio = \frac {curr\_dyna\_ratio} {curr\_map\_ratio} \end{align}\)</p>
-<p>我们可以看到，<code>dyna_filter_ratio</code>越大，表明动态点云地图中拥有的具有真实动态标签的点越多的同时，该动态点云地图的size还很小，这符合我们的直觉上的稠密静态高精地图的原则。将3.1节中设计的<code>calc_dyna_classify_acc</code>函数重新设计修改如下：</p>
+<p>同时，我们希望比较在不同数据集上实验之间的\(dyna\_filter\_ratio\)，而\(dyna\_filter\_ratio\)和很多地图的信息有关，因此我们需要将\(dyna\_filter\_ratio\)进行归一化。</p>
+<p>我们注意到\(dyna\_filter\_ratio\)的极大值应该满足两个条件：</p>
+<ol>
+<li>在\(dyna\_filter\_ratio\)的分子上：动态点云地图中包含了所有具有真实动态点云标签的点，此时由式（2）知\(curr\_dyna\_ratio = 1\)；</li>
+<li>在\(dyna\_filter\_ratio\)的分母上：此时动态点云地图的数量仅包含了所有具有真实动态点云标签的点，此时由式（3）知\(curr\_map\_ratio = \frac {orig\_dyna\_cnt} {orig\_map\_cnt}\)。</li>
+</ol>
+<p>因此，\(dyna\_filter\_ratio\)的极大值应为：</p>
+<p>\( \begin{align}  dyna\_filter\_ratio\_max = \frac {1} {\frac {orig\_dyna\_cnt} {orig\_map\_cnt}} = \frac {orig\_map\_cnt} {orig\_dyna\_cnt}  \end{align}\)</p>
+<p>因此若我们要做归一化，则将\(dyna\_filter\_ratio\)修改为以下即可：</p>
+<p>\( \begin{align}  dyna\_filter\_ratio = \frac {dyna\_filter\_ratio} {dyna\_filter\_ratio\_max} = \frac {dyna\_filter\_ratio \times orig\_map\_cnt} {orig\_dyna\_cnt}  \end{align}\)</p>
+<p>我们可以看到，<code>dyna_filter_ratio</code>越接近于1，表明动态点云地图中拥有的具有真实动态标签的点越多的同时，该动态点云地图的size还很小，这符合我们的直觉上的稠密静态高精地图的原则。将3.1节中设计的<code>calc_dyna_classify_acc</code>函数重新设计修改如下：</p>
 <pre><code class="language-cpp">void calc_dyna_filter_acc(const pcl::PointCloud&lt;PointType&gt;::Ptr&amp; _orig_cloud, const pcl::PointCloud&lt;PointType&gt;::Ptr&amp; _curr_cloud)
 {
     float curr_dyna_ratio = 0.0, curr_map_ratio = 0.0, dyna_filter_ratio = 0.0;
@@ -581,7 +591,7 @@ calc_dyna_classify_acc(map_global_curr_, map_global_curr_dynamic_);
 <td style="text-align: center">2.5</td>
 <td style="text-align: center">0.863894</td>
 <td style="text-align: center">0.0541015</td>
-<td style="text-align: center">15.968</td>
+<td style="text-align: center">0.104127</td>
 <td style="text-align: center">0.748211</td>
 <td style="text-align: center">0.0425716</td>
 <td style="text-align: center">17.5753</td>
@@ -711,11 +721,433 @@ calc_dyna_classify_acc(map_global_curr_, map_global_curr_dynamic_);
 </tr>
 </tbody>
 </table>
-<p>将每个grid_size经过Removert完整流程后的最终指标进行直方图输出，如下图所示：</p>
+<p>其中，CDR指标表示得到动态点云地图中的带有ground truth的动态标签的点的比例，CMR表示当前动态点云地图的点云数量的比例，\(DFR = \frac {CDR} {CMR}\)作为我们提出的指标，衡量动态点剔除的效果。将每个grid_size经过Removert完整流程后的最终指标进行直方图输出，如下图所示：</p>
 <div style="text-align: center">
 <img src="media/17134976893094/1.jpg"/>
 <p>图 2 Different Indicator Performance for Different Grid Sizes</p>
 </div>
+<p>可以看到，虽然不采用地面点筛选时，查找动态点的准确率CDR指标最高，但是其DFR指标在对比试验中是最低的。我们在讨论其各个指标前，先注意到一个问题：<strong>在全局点云地图中，具有真实动态标签的点云总数过少。</strong> 在当前实验中，虽然全局点云地图的数量为4,114,712，但是具有真实动态标签的点云总数只有26,832，只占了全局点云数量的0.65%，这样相差极端的对比也可能会对指标造成一定影响。</p>
+<p>但是这样的占比在SemanticKitti数据集中是正常的，我们获取到SemanticKitti数据集编号为00-09这十个序列，分别观察其序列得到的总点云数量和具有真实动态标签的点云数量的关系，如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Sequence id</th>
+<th style="text-align: center">Overall cnt</th>
+<th style="text-align: center">Dynamic cnt</th>
+<th style="text-align: center">Dynamic ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">00</td>
+<td style="text-align: center">551,704,700</td>
+<td style="text-align: center">539,641</td>
+<td style="text-align: center">0.097%</td>
+</tr>
+<tr>
+<td style="text-align: center">01</td>
+<td style="text-align: center">116,355,734</td>
+<td style="text-align: center">929,801</td>
+<td style="text-align: center">0.799%</td>
+</tr>
+<tr>
+<td style="text-align: center">02</td>
+<td style="text-align: center">585,548,199</td>
+<td style="text-align: center">460,016</td>
+<td style="text-align: center">0.079%</td>
+</tr>
+<tr>
+<td style="text-align: center">03</td>
+<td style="text-align: center">99,300,740</td>
+<td style="text-align: center">77,553</td>
+<td style="text-align: center">0.078%</td>
+</tr>
+<tr>
+<td style="text-align: center">04</td>
+<td style="text-align: center">34,069,557</td>
+<td style="text-align: center">316,222</td>
+<td style="text-align: center">0.928%</td>
+</tr>
+<tr>
+<td style="text-align: center">05</td>
+<td style="text-align: center">345,228,978</td>
+<td style="text-align: center">980,322</td>
+<td style="text-align: center">0.284%</td>
+</tr>
+<tr>
+<td style="text-align: center">06</td>
+<td style="text-align: center">134,652,688</td>
+<td style="text-align: center">122,217</td>
+<td style="text-align: center">0.091%</td>
+</tr>
+<tr>
+<td style="text-align: center">07</td>
+<td style="text-align: center">133,585,213</td>
+<td style="text-align: center">1,067,784</td>
+<td style="text-align: center">0.799%</td>
+</tr>
+<tr>
+<td style="text-align: center">08</td>
+<td style="text-align: center">499,079,562</td>
+<td style="text-align: center">1,664,121</td>
+<td style="text-align: center">0.333%</td>
+</tr>
+<tr>
+<td style="text-align: center">09</td>
+<td style="text-align: center">197,895,475</td>
+<td style="text-align: center">458,322</td>
+<td style="text-align: center">0.232%</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，在公开数据集SemanticKitti的10个序列中，所包含的动态点均未超过1%，因此我们需要想办法提高动态点在全局点云中的比例，一个想法是通过下采样：全局点云经过下采样后减少的点，一定比动态点云经过下采样后减少的点多，因此或许可以提高动态标签点在全局中的比例。</p>
+<h3><a id="3-3-dimensionality-reduction" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.3 Dimensionality Reduction</h3>
+<p>我们通过原本的数据集处理可以得知，采用的实验数据均是由SemanticKitti的序号为09的sequence的序号从1300到1600，共300帧构成。然而由于代码对其进行了多次下采样等降维操作，因此最终得到的全局地图的点云总数为4,114,712，而其中的具有人工标注的动态标签的点云数量仅有26,832个点，还不及全局点云总数的1%，这无疑会对动点剔除的指标造成较大的影响，可能与实际结果不符。因此我们将从代码入手，尽可能的通过降维操作，让动态点云的占比更高，同时再做实验评估不同方法的指标。</p>
+<h4><a id="3-3-1-method" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.3.1 Method</h4>
+<p>首先在代码中寻找所有的降维方法，在<code>Removerter.cpp</code>中寻找如下，按处理顺序排出：</p>
+<ol>
+<li>在得到所有帧的信息后，在<code>parseValidScanInfo</code>函数中，利用config中的<code>use_keyframe_gap_</code>和<code>keyframe_gap_</code>参数，进行降维。其原理是：若<code>use_keyframe_gap_ = true</code>，则对于最初输入的所有关键帧，每隔<code>keyframe_gap_</code>存储一个关键帧的信息，将存储的信息大小变为最初的\( \frac {1}{keyframe\_gap\_}\)，达到降维效果，代码如下：（<strong>这一步是数据量大幅减少的关键原因</strong>）</li>
+</ol>
+<pre><code class="language-cpp">if(use_keyframe_gap_) {
+    // remainder（x,y）:返回x/y的浮点余数
+    if( remainder(num_valid_parsed, keyframe_gap_) != 0 ) {
+        num_valid_parsed++;
+        continue;
+    }
+}
+</code></pre>
+<ol start="2">
+<li>在得到由<code>keyframe_gap_</code>降维后的所有有效帧后，在<code>readValidScans</code>函数中，利用pcl自带的<code>pcl::VoxelGrid</code>类进行下采样，基本原理是：通过输入的点云数据创建一个三维体素栅格（可把体素栅格想象为微小的空间三维立方体的集合），然后在每个体素（即，三维立方体）内，用体素中所有点的重心来近似显示体素中其他点，这样该体素就内所有点就用一个重心点最终表示，对于所有体素处理后得到过滤后的点云。代码如下：</li>
+</ol>
+<pre><code class="language-cpp">pcl::VoxelGrid&lt;PointType&gt; downsize_filter;
+downsize_filter.setLeafSize(kDownsampleVoxelSize, kDownsampleVoxelSize, kDownsampleVoxelSize);
+downsize_filter.setInputCloud(points_);
+pcl::PointCloud&lt;PointType&gt;::Ptr downsampled_points (new pcl::PointCloud&lt;PointType&gt;);
+downsize_filter.filter(*downsampled_points);
+</code></pre>
+<ol start="3">
+<li>在得到经过<code>pcl::VoxelGrid</code>类的体素采样后，在<code>makeGlobalMap</code>函数中，利用八叉树对拼接完成的全局地图进行下采样。也是类似于体素采样，返回每个体素中心点坐标，代码如下：</li>
+</ol>
+<pre><code class="language-cpp">// 八叉树对点云进行体素滤波，下采样
+void Removerter::octreeDownsampling(const pcl::PointCloud&lt;PointType&gt;::Ptr&amp; _src, pcl::PointCloud&lt;PointType&gt;::Ptr&amp; _to_save)
+{
+    pcl::octree::OctreePointCloudVoxelCentroid&lt;PointType&gt; octree( kDownsampleVoxelSize );
+    octree.setInputCloud(_src);
+    octree.defineBoundingBox();
+    octree.addPointsFromInputCloud();
+    pcl::octree::OctreePointCloudVoxelCentroid&lt;PointType&gt;::AlignedPointTVector centroids;
+    octree.getVoxelCentroids(centroids);
+
+    // init current map with the downsampled full cloud 
+    _to_save-&gt;points.assign(centroids.begin(), centroids.end());    
+    _to_save-&gt;width = 1; 
+    _to_save-&gt;height = _to_save-&gt;points.size(); // make sure again the format of the downsampled point cloud 
+    ROS_INFO_STREAM(&quot;\033[1;32m Downsampled pointcloud have: &quot; &lt;&lt; _to_save-&gt;points.size() &lt;&lt; &quot; points.\033[0m&quot;);   
+    cout &lt;&lt; endl;
+} // octreeDownsampling
+</code></pre>
+<h4><a id="3-3-2-performance" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.3.2 Performance</h4>
+<h4><a id="keyframe-gap-1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>keyframe_gap = 1</h4>
+<p>我们试着采用<code>keyframe_gap = 1</code>，来探寻经过上节中三个降维操作对数据造成的影响。注意当<code>keyframe_gap = 1</code>时，表明我们对输入的每一帧都进行操作。命令行显示如下：</p>
+<pre><code class="language-shell">[ INFO] [1713771496.165562002]:  ----------------------- Preprocessing is beginning.  -----------------------
+
+[ INFO] [1713771496.166073769]:  Total 291 nodes are used from the index range [1300, 1600] (every 1 frames parsed)
+
+[ INFO] [1713771509.175144290]:  Before the first downsampling, global map has 36596019 points. 
+[ INFO] [1713771509.175185604]:  Before the first downsampling, global map has 214701 dynamic points in ground truth. 
+
+[ INFO] [1713771510.175193410]:  Downsampling leaf size is 0.05 m.
+
+[ INFO] [1713771509.175201217]:  After the first downsampling, global map has 26598870 points. 
+[ INFO] [1713771509.175211380]:  After the first downsampling, global map has 151843 dynamic points in ground truth. 
+
+
+[ INFO] [1713771510.204883084]:  Before the second downsampling, global map has 26598870 points. 
+[ INFO] [1713771510.277145144]:  Before the second downsampling, global map has 151843 dynamic points in ground truth. 
+
+[ INFO] [1713771510.283385539]:  Downsampling leaf size is 0.05 m.
+
+[ INFO] [1713771516.834291792]:  After the second downsampling, global map has 12018314 points. 
+[ INFO] [1713771516.834336986]:  After the second downsampling, global map has 132009 dynamic points in ground truth. 
+
+[ INFO] [1713771520.135955878]:  -- the original pointcloud is saved : /home/ubuntu/yn/SLAM/Dynamic_Object_Removing/Result/Removert/removert/PCD/PCD_keyframe_gap_1/PCD_origin_rb/map_compare/OriginalNoisyMapGlobal.pcd
+
+[ INFO] [1713771520.136070239]:  ----------------------- Preprocessing is done.  -----------------------
+</code></pre>
+<p><br />
+将其全局点云数量和具有真实动态标签的点云数量的变化绘制成表格如下所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">keyframe_gap = 1</th>
+<th style="text-align: center">dynamic_size</th>
+<th style="text-align: center">global_size</th>
+<th style="text-align: center">dynamic_ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left">before first downsapling</td>
+<td style="text-align: center">214,701</td>
+<td style="text-align: center">36,596,019</td>
+<td style="text-align: center">0.5867%</td>
+</tr>
+<tr>
+<td style="text-align: left">after first downsapling</td>
+<td style="text-align: center">151,843</td>
+<td style="text-align: center">26,598,870</td>
+<td style="text-align: center">0.5709%</td>
+</tr>
+<tr>
+<td style="text-align: left">first reduction ratio</td>
+<td style="text-align: center">-29.28%</td>
+<td style="text-align: center">-27.32%</td>
+<td style="text-align: center"></td>
+</tr>
+<tr>
+<td style="text-align: left">before second downsapling</td>
+<td style="text-align: center">151,843</td>
+<td style="text-align: center">26,598,870</td>
+<td style="text-align: center">0.5709%</td>
+</tr>
+<tr>
+<td style="text-align: left">after second downsapling</td>
+<td style="text-align: center">132,009</td>
+<td style="text-align: center">12,018,314</td>
+<td style="text-align: center">1.0984%</td>
+</tr>
+<tr>
+<td style="text-align: left">second reduction ratio</td>
+<td style="text-align: center">-13.06%</td>
+<td style="text-align: center">-54.82%</td>
+<td style="text-align: center"></td>
+</tr>
+<tr>
+<td style="text-align: left">overall reduction ratio</td>
+<td style="text-align: center">-38.51%</td>
+<td style="text-align: center">-67.16%</td>
+<td style="text-align: center"></td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，经过这两次下采样后，变化如下：</p>
+<ol>
+<li>动态点云数量总共减少38.51%，而全局点云数量总共减少了67.16%；</li>
+<li>动态点云在全局点云中的占比由0.5867%提升到1.0984%，占比较原来提高了87.2166%；</li>
+</ol>
+<p>因此可以得出结论：这两次下采样对于衡量动态去除建图效果是有意义的，因为该操作成功的增加了动态点所占的比例。</p>
+<h4><a id="keyframe-gap-5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>keyframe_gap = 5</h4>
+<p>接着我们为了证明上一节中的<code>use_keyframe_gap_</code>对点云数量的改变具有最关键的意义，我们采用<code>keyframe_gap = 5</code>来做对比，表示每隔5帧才会选择1帧存储其数据，命令行显示如下：</p>
+<pre><code class="language-shell">[ INFO] [1713776960.666021233]:  ----------------------- Preprocessing is beginning.  -----------------------
+
+[ INFO] [1713776960.666048937]:  Total 59 nodes are used from the index range [1300, 1600] (every 5 frames parsed)
+[ INFO] [1713776961.475657939]:  Before the first downsampling, global map has 7412921 points. 
+[ INFO] [1713776961.475686804]:  Before the first downsampling, global map has 41292 dynamic points in ground truth. 
+
+[ INFO] [1713776961.475716265]:  Downsampling leaf size is 0.05 m.
+
+[ INFO] [1713776961.475727876]:  After the first downsampling, global map has 5407162 points. 
+[ INFO] [1713776961.475735053]:  After the first downsampling, global map has 29003 dynamic points in ground truth. 
+
+
+[ INFO] [1713776961.699694925]:  Before the second downsampling, global map has 5407162 points. 
+[ INFO] [1713776961.699727419]:  Before the second downsampling, global map has 29003 dynamic points in ground truth. 
+
+[ INFO] [1713776961.699739889]:  Downsampling leaf size is 0.05 m.
+
+[ INFO] [1713776963.222543473]:  After the second downsampling, global map has 4114712 points. 
+[ INFO] [1713776963.222577451]:  After the second downsampling, global map has 26832 dynamic points in ground truth. 
+
+[ INFO] [1713776964.349467538]:  -- the original pointcloud is saved : /home/ubuntu/yn/SLAM/Dynamic_Object_Removing/Result/Removert/removert/PCD/PCD_keyframe_gap_1/PCD_origin_rb/map_compare/OriginalNoisyMapGlobal.pcd
+
+[ INFO] [1713776964.349589569]:  ----------------------- Preprocessing is done.  -----------------------
+</code></pre>
+<p><br />
+将其全局点云数量和具有真实动态标签的点云数量的变化绘制成表格如下所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left">keyframe_gap = 5</th>
+<th style="text-align: center">dynamic_size</th>
+<th style="text-align: center">global_size</th>
+<th style="text-align: center">dynamic_ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left">before first downsapling</td>
+<td style="text-align: center">41,292</td>
+<td style="text-align: center">7,412,921</td>
+<td style="text-align: center">0.557%</td>
+</tr>
+<tr>
+<td style="text-align: left">after first downsapling</td>
+<td style="text-align: center">29,003</td>
+<td style="text-align: center">5,407,162</td>
+<td style="text-align: center">0.5364%</td>
+</tr>
+<tr>
+<td style="text-align: left">first reduction ratio</td>
+<td style="text-align: center">-29.76%</td>
+<td style="text-align: center">-27.06%</td>
+<td style="text-align: center"></td>
+</tr>
+<tr>
+<td style="text-align: left">before second downsapling</td>
+<td style="text-align: center">29,003</td>
+<td style="text-align: center">5,407,162</td>
+<td style="text-align: center">0.5364%</td>
+</tr>
+<tr>
+<td style="text-align: left">after second downsapling</td>
+<td style="text-align: center">26,832</td>
+<td style="text-align: center">4,114,712</td>
+<td style="text-align: center">0.652%</td>
+</tr>
+<tr>
+<td style="text-align: left">second reduction ratio</td>
+<td style="text-align: center">-7.49%</td>
+<td style="text-align: center">-23.9%</td>
+<td style="text-align: center"></td>
+</tr>
+<tr>
+<td style="text-align: left">overall reduction ratio</td>
+<td style="text-align: center">-35.02%</td>
+<td style="text-align: center">-44.49%</td>
+<td style="text-align: center"></td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，经过这两次下采样后，变化如下：</p>
+<ol>
+<li>动态点云数量总共减少35.02%，而全局点云数量总共减少了44.49%；</li>
+<li>动态点云在全局点云中的占比由0.557%提升到0.652%，占比较原来提高了17.0557%；</li>
+</ol>
+<p>因此可以得出结论：对于<code>keyframe_gap = 5</code>来讲，这两次下采样对于衡量动态去除建图效果同样是有意义的。</p>
+<h4><a id="3-3-3-dynamic-ratio-with-different-keyframe-gap" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.3.3 Dynamic Ratio with Different Keyframe Gap</h4>
+<p>接着我们分别测试了<code>keyframe_gap = 2</code>和<code>keyframe_gap = 3</code>时，动态点云占比的情况，最终作图得到当<code>keyframe_gap = 1, 2, 3, 5</code>时，下采样前后动态点云占比的变化扇形图：</p>
+<div style="text-align: center">
+<img src="media/17134976893094/4-1.jpg"/>
+<p>图 3 Dynamic Ratio with Downsampling in Different keyframe_gap</p>
+</div>
+<p>通过该图可以看到，当<code>keyframe_gap</code>越小时，经过下采样后，动态点云在原始点云中占的比例越高。我们推测这是因为<code>keyframe_gap</code>越小，代表采用的帧的数量就会更多，而在SemanticKittic数据集上，或者通常情况下的室外数据集上，在任何一帧中，静态点云的数量都是远远大于动态点云的数量的，因此选择的帧越多，静态点云增加的数量会远大于动态点云增加的数量，同时其静态点云增长的速度也远大于动态点云增长的速度。因此在进行下采样操作时，对于越小的<code>keyframe_gap</code>，其静态点云数量在该操作中损失的比例要远大于动态点云数量损失的比例，因此会造成动态点云的比例在下采样后变得更高了。</p>
+<p>因此在后续的测试模块，我们会选择一些较小的<code>keyframe_gap</code>，评估选用不同的<code>keyframe_gap</code>和<code>grid_size</code>，究竟对动态点剔除会造成什么影响。</p>
+<h2><a id="4-evaluation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4. Evaluation</h2>
+<p>在设计了指标后，分别得到<code>keyframe_gap = 1, 2, 3, 5</code>时，<code>grid_size = none, 0.5, 1, 3, 5</code>时的表现。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">grid_size</th>
+<th style="text-align: center">none</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+<th style="text-align: center">5</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+<th style="text-align: center">3</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+<th style="text-align: center">1</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+<th style="text-align: center">0.5</th>
+<th style="text-align: center"></th>
+<th style="text-align: center"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">keyframe_gap</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFRN</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFRN</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFRN</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFRN</td>
+<td style="text-align: center">CDR</td>
+<td style="text-align: center">CMR</td>
+<td style="text-align: center">DFRN</td>
+</tr>
+<tr>
+<td style="text-align: center">5</td>
+<td style="text-align: center">0.909101</td>
+<td style="text-align: center">0.076869</td>
+<td style="text-align: center">0.0771213</td>
+<td style="text-align: center">0.858751</td>
+<td style="text-align: center">0.0585932</td>
+<td style="text-align: center">0.0955727</td>
+<td style="text-align: center">0.873621</td>
+<td style="text-align: center">0.0564844</td>
+<td style="text-align: center">0.100858</td>
+<td style="text-align: center">0.837657</td>
+<td style="text-align: center">0.0514765</td>
+<td style="text-align: center">0.106113</td>
+<td style="text-align: center">0.811829</td>
+<td style="text-align: center">0.0479616</td>
+<td style="text-align: center">0.110379</td>
+</tr>
+<tr>
+<td style="text-align: center">3</td>
+<td style="text-align: center">0.918363</td>
+<td style="text-align: center">0.0906455</td>
+<td style="text-align: center">0.0803497</td>
+<td style="text-align: center">0.884408</td>
+<td style="text-align: center">0.0694274</td>
+<td style="text-align: center">0.101027</td>
+<td style="text-align: center">0.887709</td>
+<td style="text-align: center">0.065784</td>
+<td style="text-align: center">0.10702</td>
+<td style="text-align: center">0.856551</td>
+<td style="text-align: center">0.0592763</td>
+<td style="text-align: center">0.114601</td>
+<td style="text-align: center">0.83519</td>
+<td style="text-align: center">0.0545808</td>
+<td style="text-align: center">0.121356</td>
+</tr>
+<tr>
+<td style="text-align: center">2</td>
+<td style="text-align: center">0.930192</td>
+<td style="text-align: center">0.10071</td>
+<td style="text-align: center">0.0796445</td>
+<td style="text-align: center">0.882381</td>
+<td style="text-align: center">0.0771943</td>
+<td style="text-align: center">0.0985658</td>
+<td style="text-align: center">0.894217</td>
+<td style="text-align: center">0.0729111</td>
+<td style="text-align: center">0.105756</td>
+<td style="text-align: center">0.875408</td>
+<td style="text-align: center">0.0658658</td>
+<td style="text-align: center">0.114606</td>
+<td style="text-align: center">0.851648</td>
+<td style="text-align: center">0.0600033</td>
+<td style="text-align: center">0.122388</td>
+</tr>
+<tr>
+<td style="text-align: center">1</td>
+<td style="text-align: center">0.926717</td>
+<td style="text-align: center">0.117238</td>
+<td style="text-align: center">0.0868236</td>
+<td style="text-align: center">0.867911</td>
+<td style="text-align: center">0.0869968</td>
+<td style="text-align: center">0.10958</td>
+<td style="text-align: center">0.897969</td>
+<td style="text-align: center">0.0842277</td>
+<td style="text-align: center">0.117103</td>
+<td style="text-align: center">0.876675</td>
+<td style="text-align: center">0.0756211</td>
+<td style="text-align: center">0.127337</td>
+<td style="text-align: center">0.838375</td>
+<td style="text-align: center">0.0686869</td>
+<td style="text-align: center">0.134068</td>
+</tr>
+</tbody>
+</table>
 
                   </article>
                   <div class="comments-wrap">
