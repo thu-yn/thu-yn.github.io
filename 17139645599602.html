@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    Pointcloud in Transformer - Prepare for the FUTURE
+    Word Embedding - Prepare for the FUTURE
     
     </title>
     
@@ -67,122 +67,97 @@
             </nav>
       </div>
 
- 
- <div class="hero-body ct-body">
-    <div class="container">
-          <h1 class="title-only">
-                <span>#Pointcloud in Transformer</span>
-          </h1>
-    </div>
-  </div>
-</section>
-<section class="ct-body">
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
       <div class="container">
-          <div class="columns is-variable bd-klmn-columns is-4">
-              <div class="column is-two-thirds">
-               <div class="post-body">
-                  <div class="card archives">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
                     
-                    
-                        
-                       <div class="card-content">
-                         <div class="content">
-                          <a href="17129107819642.html">
-                            <h2 class="title">CT3D: Improving 3D Object Detection with Channel-wise Transformer</h2>
-                          </a>
-                             <p class="des">
-                             <span class="date">2024/04/12</span>
-                              
-                                     
-                             
-                                  
-                              <span class="tran-tags">Tags:</span>&nbsp;
-                              
-                                <a href='tag_Pointcloud%20in%20Transformer.html'>#Pointcloud in Transformer</a>
-                                
-                           </p>
-                          </div>
-                       </div>
-                    
-                    
-                        
-                       <div class="card-content">
-                         <div class="content">
-                          <a href="17119019748705.html">
-                            <h2 class="title">Pointcloud in Transfromer: A Survey</h2>
-                          </a>
-                             <p class="des">
-                             <span class="date">2024/04/01</span>
-                              
-                                     
-                             
-                                  
-                              <span class="tran-tags">Tags:</span>&nbsp;
-                              
-                                <a href='tag_Pointcloud%20in%20Transformer.html'>#Pointcloud in Transformer</a>
-                                
-                           </p>
-                          </div>
-                       </div>
+                    <h1 class="title">
+                            Word Embedding   
+                      </h1>
                      
-          </div><!-- end card -->
-        </div><!-- end post body -->
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/24</span>
+                                  
+                                         
+                                  
 
-              </div><!-- end column -->
-              <div class="column">
-                    <div class="card">
-                      <header class="card-header">
-                        <p class="card-header-title">
-                           <span class="tran-site-categories">Categories</span> 
-                        </p>
-                     
-                      </header>
-                      <div class="card-content site-categories">
-                        <div class="content"> 
-                          <ul>
-                          
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
                                   
-                                </li> 
-                          
-                          </ul>
-                        </div>
-                      </div>
-                     
+                                    <a class="tag is-link is-light" href='tag_LLM.html'>#LLM</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
                     </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <h2><a id="1-one-hot%E5%90%91%E9%87%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 one-hot向量</h2>
+<ol>
+<li>每个词用一个长度为词典大小的向量表示，该词的索引处为1，其余均为0；</li>
+<li>相同的词距离为0，其余情况距离均为1；</li>
+<li>若词典较大，则one-hot是一个高维稀疏向量。</li>
+</ol>
+<h2><a id="2-n-gram%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 N-gram语言模型</h2>
+<h3><a id="2-1%E5%AE%9A%E4%B9%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.1 定义</h3>
+<p>根据给定词序列，限定当前词的概率值依赖于之前N-1个词，给出该序列定义如下：</p>
+<p>\( \begin{align}  P(w) = \prod ^K _{k = 1} P(w_k | w_{k - 1}, ... , w_{k - N + 1}) \tag {1} \end{align}\)</p>
+<p>并用困惑度Perplexity描述语言模型的好坏：</p>
+<p>\( \begin{align*}  H &amp;= -\lim _{k \to \infty} \frac {1} {K} \log_2 P(w_1, ..., w_k) \\ &amp; \approx \frac {1} {K} \sum ^K _{k = 1} \log _2 P(w_k | w_{k - 1}, ... , w_{k - N + 1}) \tag {2} \end{align*}\)</p>
+<h3><a id="2-2%E9%97%AE%E9%A2%98" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 问题</h3>
+<p><strong>1.</strong> 数据的稀疏性：若多个单词没有在训练数据中一起出现过，则概率为0，然而并不代表其构成不合理。</p>
+<p>改进：采用数据平滑的方式，通过打折（概率分配）或回退（(N-1)-gram)来改进最大似然估计。</p>
+<p><strong>2.</strong> N不能太大，否则N-gram存储得过多，很难考虑长距离的依赖。</p>
+<p>改进：RNN/LSTM/GRU</p>
+<p><strong>3.</strong> 泛化能力差</p>
+<h2><a id="3%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 神经网络语言模型</h2>
+<p><img src="media/17139645599602/17139653818870.jpg" alt="" /></p>
+<p>look-up table等价于将one-hot向量与一个神经网络可学习的Embedding矩阵相乘。</p>
+<p>缺陷：训练较慢。</p>
+<h2><a id="4-word2vec" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 Word2Vec</h2>
+<h3><a id="4-1%E5%81%87%E8%AE%BE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1 假设</h3>
+<p>若两个词的上下文相似，这两个词的语义就相似。</p>
+<p>基于统计方法获得词向量。</p>
+<h3><a id="4-2-cbow" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.2 CBoW</h3>
+<p>用一个词的上下文来预测这个词。</p>
+<p><img src="media/17139645599602/17139654519234.jpg" alt="" /></p>
+<p>两个全连接构成，W和W'为可学习参数矩阵。</p>
+<h3><a id="4-3-skip-gram" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.3 Skip-Gram</h3>
+<p>用一个词来预测他的上下文。</p>
+<p><img src="media/17139645599602/17139654812001.jpg" alt="" /></p>
 
-                    <div class="card">
-                        <header class="card-header">
-                          <p class="card-header-title">
-                              <span class="tran-site-tags">Tags</span> 
-                          </p>
-                       
-                        </header>
-                        <div class="card-content site-tags">
-                          <div class="content">
-                           <div class="tags">
-                            
-                              <a class="tag is-link is-light" href="tag_Auxiliary.html">#Auxiliary</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Dynamic%20Object%20Removal.html">#Dynamic Object Removal</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_LLM.html">#LLM</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Pointcloud%20in%20Transformer.html">#Pointcloud in Transformer</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Reproduction.html">#Reproduction</a> 
-                            
-                           </div>
-                             
-                          </div>
-                        </div>
-                       
-                      </div>
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
               </div>
-            </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
 
-          
-      </div>
-    </section>    <footer class="footer">
+
+
+    <footer class="footer">
         <div class="content has-text-centered">
           <p>
               Copyright &copy; 2019

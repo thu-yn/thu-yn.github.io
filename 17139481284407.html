@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    BERT - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            BERT   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/24</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_LLM.html'>#LLM</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <h2><a id="1%E7%BB%93%E6%9E%84%E6%A1%86%E6%9E%B6%E5%9B%BE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 结构框架图</h2>
+<p>Encoder-only 结构：利用 Transformer 结构构造了一个多层双向的 encoder 网络。</p>
+<blockquote>
+<p>为什么是双向？<br />
+因为 bert 相当于只用了 transformer 的 encoder 结构，而在 encoder 过程中，网络通过自注意力机制可以学习到输入单词序列中任意两个单词之间的关系，因此是双向的。</p>
+</blockquote>
+<blockquote>
+<p>两种输出：<br />
+pooler output：对应 [CLS] 的输出，可以用于分类 / 回归任务。<br />
+sequence output：对应序列所有字的最后一层 hidden 输出，可以用于序列任务。</p>
+</blockquote>
+<p><img src="media/17139481284407/17139482837690.jpg" alt="" /></p>
+<p>框架：Pre-training + Fine-tuning</p>
+<ul>
+<li>预训练：预先训练的一个模型或指预先训练模型的过程。</li>
+<li>微调：将预训练过的模型作用于自己的数据集，并使参数适应自己的数据集的过程。</li>
+</ul>
+<p>作用：相对于从头开始训练，省去大量计算资源和计算时间，减少了因为自己数据质量数量较差导致的过拟合风险。</p>
+<h2><a id="2%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 框架实现</h2>
+<h3><a id="2-1%E8%BE%93%E5%85%A5%E5%B1%82" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.1 输入层</h3>
+<p><img src="media/17139481284407/17139484814612.jpg" alt="" /></p>
+<ol>
+<li>
+<p>输入被改造为：[CLS]+seq_A(+[SEP]+seq_B+[SEP])</p>
+</li>
+<li>
+<p>三个 Embedding：</p>
+</li>
+<li>
+<p>Token Embedding：将词语转化为对应的向量表示。</p>
+</li>
+<li>
+<p>Segment Embedding：需要对不同的句子组合进行分类。</p>
+</li>
+<li>
+<p>Position Embedding：用随机生成且可训练的向量来进行位置编码。</p>
+</li>
+<li>
+<p>将三个编码相加得到最终的输入。</p>
+</li>
+</ol>
+<h3><a id="2-2%E4%B8%AD%E9%97%B4%E5%B1%82" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 中间层</h3>
+<p>与 Tranformer 的 encoder 层一样。包括 Self-attention、Add&amp;Norm 和 FeedForward。</p>
+<p><img src="media/17139481284407/17139487103658.jpg" alt="" /></p>
+<h3><a id="2-3%E8%BE%93%E5%87%BA%E5%B1%82" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3 输出层</h3>
+<p>两类输出，对应两类任务。</p>
+<p><img src="media/17139481284407/17139487682121.jpg" alt="" /></p>
+<h2><a id="3-pretraining%E7%9A%84%E4%B8%A4%E4%B8%AA-mask" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 Pretraining 的两个 Mask</h2>
+<h3><a id="3-1-mask-language-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.1  Mask Language Model</h3>
+<p>随机 mask 输入的几个词，然后预测它们。</p>
+<p>问题：在 Fine tuning 阶段并没有 [MASK] 这个 token，导致预训练和微调不匹配。</p>
+<p>措施：对于 15% 被 mask 的 tokens：</p>
+<ol>
+<li>80% 替换为[MASK]</li>
+<li>10% 替换为随机的 token</li>
+<li>10% 保持不变</li>
+</ol>
+<p><img src="media/17139481284407/17139489307463.jpg" alt="" /></p>
+<h3><a id="3-2-next-sentence-order" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.2 Next Sentence Order</h3>
+<p>预测下一句是否和上一句话有关。</p>
+<p>对于 A 句和 B 句：</p>
+<ol>
+<li>50% 概率是上下句，不变；</li>
+<li>50% 概率不是上下句的，从其他的文档中，加入新的连续句子作为 B。</li>
+</ol>
+<h2><a id="4-fine-tuning%E7%9A%84%E5%9B%9B%E4%B8%AA-task" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 Fine-tuning 的四个 Task</h2>
+<ol>
+<li>句子对分类任务；</li>
+<li>单句子分类任务；</li>
+<li>问答任务；</li>
+<li>命名实体识别任务。</li>
+</ol>
+<h2><a id="5%E6%94%B9%E8%BF%9B%E6%8E%AA%E6%96%BD" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 改进措施</h2>
+<p>针对模型大、训练慢，采取以下几个措施进行缓解：</p>
+<h3><a id="5-1%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E2%80%94%E2%80%94%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1 模型压缩——知识蒸馏</h3>
+<h4><a id="5-1-1%E5%90%AB%E4%B9%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1.1 含义</h4>
+<p>基于“教师 - 学生网络思想”：将已经训练好的模型包含的知识，蒸馏提取到另一个模型里面去。</p>
+<ul>
+<li>原始 teacher 模型 (Net-T) 训练，模型复杂。要求：对于输入 X，可以输出 Y</li>
+<li>精简 student 模型 (Net-S) 训练，模型简单。要求：对于输入 X，都能输出 Y</li>
+</ul>
+<h4><a id="5-1-2%E7%90%86%E8%AE%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1.2 理论</h4>
+<p>**5.1.2.1 迁移泛化能力 **</p>
+<p>使用 Softmax 层输出的类别的概率作为“soft target&quot;：</p>
+<ul>
+<li>
+<p>传统的训练过程中，模型只选择 Softmax 输出的最大概率标签进行训练，称为 hard target。最大概率对应的称为正标签，其余均为负标签，此时模型只关注正标签的信息。</p>
+</li>
+<li>
+<p>知识蒸馏的训练过程中，模型选择更多 Softmax 输出的标签进行训练，称为 soft target，此时模型也会关注更多的负标签的信息。</p>
+</li>
+</ul>
+<p>该训练方式使得每个样本给 student 模型带来的信息量大于传统的训练方式。</p>
+<p>**5.1.2.2 Softmax 公式表示 **</p>
+<p>传统 softmax：</p>
+<p>\( \begin{align}  q_i = \frac {\exp (z_i)} {\sum _j  \exp(z_j)} \end{align}\)</p>
+<ul>
+<li>若输出概率分布熵较小，则负标签的值很接近 0，此时无法很好的被学习。</li>
+</ul>
+<p>知识蒸馏 softmax：</p>
+<p>\( \begin{align}  q_i = \frac {\exp (z_i / T)} {\sum _j  \exp(z_j / T)} \end{align}\)</p>
+<ul>
+<li>增加温度变量 T，T&gt;=1。</li>
+<li>T 越高，输出概率分布越平滑，其熵越大，负标签携带的信息相应的放大，使得模型训练更加关注负标签。</li>
+</ul>
+<p>思考：温度 T 决定 Net-S 训练过程中对负标签的关注程度；当 Net-S 参数量比较小时，用相对较低的温度就可以 work。</p>
+<p>**5.1.2.3 具体实现方法 **</p>
+<p>过程：</p>
+<ol>
+<li>
+<p>训练教师网络 Net_T;</p>
+</li>
+<li>
+<p>在温度 T 下，将 Net_T 的知识蒸馏到学生网络 Net_s 上。</p>
+<ol>
+<li>用 T=t 的 Net-T 得到标签 soft labels，用 T=t 的 Net-S 得到预测 soft preditions，用 soft label 和 soft predictions 计算交叉熵损失函数，得到 Loss soft：\(L_{soft} = - \sum ^{N} _{j} p^T_j \log (q^T_j)\)， 其中 \(p^T_i = \frac {\exp (v_i / T)} {\sum ^N _k \exp (v_k / T)},  q^T_i = \frac {\exp (z_i / T)} {\sum ^N _k \exp (z_k / T)}\)</li>
+<li>用 ground truth 得到标签 hard labels，用 T=1 的 Net-S 得到预测 hard predictions，用 hard label 和 hard predictions 计算交叉熵损失函数，得到 Loss hard：\(L_{hard} = - \sum ^{N} _{j} c_j \log (q^1_j)\)， 其中 \(q^1_i = \frac {\exp (z_i)} {\sum ^N _k \exp (z_k)}\)</li>
+<li>得到高温蒸馏过程的目标函数 L：\( L = \alpha L_{soft} + \beta L_{hard}\)</li>
+</ol>
+</li>
+</ol>
+<blockquote>
+<p>需要 Loss hard 的原因：Net-T 也有一定的错误率，使用 ground truth 可以有效降低错误被传播给 Net-S 的可能。</p>
+</blockquote>
+<p>框架图：</p>
+<p><img src="media/17139481284407/17139607020616.jpg" alt="" /></p>
+<p>Trick：</p>
+<ol>
+<li>Loss hard 占比较小时，效果较好；</li>
+<li>Loss hard 是 Loss soft 的 T^2 倍。</li>
+</ol>
+<p><img src="media/17139481284407/17139607651611.jpg" alt="" /></p>
+<p>**5.1.2.3 另一种实现方法 **</p>
+<p>不经过 softmax 直接 match logits：直接使用 softmax 层的输入 logits 作为 soft targets，此时最小化目标函数是 Net-T 和 Net-S 的 logits 之间的平方差。</p>
+<p>\( \begin{align}  L'_{soft} = \frac {(z_i - v_i)^2} {2} \end{align}\)</p>
+<h3><a id="5-2%E9%87%87%E7%94%A8-lamb%E4%BC%98%E5%8C%96%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2 采用 LAMB 优化器</h3>
+<p>使模型可以使用更大的 batch_size。</p>
+<h4><a id="5-2-1%E4%BC%98%E5%8C%96%E5%99%A8%E5%9B%9E%E9%A1%BE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2.1 优化器回顾</h4>
+<p><strong>Adam</strong></p>
+<ul>
+<li>为每一个参数分配一个学习率，梯度较大的参数获得较低的学习率。</li>
+<li>收敛速度快，但是会存在参数过拟合（对前期特征过拟合，后期出现特征很难纠正），且后期可能无法较好收敛（学习率太低）。</li>
+</ul>
+<p><strong>AdamW</strong></p>
+<ul>
+<li>Adam 加上 L2 正则，限制参数值不可太大。但正则并非加到损失函数上，而是加到梯度更新最后一步。</li>
+</ul>
+<p><img src="media/17139481284407/17139619666082.jpg" alt="" /></p>
+<h4><a id="5-2-2-lamb" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2.2 LAMB</h4>
+<ul>
+<li>提出原因：在使用 Adam 或 AdamW 时，batch size 存在一个隐式上限，超过这个上限之后，模型会变得极难收敛。</li>
+<li>作用：在模型可以进行大批量数据训练时，还可以维持梯度更新的精度</li>
+<li>算法：见下图。</li>
+</ul>
+<p><img src="media/17139481284407/17139620591886.jpg" alt="" /></p>
+<h3><a id="5-3%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%AD%E7%BB%83" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.3 分布式训练</h3>
+<h3><a id="5-4%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.4 混合精度训练</h3>
+<h3><a id="5-5%E9%87%87%E7%94%A8-tensorrt%E5%8A%A0%E9%80%9F-gpu%E6%8E%A8%E7%90%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.5 采用 TensorRT 加速 GPU 推理</h3>
+<h3><a id="5-6%E6%94%B9%E8%BF%9B-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.6 改进 Transformer</h3>
+<p>google 推出的 REFORMER：将模型复杂度从 \(O(N^2)\) 降到 \(O(N \times \log N)\)</p>
+<h4><a id="5-6-1%E5%AF%B9%E6%AF%94" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.6.1 对比</h4>
+<p>传统 self-attention：</p>
+<p><img src="media/17139481284407/17139622132411.jpg" alt="" /></p>
+<p>改进 self-attention：</p>
+<p><img src="media/17139481284407/17139622266102.jpg" alt="" /></p>
+<h4><a id="5-6-2%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.6.2 技术方案</h4>
+<p><strong>1.</strong> 丢弃了 query 投影，将注意力权重替换为 key 的函数，即令 Q=K，节省了模型参数量。</p>
+<p><strong>2.</strong> 由于 Softmax 输出通常只由最大的某些元素决定，因此不用关注那些注意力权重很小的 token。即在计算 attention 的 Q*K 中，我们只需关注与 q_i 相近的 k_i 即可。</p>
+<p><strong>2.1</strong> 给定 q_i，找其最近邻的方法：LSH，局部敏感哈希。</p>
+<p>LSH 作用：常用来近似最近邻搜索，将高维空间中相近的向量以高概率分配到相同的哈希</p>
+<p>寻找流程：将输入向量投影到单位球面上，再应用一系列的旋转，最后找到每个旋转向量所属的切片。如下图所示：</p>
+<p><img src="media/17139481284407/17139623680365.jpg" alt="" /></p>
+<p><strong>2.2</strong> 具体实现</p>
+<p><img src="media/17139481284407/17139624050260.jpg" alt="" /></p>
+<p>流程</p>
+<ol>
+<li>对 Q=K 的输入向量，对其做 LSH bucketing，使得不同的向量在不同的 buckets 中；</li>
+<li>对不同 buckets 进行排序，同一个 buckets 中，按照 query 本来的顺序进行排序；</li>
+<li>对新序列进行 chunk 拆分，变成大小统一的 chunk；</li>
+<li>对每个 query，只管制自己以及自己之前的 chunk，对于这些候选集中相同 bucket 的 key 进行 attend。</li>
+</ol>
+<p><strong>3.</strong> 通过 RevNet，以一种特定的方式构造每一层，使内存使用与网络深度保持一致。</p>
+<p><img src="media/17139481284407/17139624714998.jpg" alt="" /></p>
+<p>效果：不需要我们记录中间层的 activations，而只需要我们储存最后一层的输出，从而通过模型的特定结构，反推出中间层的结果。使内存不会因为网络层数增加而增加。</p>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script>window.MathJax = {     tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } ,     startup: {     pageReady() {       return MathJax.startup.defaultPageReady().then(function () {          window.mweb_mathjax_ready_val = 'yes';          if(window.mweb_mathjax_ready !== undefined){ mweb_mathjax_ready(); }       });     }   }};document.addEventListener('DOMContentLoaded', function(event) {    if (typeof Prism != 'undefined') {         Prism.highlightAll();     }});window.mweb_mathjax_ready_val = '';function theMWebMathJaxRenderIsReady(key){ return window.mweb_mathjax_ready_val; }</script><script>window.MathJax = { tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } }; </script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>

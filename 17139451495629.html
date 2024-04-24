@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    Transformer - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            Transformer   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/24</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_LLM.html'>#LLM</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <h2><a id="%E6%A1%86%E6%9E%B6%E7%BB%93%E6%9E%84%E5%9B%BE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>框架结构图</h2>
+<p>Encoder-Decoder 结构。</p>
+<p><img src="media/17139451495629/17139452262400.jpg" alt="" /></p>
+<h2><a id="%E7%89%B9%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>特点</h2>
+<ul>
+<li>
+<p>完全通过注意力机制完成对源语言序列和目标语言序列全局依赖的建模。</p>
+</li>
+<li>
+<p>通过注意力机制，可以具有并行计算的能力（训练时有，推理时没有）。</p>
+</li>
+</ul>
+<h2><a id="%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>框架实现细节</h2>
+<h3><a id="1-embedding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. Embedding</h3>
+<h4><a id="1-1-word-embedding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.1 Word Embedding</h4>
+<ul>
+<li>
+<p>tokenizer 将单词转化为向量表示。</p>
+</li>
+<li>
+<p>size: [max_seq_len, d_model]，d_model 表示将每个单词映射到向量的维数。</p>
+</li>
+<li>
+<p>trick:  \(x = x \times \sqrt{(self.d\_model)}\)</p>
+<ul>
+<li>由于需要对词向量进行 L2norm 时会将词向量归一化，维度越大的向量，进行归一化后单独的值就越小，乘以该权重后，该归一化后的值的 scale 与位置编码的值差不多。</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-python"># word embedding
+# input size:   [seq_len, d_model]
+# output size:  [seq_len, d_model]
+class WordEmbedding(nn.Module):
+    def __init__(self, d_model, vocab_size, pad_idx):
+        super().__init__()
+        self.lut = nn.Embedding(vocab_size, d_model, pad_idx)
+        self.d_model = d_model
+
+    def forward(self, x):
+        # 原因：由于对词向量进行 L2norm 时会将向量的值归一化，维度越大的向量归一化后单个值越小，乘以该权重后，
+        # 与位置编码相加时大家的 scale 都差不多
+        return self.lut(x) * self.d_model ** 0.5
+</code></pre>
+<h4><a id="1-2-position-embedding" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.2 Position Embedding</h4>
+<p>1.2.1 Why</p>
+<p>Transformer 不再采用类似 RNN 或 LSTM 的基于循环的方式建模文本输入，序列中缺乏提示单词之间相对位置关系的信息</p>
+<p>1.2.2 How</p>
+<p>对每一个单词的位置构造一个向量，该向量会与 Word Embedding 对应相加，送入到后续模块中做进一步处理。</p>
+<p>构建 PE 矩阵来表示，pos 代表单词所在位置 2i 和 2i+1 代表位置编码向量中的对应维度，d 代表 d_model。</p>
+<p>\( \begin{align}  PE(pos, 2i) = \sin {(\frac {pos} {10000^{2i/d}})} \\ PE(pos, 2i + 1) = \cos{(\frac {pos} {10000^{2i/d}})} \end{align}\)</p>
+<p>选择正余弦函数的优势：</p>
+<ol>
+<li>首先确保每个维度的位置编码不同；</li>
+<li>范围在 [-1,1] 之间，与原词相加后不会使结果偏离过远，导致破坏原本单词的语义信息；</li>
+<li>利用三角函数基本性质，可以得到任意两个位置中，某一个位置的编码是另一个位置编码的线性组合，即可以包含单词之间的距离信息。</li>
+</ol>
+<p>代码实现</p>
+<pre><code class="language-python"># position embedding，本质是求二元函数 PE(pos,i)在 [0&lt;=pos&lt;=seqlen-1],[0&lt;=i&lt;=d_model-1] 时的函数值构成的矩阵
+# input size:   [batch_size, seq_len, d_model]
+# output size:  [batch_size, seq_len, d_model]
+class PositionalEncoding(nn.Module):
+    # max_seq_len：序列中有多少个词；d_model：每个词的向量的长度
+    def __init__(self, d_model, dropout, max_seq_len):
+        super().__init__()  # 调用父类的 init 方法
+        self.dropout = nn.Dropout(p=dropout)
+
+        assert d_model % 2 == 0
+
+        pos_seq = torch.linspace(0, max_seq_len - 1, max_seq_len)  # 生成 pos 的一维张量
+        i_seq = torch.linspace(0, d_model - 2, d_model // 2)  # 生成 i 的一维张量
+        # meshgrid 生成网格：对于输入的 pos_seq 和 i_seq，将 pos_seq 里的值均当作横坐标，i_seq 里的值均当作纵坐标进行网格化
+        # 返回的 pos 和 i_2 分别是网格后横坐标的 tensor 和纵坐标的 tensor，维度均变为[max_seq_len, d_model]
+        pos, i_2 = torch.meshgrid(pos_seq, i_seq)
+        pe_2i = torch.sin(pos / 10000 ** (i_2 / d_model))  # 生成 PE(pos, 2i)
+        pe_2i_1 = torch.cos(pos / 10000 ** (i_2 / d_model))  # 生成 PE(pos, 2i+1)
+        pe = torch.stack((pe_2i, pe_2i_1), 2).reshape(1, max_seq_len, d_model)
+
+        self.register_buffer('pe', pe, False)
+
+    # 以 batch 为单位处理，x 的 size 为[batch_size, seq_len, d_model]，即将一个批次中所有词向量与其位置编码相加
+    def forward(self, x):
+        batch_size, seq_len, d_model = x.shape
+        pe: torch.Tensor = self.pe
+        x += pe[:, 0:seq_len, :]
+        return self.dropout(x)
+</code></pre>
+<p><br />
+为何是相加而不是 concat？</p>
+<p><img src="media/17139451495629/17139457776574.jpg" alt="" /></p>
+<h3><a id="2-attention" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2. Attention</h3>
+<p>计算查询对象和被查询对象中每个信息的相关程度。</p>
+<p><img src="media/17139451495629/17139458413062.jpg" alt="" /></p>
+<h4><a id="2-1%E6%B5%81%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.1 流程</h4>
+<p>\( \begin{align}  Attention(Q,K,V) = Softmax(\frac {QK^T} {\sqrt {d}})V \end{align}\)</p>
+<ol>
+<li>
+<p>Query 与每一个 Key 计算相似性得到相似性评分 s；</p>
+</li>
+<li>
+<p>将 s 评分进行 softmax 转换成 [0,1] 之间的概率分布 a；</p>
+</li>
+<li>
+<p>将 [a1,a1,...,an] 作为权值矩阵对 Value 进行加权求和得到最后的 Attention 值。</p>
+</li>
+</ol>
+<blockquote>
+<p>trick: 除 \(\sqrt {d}\) 原因：假设 Q 和 K 均值为 0，方差为 1，则进行矩阵相乘后，\(S=Q*K^T\) 的均值为 0，方差为 d_model，当 d_model 较大时，S 中元素的方差也会很大，此时若经过 Softmax 层后，在数量级较大时，softmax 会将几乎全部的概率分布都分配给了最大值对应的标签，此时会导致在将来求梯度时，会产生梯度消失的情况。因此对 S 中元素均除 \(\sqrt {d}\) 后，其方差又变为 1，降低了梯度消失的可能性。</p>
+</blockquote>
+<h4><a id="2-2-self-attention" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 Self Attention</h4>
+<p>减少对外部信息的依赖，更擅长捕捉数据的内部相关性。</p>
+<p>由输入单词 \(w_i\) 经过 Embedding 后，分别与三个可学习的权重矩阵 \(W^Q,W^K,W^V\) 相乘得到其中的一个 \(q_i,k_i,v_i\)；再将所有单词分别得到的 \(q_i,k_i,v_i\) 相拼接得到最终的 \(Q,K,V\)。</p>
+<p>\(Q,K,V\) 的获得：</p>
+<p><img src="media/17139451495629/17139461609962.jpg" alt="" /></p>
+<p>\(Q * K^T\) 的获得：</p>
+<p><img src="media/17139451495629/17139461661358.jpg" alt="" /></p>
+<p>\(Attention\) 的获得：</p>
+<p><img src="media/17139451495629/17139461707026.jpg" alt="" /></p>
+<h4><a id="2-3-multi-head-attention" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3 Multi-head Attention</h4>
+<p>由于相关性有很多种不同的形式，一个 q 往往很难学习到所有层面上的相关性，因此需要有多组 QKV 进行学习。</p>
+<p>2.3.1 过程：</p>
+<p>上下文中每一个单词的表示 xi 经过多组线 \(W^Q_i, W^K_i, W^V_i\) 映射到不同的子空间中，最终将各个 \(Q_i、K_i、V_i\) 得到的 \(Attention_i\) 结果整合到一起，形成最终的 \(Attention\) 结果。</p>
+<p><img src="media/17139451495629/17139464367945.jpg" alt="" /></p>
+<p>2.3.2 代码实现：</p>
+<pre><code class="language-python"># 单头注意力机制，即计算 Multi-Attention(Q,K,V)
+def attention(q, k, v, mask: Optional[torch.Tensor] = None):
+    # q shape:[batch_size, num_heads, q_len, d_k]
+    # k shape:[batch_size, num_heads, k_len, d_k]
+    # v shape:[batch_size, num_heads, k_len, d_v]
+    assert q.shape[-1] == k.shape[-1]
+    d_k = k.shape[-1]
+    # temp shape:[batch_size, num_heads, q_len, k_len]
+    temp = torch.matmul(q, k.transpose(-2, -1)) / d_k ** 0.5
+    if mask is not None:
+        temp.masked_fill_(mask, MY_INF)     # 不能将 masked 的 value 设为 torch.inf，因为此时 softmax 会存在分母为 0 的情况
+    temp = F.softmax(temp, -1)
+    # output shape:[batch_size, num_heads, q_len, d_v]
+    output = torch.matmul(temp, v)
+    return output
+
+# output size:  [batch_size, seq_len, d_model]
+class MultiHeadAttention(nn.Module):
+    def __init__(self, num_heads, d_model, dropout):
+        super().__init__()
+        
+        assert d_model % num_heads == 0
+        self.d_model = d_model
+        self.heads = num_heads
+        self.d_k = d_model // num_heads     # q,k,v 变换空间后向量维数
+        self.q = nn.Linear(d_model, d_model)
+        self.k = nn.Linear(d_model, d_model)
+        self.v = nn.Linear(d_model, d_model)
+        self.out = nn.Linear(d_model, d_model)
+        self.dropout = nn.Dropout(p=dropout)
+
+    def forward(self, q, k, v, mask:Optional[torch.Tensor]=None):
+        assert q.shape[0] == k.shape[0]
+        assert q.shape[0] == v.shape[0]
+        assert k.shape[1] == v.shape[1]
+
+        n, q_len = q.shape[0:2]
+        n, k_len = k.shape[0:2]
+
+        # q:                [n, q_len, d_model]
+        # self.q(q):        [n, q_len, d_model]
+        # after reshape:    [n, q_len, self.heads, self.d_k]
+        # after transpose:  [n, self.heads, q_len, self.d_k] 
+        # 这里的 n 也即 batch_size，此时 q 可以输入进 attention，k 和 v 同理
+        q_ = self.q(q).reshape(n, q_len, self.heads, self.d_k).transpose(1, 2)
+        k_ = self.k(k).reshape(n, k_len, self.heads, self.d_k).transpose(1, 2)
+        v_ = self.v(v).reshape(n, k_len, self.heads, self.d_k).transpose(1, 2)
+
+        attn_res = attention(q_, k_, v_, mask)
+        # attn_res:         [n, num_heads, q_len, d_v]
+        # after transpose:  [n, q_len, num_heads, d_v]
+        # after reshape:    [n, q_len, d_model]
+        concat_res = attn_res.transpose(1, 2).reshape(n, q_len, self.d_model)
+        concat_res = self.dropout(concat_res)
+
+        output = self.out(concat_res)
+        return output
+</code></pre>
+<p>2.3.3 改进：</p>
+<ul>
+<li>
+<p>MQA：所有 head 的 query 对应一个 head 的 key 和 value，减少 KV Cache 所需缓存。</p>
+</li>
+<li>
+<p>GQA：某几个 head 的 query 对应一个 head 的 key 和 value，减少 KV Cache 所需缓存</p>
+</li>
+</ul>
+<h3><a id="3-feedforward" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3. FeedForward</h3>
+<p>本质是两层 mlp，先升维后降维。</p>
+<h4><a id="3-1%E5%85%AC%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.1 公式</h4>
+<p>\( \begin{align}  FFN(x) = Relu(xW_1+b_1)W_2 + b_2 \end{align}\)</p>
+<h4><a id="3-2%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.2 代码实现</h4>
+<pre><code class="language-python">class FeedForward(nn.Module):
+    def __init__(self, d_model, d_ff, dropout):
+        super().__init__()
+        self.layer1 = nn.Linear(d_model, d_ff)
+        self.dropout = nn.Dropout(p=dropout)
+        self.layer2 = nn.Linear(d_ff, d_model)
+    
+    def forward(self, x):
+        x = self.layer1(x)
+        x = self.dropout(F.relu(x))
+        x = self.layer2(x)
+        return x
+</code></pre>
+<h3><a id="4-add-norm" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4. Add &amp; Norm</h3>
+<h4><a id="4-1-residual-addation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1 Residual Addation</h4>
+<p>目的：使网络效果起码比没有时要好，也避免网络过深可能导致的梯度消失。</p>
+<p>\( \begin{align}  x^{l + 1} = f(x^l) + x^l \end{align}\)</p>
+<h4><a id="4-2-normalization" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.2 Normalization</h4>
+<p>目的：将数据平移缩放到均值为 0，方差为 1 的标准分布，可以缓解优化过程中的不稳定、数据收敛慢的问题。</p>
+<p>\( \begin{align}  LN(x) = \alpha · \frac {x - \mu} {\sigma} + b \end{align}\)</p>
+<p>Batch Norm：</p>
+<ul>
+<li>对一个 batch_size 内，所有样本的某一个特征做标准化，保留了不同样本的某一特征之间的可比性；</li>
+<li>适用于 CV，因为同一图像的不同特征之间关系较小，而不同图像的同一特征之间关系较大。</li>
+</ul>
+<p>Layer Norm：</p>
+<ul>
+<li>对一个 batch_size 内，某一样本的所有特征做标准化，保留了同一样本的不同特征之间的可比性；</li>
+<li>适用于 NLP，因为一句话中，某个词和上下文关系很大，而和别的句子中同一个词的关系较小。</li>
+</ul>
+<h3><a id="5-encoder" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5. Encoder</h3>
+<h4><a id="5-1-goal" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1 Goal</h4>
+<p>实现高级语义特征的提取。</p>
+<p><img src="media/17139451495629/17139469138514.jpg" alt="" /></p>
+<h4><a id="5-2-code" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2 Code</h4>
+<pre><code class="language-python">class EncoderLayer(nn.Module):
+    def __init__(self, num_heads, d_model, d_ff, dropout):
+        super().__init__()
+        self.self_attn = MultiHeadAttention(num_heads, d_model, dropout)
+        self.ffn = FeedForward(d_model, d_ff, dropout)
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
+        self.dropout1 = nn.Dropout(dropout)
+        self.dropout2 = nn.Dropout(dropout)
+
+    def forward(self, x, ec_mask:Optional[torch.Tensor]=None):
+        # construct-1
+        temp1 = self.self_attn(x, x, x, ec_mask)
+        temp1 = self.dropout1(temp1)
+        x = self.norm1(x + temp1)
+        # construct-2
+        temp2 = self.ffn(x)
+        temp2 = self.dropout2(temp2)
+        x = self.norm2(x + temp2)
+        return x
+        
+class Encoder(nn.Module):
+    def __init__(self, vocab_size, pad_idx, d_model, d_ff, n_layers, num_heads, dropout, max_seq_len):
+        super().__init__()
+        self.we = WordEmbedding(d_model, vocab_size, pad_idx)
+        self.pe = PositionalEncoding(d_model, dropout, max_seq_len)
+        self.layers = []
+        for i in range(n_layers):
+            self.layers.append(EncoderLayer(num_heads, d_model, d_ff, dropout))
+        self.layers = nn.ModuleList(self.layers)
+    
+    def forward(self, x, ec_mask:Optional[torch.Tensor]=None):
+        x = self.we(x)
+        x = self.pe(x)
+        for layer in self.layers:
+            x = layer(x, ec_mask)
+        return x
+</code></pre>
+<h3><a id="6-decoder" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6. Decoder</h3>
+<h4><a id="6-1-goal" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6.1 Goal</h4>
+<p>根据编码器的信息，推断对应的文本。</p>
+<p><img src="media/17139451495629/17139470162082.jpg" alt="" /></p>
+<p>相比于 encoder，多了一个和 encoder 输出之间的交叉注意力机制。在该机制中，query 是 decoder 前一层输出的投影，key 和 value 是 encoder 的输出进行的投影。</p>
+<p>作用：允许模型在生成输出序列时，将注意力集中在输入序列中的相关部分。</p>
+<h4><a id="6-2-code" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6.2 Code</h4>
+<pre><code class="language-python">class DecoderLayer(nn.Module):
+    def __init__(self, num_heads, d_model, d_ff, dropout):
+        super().__init__()
+        self.self_attn = MultiHeadAttention(num_heads, d_model, dropout)
+        self.cross_attn = MultiHeadAttention(num_heads, d_model, dropout)
+        self.ffn = FeedForward(d_model, d_ff, dropout)
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
+        self.norm3 = nn.LayerNorm(d_model)
+        self.dropout1 = nn.Dropout(dropout)
+        self.dropout2 = nn.Dropout(dropout)
+        self.dropout3 = nn.Dropout(dropout)
+    
+    def forward(self, x, encoder_kv, dc_mask:Optional[torch.Tensor]=None, ec_dc_mask:Optional[torch.Tensor]=None):
+        # construct-1
+        temp1 = self.self_attn(x, x, x, dc_mask)
+        temp1 = self.dropout1(temp1)
+        x = self.norm1(x + temp1)
+        # construct-2
+        temp2 = self.self_attn(x, encoder_kv, encoder_kv, ec_dc_mask)
+        temp2 = self.dropout2(temp2)
+        x = self.norm2(x + temp2)
+        # construct-3
+        temp3 = self.ffn(x)
+        temp3 = self.dropout3(temp3)
+        x = self.norm3(x + temp3)
+        return x
+
+class Decoder(nn.Module):
+    def __init__(self, vocab_size, pad_idx, d_model, d_ff, n_layers, num_heads, dropout, max_seq_len):
+        super().__init__()
+        self.we = WordEmbedding(d_model, vocab_size, pad_idx)
+        self.pe = PositionalEncoding(d_model, dropout, max_seq_len)
+        self.layers = []
+        for i in range(n_layers):
+            self.layers.append(DecoderLayer(num_heads, d_model, d_ff, dropout))
+        self.layers = nn.Sequential(*self.layers)
+    
+    def forward(self, x, encoder_kv, dc_mask:Optional[torch.Tensor]=None, ec_dc_mask:Optional[torch.Tensor]=None):
+        x = self.we(x)
+        x = self.pe(x)
+        for layer in self.layers:
+            x = layer(x, encoder_kv, dc_mask, ec_dc_mask)
+        return x
+</code></pre>
+<h3><a id="7-mask" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>7 Mask</h3>
+<h4><a id="7-1-encoder%E4%B8%AD-self-attention%E7%9A%84-mask" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>7.1 encoder 中 self-attention 的 mask</h4>
+<p>需要将同一个 batch 中所有的样本都 padding 到最长长度，同时使 attention 结果不受 padding 的影响。</p>
+<p>将 K 为 padding 时对应的 attention 权重设为 0，并在计算交叉熵损失的过程中设置 ignore_idx 将这部分的 loss 去掉。</p>
+<p>在得到 Q 和 K 的内积结果后，将 mask 的部分设置为一个很小的数，保证 softmax 后该部分的值趋于 0，影响最小。</p>
+<h4><a id="7-2-decoder%E4%B8%AD-self-attention%E7%9A%84-casual-mask" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>7.2 decoder 中 self-attention 的 casual mask</h4>
+<p>decoder 需要不断地通过自回归预测下一个生成的单词，因此仅有当前单词之前的目标语言序列是可以被观测的，添加该 mask 是为了掩盖后续的文本信息。</p>
+<h4><a id="7-3-decoder%E4%B8%AD-cross-attention%E7%9A%84-mask" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>7.3 decoder 中 cross-attention 的 mask</h4>
+<p>对于不应该计算注意力的位置进行 mask。</p>
+<h3><a id="8-transformer" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>8 Transformer</h3>
+<pre><code class="language-python">class Transformer(nn.Module):
+    def __init__(self, src_vocab_size, dst_vocab_size, pad_idx, d_model, d_ff, n_layers, num_heads, dropout, max_seq_len):
+        super().__init__()
+        self.encoder = Encoder(src_vocab_size, pad_idx, d_model, d_ff, n_layers, num_heads, dropout, max_seq_len)
+        self.decoder = Decoder(dst_vocab_size, pad_idx, d_model, d_ff, n_layers, num_heads, dropout, max_seq_len)
+        self.pad_idx = pad_idx
+        self.output_layer = nn.Linear(d_model, dst_vocab_size)
+    
+    def generate_mask(self, q_pad, k_pad, with_left_mask=False):
+        # q_pad's shape:[batch_size, q_len], k_pad's shape:[batch-size, k_len]
+        assert q_pad.device == k_pad.device
+        batch_size, q_len = q_pad.shape
+        batch_size, k_len = k_pad.shape
+        # mask's shape should be equal to the tensor's shape which before softmax in attention[batch_size, num_heads, q_len, k_len]
+        mask_shape = [batch_size, 1, q_len, k_len]
+        # 若并非解码器的 mask，就初始化为全 0 张量；否则为上三角为 0，其余为 1 的张量
+        if with_left_mask:
+            mask = 1 - torch.tril(torch.ones(mask_shape))
+        else:
+            mask = torch.zeros(mask_shape)
+        mask = mask.to(q_pad.device)
+        for i in range(batch_size):
+            mask[i, :, q_pad[i], :] = 1
+            mask[i, :, :, k_pad[i]] = 1
+        mask = mask.to(torch.bool)
+        return mask
+
+    def forward(self, x, y):
+        # 若张量 x 中的元素等于 pad_idx，则将 ec_pad_mask 中的对应元素的值设置为 True，否则为 False
+        ec_pad_mask = x == self.pad_idx
+        dc_pad_mask = y == self.pad_idx
+        ec_mask = self.generate_mask(ec_pad_mask, ec_pad_mask, False)
+        dc_mask = self.generate_mask(dc_pad_mask, dc_pad_mask, True)
+        ec_dc_mask = self.generate_mask(dc_pad_mask, ec_pad_mask, False)
+        encoder_kv = self.encoder(x, ec_mask)
+        res = self.decoder(y, encoder_kv, dc_mask, ec_dc_mask)
+        res = self.output_layer(res)
+        return res
+</code></pre>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script><script>!function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;var l=a.element.classList;if(l.contains('language-mermaid') || l.contains('language-echarts') || l.contains('language-plantuml')){return;} if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.css"><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><style>div.code-toolbar > .toolbar > .toolbar-item > a, div.code-toolbar > .toolbar > .toolbar-item > button, div.code-toolbar > .toolbar > .toolbar-item > span {padding: 4px .5em; background: #f5f2f0; background: rgba(224, 224, 224, 0.4);}</style><script>window.MathJax = {     tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } ,     startup: {     pageReady() {       return MathJax.startup.defaultPageReady().then(function () {          window.mweb_mathjax_ready_val = 'yes';          if(window.mweb_mathjax_ready !== undefined){ mweb_mathjax_ready(); }       });     }   }};document.addEventListener('DOMContentLoaded', function(event) {    if (typeof Prism != 'undefined') {         Prism.highlightAll();     }});window.mweb_mathjax_ready_val = '';function theMWebMathJaxRenderIsReady(key){ return window.mweb_mathjax_ready_val; }</script><script>window.MathJax = { tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } }; </script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    Pointcloud in Transformer - Prepare for the FUTURE
+    LLM Process - Prepare for the FUTURE
     
     </title>
     
@@ -67,122 +67,77 @@
             </nav>
       </div>
 
- 
- <div class="hero-body ct-body">
-    <div class="container">
-          <h1 class="title-only">
-                <span>#Pointcloud in Transformer</span>
-          </h1>
-    </div>
-  </div>
-</section>
-<section class="ct-body">
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
       <div class="container">
-          <div class="columns is-variable bd-klmn-columns is-4">
-              <div class="column is-two-thirds">
-               <div class="post-body">
-                  <div class="card archives">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
                     
-                    
-                        
-                       <div class="card-content">
-                         <div class="content">
-                          <a href="17129107819642.html">
-                            <h2 class="title">CT3D: Improving 3D Object Detection with Channel-wise Transformer</h2>
-                          </a>
-                             <p class="des">
-                             <span class="date">2024/04/12</span>
-                              
-                                     
-                             
-                                  
-                              <span class="tran-tags">Tags:</span>&nbsp;
-                              
-                                <a href='tag_Pointcloud%20in%20Transformer.html'>#Pointcloud in Transformer</a>
-                                
-                           </p>
-                          </div>
-                       </div>
-                    
-                    
-                        
-                       <div class="card-content">
-                         <div class="content">
-                          <a href="17119019748705.html">
-                            <h2 class="title">Pointcloud in Transfromer: A Survey</h2>
-                          </a>
-                             <p class="des">
-                             <span class="date">2024/04/01</span>
-                              
-                                     
-                             
-                                  
-                              <span class="tran-tags">Tags:</span>&nbsp;
-                              
-                                <a href='tag_Pointcloud%20in%20Transformer.html'>#Pointcloud in Transformer</a>
-                                
-                           </p>
-                          </div>
-                       </div>
+                    <h1 class="title">
+                            LLM Process   
+                      </h1>
                      
-          </div><!-- end card -->
-        </div><!-- end post body -->
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/24</span>
+                                  
+                                         
+                                  
 
-              </div><!-- end column -->
-              <div class="column">
-                    <div class="card">
-                      <header class="card-header">
-                        <p class="card-header-title">
-                           <span class="tran-site-categories">Categories</span> 
-                        </p>
-                     
-                      </header>
-                      <div class="card-content site-categories">
-                        <div class="content"> 
-                          <ul>
-                          
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
                                   
-                                </li> 
-                          
-                          </ul>
-                        </div>
-                      </div>
-                     
+                                    <a class="tag is-link is-light" href='tag_LLM.html'>#LLM</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
                     </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <h2><a id="%E6%9E%84%E5%BB%BA%E6%B5%81%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>构建流程</h2>
+<p><img src="media/17139441752638/17139442169128.jpg" alt="" /></p>
+<h4><a id="%E9%A2%84%E8%AE%AD%E7%BB%83%EF%BC%9A%E9%80%9A%E8%BF%87%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%EF%BC%8C%E6%9E%84%E5%BB%BA%E5%9F%BA%E7%A1%80%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8Bbase-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>预训练：通过海量数据，构建基础语言模型Base Model</h4>
+<p>Base模型构建长文本的建模能力，使模型有语言生成能力，根据输入的提示词Prompt，模型可以生成文本补全句子。</p>
+<p>难点：提升分布式计算效率；让模型训练稳定收敛。</p>
+<h4><a id="%E6%9C%89%E7%9B%91%E7%9D%A3%E5%BE%AE%E8%B0%83%EF%BC%9A%E9%80%9A%E8%BF%87%E5%B0%91%E9%87%8F%E9%AB%98%E8%B4%A8%E9%87%8F%E6%95%B0%E6%8D%AE%E9%9B%86%E5%90%88%EF%BC%88prompt%E8%BE%93%E5%87%BA%EF%BC%89%EF%BC%8C%E6%9E%84%E5%BB%BA%E6%9C%89%E7%9B%91%E7%9D%A3%E5%BE%AE%E8%B0%83%E6%A8%A1%E5%9E%8B-sft-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>有监督微调：通过少量高质量数据集合（Prompt+输出），构建有监督微调模型SFT Model</h4>
+<p>SFT模型具备初步的指令理解能力和上下文理解能力，具备初步的任务完成能力。</p>
+<p>难点：如何构造少量高质量的训练数据。</p>
+<h4><a id="%E5%A5%96%E5%8A%B1%E5%BB%BA%E6%A8%A1%EF%BC%9A%E5%AF%B9%E4%BA%8E%EF%BC%88%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%AF%B9%E6%AF%94%E6%95%B0%E6%8D%AE%E6%A0%87%E6%B3%A8%EF%BC%89%E5%90%8C%E4%B8%80%E4%B8%AAprompt%EF%BC%8Csft%E7%BB%99%E5%87%BA%E7%9A%84%E5%A4%9A%E4%B8%AA%E4%B8%8D%E5%90%8C%E8%BE%93%E5%87%BA%E7%BB%93%E6%9E%9C%E7%9A%84%E8%B4%A8%E9%87%8F%E8%BF%9B%E8%A1%8C%E6%8E%92%E5%BA%8F%EF%BC%8C%E6%9E%84%E5%BB%BA%E5%A5%96%E5%8A%B1%E6%A8%A1%E5%9E%8Breward-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>奖励建模：对于（大规模对比数据标注）同一个Prompt，SFT给出的多个不同输出结果的质量进行排序，构建奖励模型Reward Model</h4>
+<p>难点：标注工作量巨大；保持标注人员人员之间的一致性；奖励模型的泛化能力边界。</p>
+<h4><a id="%E5%A5%96%E5%8A%B1%E5%BB%BA%E6%A8%A1%EF%BC%9A%E5%AF%B9%E4%BA%8E%EF%BC%88%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%AF%B9%E6%AF%94%E6%95%B0%E6%8D%AE%E6%A0%87%E6%B3%A8%EF%BC%89%E5%90%8C%E4%B8%80%E4%B8%AAprompt%EF%BC%8Csft%E7%BB%99%E5%87%BA%E7%9A%84%E5%A4%9A%E4%B8%AA%E4%B8%8D%E5%90%8C%E8%BE%93%E5%87%BA%E7%BB%93%E6%9E%9C%E7%9A%84%E8%B4%A8%E9%87%8F%E8%BF%9B%E8%A1%8C%E6%8E%92%E5%BA%8F%EF%BC%8C%E6%9E%84%E5%BB%BA%E5%A5%96%E5%8A%B1%E6%A8%A1%E5%9E%8Breward-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>奖励建模：对于（大规模对比数据标注）同一个Prompt，SFT给出的多个不同输出结果的质量进行排序，构建奖励模型Reward Model</h4>
+<p>难点：标注工作量巨大；保持标注人员人员之间的一致性；奖励模型的泛化能力边界。</p>
+<h2><a id="" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a></h2>
 
-                    <div class="card">
-                        <header class="card-header">
-                          <p class="card-header-title">
-                              <span class="tran-site-tags">Tags</span> 
-                          </p>
-                       
-                        </header>
-                        <div class="card-content site-tags">
-                          <div class="content">
-                           <div class="tags">
-                            
-                              <a class="tag is-link is-light" href="tag_Auxiliary.html">#Auxiliary</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Dynamic%20Object%20Removal.html">#Dynamic Object Removal</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_LLM.html">#LLM</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Pointcloud%20in%20Transformer.html">#Pointcloud in Transformer</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Reproduction.html">#Reproduction</a> 
-                            
-                           </div>
-                             
-                          </div>
-                        </div>
-                       
-                      </div>
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
               </div>
-            </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
 
-          
-      </div>
-    </section>    <footer class="footer">
+
+
+    <footer class="footer">
         <div class="content has-text-centered">
           <p>
               Copyright &copy; 2019
@@ -274,7 +229,7 @@ div.code-toolbar > .toolbar > .toolbar-item > span:focus {
   color: inherit;
   text-decoration: none;
 }
-</style><script>window.MathJax = {     tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } ,     startup: {     pageReady() {       return MathJax.startup.defaultPageReady().then(function () {          window.mweb_mathjax_ready_val = 'yes';          if(window.mweb_mathjax_ready !== undefined){ mweb_mathjax_ready(); }       });     }   }};document.addEventListener('DOMContentLoaded', function(event) {    if (typeof Prism != 'undefined') {         Prism.highlightAll();     }});window.mweb_mathjax_ready_val = '';function theMWebMathJaxRenderIsReady(key){ return window.mweb_mathjax_ready_val; }</script><script>window.MathJax = { tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } }; </script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+</style>
 
 
   

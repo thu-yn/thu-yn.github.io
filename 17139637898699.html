@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    Pointcloud in Transformer - Prepare for the FUTURE
+    Base Optimizer - Prepare for the FUTURE
     
     </title>
     
@@ -67,122 +67,96 @@
             </nav>
       </div>
 
- 
- <div class="hero-body ct-body">
-    <div class="container">
-          <h1 class="title-only">
-                <span>#Pointcloud in Transformer</span>
-          </h1>
-    </div>
-  </div>
-</section>
-<section class="ct-body">
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
       <div class="container">
-          <div class="columns is-variable bd-klmn-columns is-4">
-              <div class="column is-two-thirds">
-               <div class="post-body">
-                  <div class="card archives">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
                     
-                    
-                        
-                       <div class="card-content">
-                         <div class="content">
-                          <a href="17129107819642.html">
-                            <h2 class="title">CT3D: Improving 3D Object Detection with Channel-wise Transformer</h2>
-                          </a>
-                             <p class="des">
-                             <span class="date">2024/04/12</span>
-                              
-                                     
-                             
-                                  
-                              <span class="tran-tags">Tags:</span>&nbsp;
-                              
-                                <a href='tag_Pointcloud%20in%20Transformer.html'>#Pointcloud in Transformer</a>
-                                
-                           </p>
-                          </div>
-                       </div>
-                    
-                    
-                        
-                       <div class="card-content">
-                         <div class="content">
-                          <a href="17119019748705.html">
-                            <h2 class="title">Pointcloud in Transfromer: A Survey</h2>
-                          </a>
-                             <p class="des">
-                             <span class="date">2024/04/01</span>
-                              
-                                     
-                             
-                                  
-                              <span class="tran-tags">Tags:</span>&nbsp;
-                              
-                                <a href='tag_Pointcloud%20in%20Transformer.html'>#Pointcloud in Transformer</a>
-                                
-                           </p>
-                          </div>
-                       </div>
+                    <h1 class="title">
+                            Base Optimizer   
+                      </h1>
                      
-          </div><!-- end card -->
-        </div><!-- end post body -->
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/24</span>
+                                  
+                                         
+                                  
 
-              </div><!-- end column -->
-              <div class="column">
-                    <div class="card">
-                      <header class="card-header">
-                        <p class="card-header-title">
-                           <span class="tran-site-categories">Categories</span> 
-                        </p>
-                     
-                      </header>
-                      <div class="card-content site-categories">
-                        <div class="content"> 
-                          <ul>
-                          
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
                                   
-                                </li> 
-                          
-                          </ul>
-                        </div>
-                      </div>
-                     
+                                    <a class="tag is-link is-light" href='tag_LLM.html'>#LLM</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
                     </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <p><strong>基础流程</strong></p>
+<p><img src="media/17139637898699/17139638095172.jpg" alt="" /></p>
+<h2><a id="1-sgd" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 SGD</h2>
+<p>没有动量概念：</p>
+<p>\( \begin{align}  m_t = g_t; V_t = I ^ 2\\ \eta _t = \alpha · g_t \end{align}\)</p>
+<p>方法最简单，但下降速度慢，可能会导致震荡，或停留在局部最优点。</p>
+<h2><a id="2-sgd-m" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 SGD-M</h2>
+<p>带有一阶动量概念的SGD：梯度不仅由当前决定，还由过去时刻的梯度决定。</p>
+<p>\( \begin{align}  m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t \end{align}\)</p>
+<p>其中\(\beta _1\)通常由经验设置为0.9。</p>
+<p>图示：</p>
+<p><img src="media/17139637898699/17139640673761.jpg" alt="" /></p>
+<p>但仍存在局部最优的问题。</p>
+<h2><a id="3-nag" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 NAG</h2>
+<p>SGD-M的改进，本质是考虑了二阶动量，因而更能加速收敛。</p>
+<p>\( \begin{align}  g_t = \nabla f (\omega _t - \alpha · m_{t - 1} / \sqrt {V_{t - 1}}) \end{align}\)</p>
+<p>图示：</p>
+<p><img src="media/17139637898699/17139641915827.jpg" alt="" /></p>
+<h2><a id="4-adagrad" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 AdaGrad</h2>
+<p>真正使用二阶动量，即过去所有梯度的平方和。</p>
+<p>\( \begin{align}  V _t = \sum ^t _{\tau = 1} g ^ 2 _{\tau}\\ \eta _t = \alpha · m_t / \sqrt {V_t} \end{align}\)</p>
+<p>二阶动量越大，学习率越低。学习率会单调递减至0，可能使训练过程提前结束。</p>
+<h2><a id="5-adadelta" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 AdaDelta</h2>
+<p>相较于考虑全局历史梯度、激进的AdaGrad，AdaDelta只考虑最近一段时间窗口下的历史梯度。</p>
+<p>\( \begin{align}  V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
+<p>可以避免训练过程提前结束。</p>
+<h2><a id="6-adam" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6 Adam</h2>
+<p>由SGD-M和AdaDelta结合而成，同时考虑一阶动量和二阶动量。</p>
+<p>\( \begin{align}  m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t\\ V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
+<h2><a id="7-nadam" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>7 Nadam</h2>
+<p>由Adam和NAG结合而成。</p>
+<p>\( \begin{align}  g_t = \nabla f (\omega _t - \alpha · m_{t - 1} / \sqrt {V_{t - 1}}) \\ m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t\\ V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
 
-                    <div class="card">
-                        <header class="card-header">
-                          <p class="card-header-title">
-                              <span class="tran-site-tags">Tags</span> 
-                          </p>
-                       
-                        </header>
-                        <div class="card-content site-tags">
-                          <div class="content">
-                           <div class="tags">
-                            
-                              <a class="tag is-link is-light" href="tag_Auxiliary.html">#Auxiliary</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Dynamic%20Object%20Removal.html">#Dynamic Object Removal</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_LLM.html">#LLM</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Pointcloud%20in%20Transformer.html">#Pointcloud in Transformer</a> 
-                            
-                              <a class="tag is-link is-light" href="tag_Reproduction.html">#Reproduction</a> 
-                            
-                           </div>
-                             
-                          </div>
-                        </div>
-                       
-                      </div>
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
               </div>
-            </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
 
-          
-      </div>
-    </section>    <footer class="footer">
+
+
+    <footer class="footer">
         <div class="content has-text-centered">
           <p>
               Copyright &copy; 2019
