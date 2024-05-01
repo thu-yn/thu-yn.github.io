@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    PEFT - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            PEFT   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/04/26</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_LLM.html'>#LLM</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <h2><a id="%E5%BC%95%E5%AD%90" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>引子</h2>
+<p>目前在 LLM 中存在一个范式：在一般领域的数据进行大规模预训练，再通过微调对特定任务或领域进行模型适应。</p>
+<p>随着预训练语言模型越来越大，存在以下问题：由于训练成本太高，不太可能重新训练所有模型参数。因此对于如何高效的微调，即 Parameter-Efficient Fine-Tuning，成为了很有研究意义的研究方向。</p>
+<h2><a id="1-lora" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 LoRA</h2>
+<h3><a id="1-1-intrinsic-dimension" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.1 Intrinsic Dimension</h3>
+<p>关于 ** 大模型内在维度 ** 的发现：大模型通常是过参数化的，其内在维度会比模型维度低，模型主要依赖其内在维度去做任务适配。</p>
+<p>因此，提出 <a href="https://arxiv.org/pdf/2106.09685" title="LORA">LoRA</a> 方法：低秩自适应的大模型微调。通过优化适应过程中密集层变化的秩分解矩阵，来间接训练网络中的一些密集层，同时保持预先训练的权重不变。</p>
+<h3><a id="1-2-method" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.2 Method</h3>
+<p>核心：冻结一个预训练模型的矩阵参数，采用低维矩阵进行替代，并在下游任务时只更新低维矩阵。</p>
+<div style="text-align: center">
+<img src="media/17141028694966/17141034326604.jpg"/>
+<p>图 1 LoRA Method</p>
+</div>
+<p>方法：</p>
+<ul>
+<li>在原始预训练语言模型 PLM 的旁边增加一个旁路，对输入数据进行先降维后升维的操作，来模拟所谓的 intrinsic rank。</li>
+<li>在训练时固定 PLM 的参数，只训练降维矩阵 \(A\) 和升维矩阵 \(B\)。其中 \(A\) 矩阵用均值为 0、方差为 \(\sigma ^2\) 的高斯分布进行初始化，\(B\) 矩阵用 \(0\) 矩阵进行初始化，保证训练开始时此旁路矩阵依然是 0 矩阵。</li>
+<li>模型的输入输出维度并不会改变，在输出时将原始 PLM 的输出与旁路矩阵输出相加。</li>
+</ul>
+<h3><a id="1-3-pipeline" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.3 Pipeline</h3>
+<p>在下游任务微调预训练语言模型时，更新预训练模型参数的公式如下：</p>
+<p>\( \begin{align}  h = W_0 x + \Delta Wx \end{align}\)</p>
+<p>其中 \(W_0\) 是预训练模型初始化的参数，\(\Delta W\) 是需要更新的参数，如果是全参数量微调，则 \(\Delta W = W_0\)。</p>
+<p>LoRA 训练更新公式表示如下：</p>
+<p>\( \begin{align}  h = W_0 x + \Delta Wx = W_0 x + BAx \end{align}\)</p>
+<p>在训练过程中，只需要微调 \(\Delta W\) 即可。假设初始化参数矩阵 \(W_0 \in \mathbb {R} ^{d \times k}\)，则 \(A\) 和 \(B\) 矩阵的维度分别为：\( A \in \mathbb {R} ^{d \times r},  B \in \mathbb {R} ^{r \times k}\)，在训练中只有 \(A\) 和 \(B\) 矩阵是训练参数。</p>
+<blockquote>
+<p>在推理过程中，LoRA 也几乎未引入额外的延迟，只需要计算 \(W = W_0 + \Delta W\) 即可。</p>
+</blockquote>
+<h2><a id="2-prefix-tuning" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 Prefix Tuning</h2>
+<h3><a id="2-1-motivation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.1 Motivation</h3>
+<p>针对传统的人工构造 prompt 模版方式进行了改进。</p>
+<p>由于之前的人工构建的 template 是离散的，对于不同的下游任务需要构建不同的模版；并且没有通用的标准去评价模版效果的优劣。</p>
+<p>因此 <a href="https://arxiv.org/pdf/2101.00190" title="Prefix-Tuning">prefix-tuning</a> 旨在创建一种连续的可学习的 template，将 prompt 转换为 virtual tokens embedding，并将其添加至输入中，作为输入的前缀。</p>
+<h3><a id="2-2-method" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.2 Method</h3>
+<p>prefix-tuning 通过在模型输入前添加一个连续的且任务特定的向量序列，称之为 prefix。在优化过程中，冻结 PLM 的所有参数，只更新优化特定任务的 prefix。</p>
+<div style="text-align: center">
+<img src="media/17141028694966/17141121685684.jpg"/>
+<p>图 2  Prefix-Tuning Method</p>
+</div>
+<p>本质：相当于微调后会训出一个固定的前缀向量。推理的时候输入的 token 向量化后会和这个前缀向量拼起来，再进行后面的 qkv 操作。</p>
+<p>对于 Decoder-only 的 GPT，prefix 只添加在句首，此时模型输入表示为：</p>
+<p>\( \begin{align}  z = [PREFIX; x; y] \end{align}\)</p>
+<p>对于 Encoder-Decoder 的 BART，不同的 prefix 同时加在编码器和解码器的开头：</p>
+<p>\( \begin{align}  z = [PREFIX; x; PREFIX'; y] \end{align}\)</p>
+<h3><a id="2-3-pipeline" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.3 Pipeline</h3>
+<p>实现：将 prefix 参数（可训练的张量）添加到所有的 transformer 层。</p>
+<p>机制：将多个 prompt vectors 放到每个 multi-head attention 的 key 矩阵和 value 矩阵之前。</p>
+<p>计算方式：原始的 token 要额外的和这些 soft prompt token 计算相似度，然后聚合：</p>
+<p>\( \begin{align*}  head &amp;= Attn(xW_q, concat(P_k, CW_k), concat(P_v, CW_v)) \\ &amp;= softmax(xW_q concat(P_k, CW_k)^T)\begin {bmatrix} P_v \\ CW_v \end {bmatrix} \\ &amp;= (1 - \lambda (x)) softmax(xW_qW^T_kC^T)CW_v + \lambda (x) softmax (x W_q P^T_k)P_v \\  &amp;= (1 - \lambda (x))  \underbrace {Attn(xW_q, CW_k, CW_v)}_{standard \; attention} + \lambda (x) \underbrace {Attn(xW_q, P_k, P_v)}_{independent \; of \; C} \tag {5} \end{align*}\)</p>
+<p>这里 \(\lambda (x)\) 是一个标量，表示前缀上标准化注意力权重的总和：</p>
+<p>\( \begin{align*}  \lambda (x) = \frac {\sum _i \exp (x W_q P^T_k)_i} {\sum _i \exp (x W_q P^T_k)_i + \sum _j \exp (x W_q P^T_k) _j} \tag {6} \end{align*}\)</p>
+<p>即此时多头注意力层的输出分为两部分的加权平均：第一部分是未加入 prefix 向量时的初始 attention 的计算公式，后半部分是与上下文向量无关的部分。</p>
+<h3><a id="2-4-matrix-factorization" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.4 Matrix Factorization</h3>
+<p>在实践中，作者发现直接更新 prefix 的参数会导致训练不稳定，因此在 prefix 层前增加了 MLP，本质上是将 prefix 分解为更小维度的 input 与 MLP 的组合输出的结果，并在训练完成后，只需要保留 MLP 输出的参数进行推理即可。</p>
+<h2><a id="3-p-tuning-v1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 P-Tuning V1</h2>
+<h3><a id="3-1-core" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.1 Core</h3>
+<p><a href="https://arxiv.org/pdf/2103.10385" title="P-Tuning V1">P-Tuning V1</a>将自然语言的离散模版转化为可训练的隐式 prompt：考虑到神经网络本质上是连续的，故离散 prompt 可能并非最优，故而测试连续的 prompt。</p>
+<h3><a id="3-2-pipeline" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.2 Pipeline</h3>
+<p>将 prompt 转换为可学习的 embedding 层，并用 MLP+LSTM 的方式对 prompt embedding 进行处理。</p>
+<div style="text-align: center">
+<img src="media/17141028694966/17143192449611.jpg"/>
+<p>图 3  P-Tuning Method (V1)</p>
+</div>
+<p>其中，input embedding 中每个 embedding 的值是由小型的 LSTM 模型得到，公式如下：</p>
+<p>\( \begin{align*}  h_i &amp;= MLP([\mathop {h_i} \limits ^{\rightarrow}, \mathop {h_i} \limits ^{\leftarrow}]) \\ &amp;= MLP([LSTM(h_{0:i}):LSTM(h_{i:m})]) \tag {7} \end{align*}\)</p>
+<blockquote>
+<p>相比于 prefix-tuning，p-tuning 增加了可微的 virtual token，但是仅限于输入，并没有在每层加。此外，virtual token 插入的位置是可选的，并不一定在前缀插入。</p>
+</blockquote>
+<h3><a id="3-3-limit" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.3 Limit</h3>
+<ul>
+<li>可解释性差；</li>
+<li>收敛更慢；</li>
+<li>可能存在过拟合；</li>
+<li>微调可能不稳定。</li>
+</ul>
+<h2><a id="4-p-tuning-v2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 P-Tuning V2</h2>
+<p>鉴于 P-tuning 的规模通用性较弱（大模型时效果可以与全量微调媲美，小模型则差异较大），提出<a href="https://arxiv.org/pdf/2110.07602" title="P-Tuning V2">P-Tuning V2</a>，利用深度提示优化（如：Prefix Tuning），对 Prompt Tuning 和 P-Tuning 进行改进，作为一个跨规模和 NLU 任务的通用解决方案。</p>
+<h3><a id="4-1-core" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.1 Core</h3>
+<p>与 P-tuning V1 相比，该方法在每一层都加入了 Prompts tokens 作为输入，而不是仅仅加在输入层。</p>
+<div style="text-align: center">
+<img src="media/17141028694966/17144611576015.jpg"/>
+<p>图 4  P-Tuning Method (V2)</p>
+</div>
+<p>可以有以下好处：</p>
+<ul>
+<li>更多可学习的参数（从 P-tuning 和 Prompt Tuning 的 0.01% 增加到 0.1%-3%），同时也足够参数高效。</li>
+<li>加入到更深层结构中的 Prompt 能给模型预测带来更直接的影响。</li>
+</ul>
+<h3><a id="4-2-pipeline" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4.2 Pipeline</h3>
+<p>可以看作是将文本生成的 Prefix Tuning 技术适配到 NLU 任务中，然后做了一些改进：</p>
+<ol>
+<li>移除重参数化的编码器：例如在 prefix tuning 中 prefix 层前的 MLP，或是 P-tuning v1 中 MLP+LSTM；</li>
+<li>针对不同任务采用不同的 prompt 长度：不同的理解任务（或文本生成任务）具有不同的最佳 prompt 长度。</li>
+<li>引入多任务学习：先在多任务的 prompt 上进行预训练，然后再适配下游任务。</li>
+<li>回归到传统的分类标签范式，而非映射器：在全数据监督设置中，Verbalizer 并不是必须的，它阻碍了 Prompt 调优在需要无实际意义的标签和句子嵌入的场景中的应用。因此，P-Tuning v2 回归传统的 CLS 标签分类范式，采用随机初始化的分类头（Classification Head）应用于 tokens 之上，以增强通用性，可以适配到序列标注任务。</li>
+</ol>
+<h2><a id="5-dora" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 Dora</h2>
+<h3><a id="5-1-core" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1 Core</h3>
+<p><a href="https://arxiv.org/pdf/2402.09353" title="Dora">Dora</a>在Lora的基础上，将预训练权重分解为幅度和方向两个部分，揭示了Lora和FT的差异化原因。</p>
+<p>将权重矩阵\( W \in \mathbb {R} ^{d \times k}\)按照幅度和方向分解如下：</p>
+<p>\( \begin{align*}  W = m \frac {V} {|| V || _c} = || W || _c \frac {W} {|| W || _c} \tag{7} \end{align*}\)</p>
+<p>这里\( m \in \mathbb {R} ^{1 \times k}\)代表幅度向量，\( V \in \mathbb {R} ^{d \times k}\)代表方向矩阵。分别分析了FT和LoRA的权重矩阵中，幅度和方向的变化关系如下：</p>
+<div style="text-align: center">
+<img src="media/17141028694966/17144680586475.jpg"/>
+<p>图 6  FT vs LoRA</p>
+</div>
+<p>可以得出：LoRA的学习方式和FT有很大不同。</p>
+<h3><a id="5-2-pipeline" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2 Pipeline</h3>
+<p>在DoRA中，对于预训练后的权重\(W_0\)，将其分解为方向向量$ m = || w_0 || $和幅度矩阵\(V = W_0\)，在微调中，我们保持\(V\)不变，将方向向量\(m\)作为一个可训练向量。DoRA的权重更新如下：</p>
+<p>\( \begin{align*}  W' = \underline {m} \frac {V + \Delta V} {|| V + \Delta V || _c} = \underline {m} \frac {W_0 + \underline {BA}} {|| W_0 + \underline {BA} || _c} \tag{8} \end{align*}\)</p>
+<div style="text-align: center">
+<img src="media/17141028694966/17144667718371.jpg"/>
+<p>图 5  DoRA Method</p>
+</div>
+<p>其中下划线参数代表可学习的参数。经过该方法的效果如下所示：</p>
+<div style="text-align: center">
+<img src="media/17141028694966/17144733945433.jpg"/>
+<p>图 6  DoRA Performance</p>
+</div>
+<p>可以看到，经过修改后，DoRA的学习方式与FT更加接近。</p>
+<h2><a id="6-qlora" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6 QLoRA</h2>
+<blockquote>
+<p>显著减少内存使用。</p>
+</blockquote>
+<h3><a id="6-1-pipeline" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6.1 Pipeline</h3>
+<div style="text-align: center">
+<img src="media/17141028694966/17144755126350.jpg"/>
+<p>图 7  QLoRA Method</p>
+</div>
+<h3><a id="6-2-4-bit-normalfloat-quantization" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6.2 4-bit NormalFloat Quantization</h3>
+<p>NormalFloat (简称NF)是一种数据类型，它是建立在 Quantile quantization（后译为分位数量化）基础上的，它是一种信息论上最优的数据类型，可以确保每个量化区间从输入张量中分配相同数量的值。分位数量化通过经验累积分布函数估计输入张量的分位数来工作。</p>
+<p>在神经网络中，预训练的权重通常具有0中心的正态分布，标准差为σ。通过缩放σ，可以使得分布恰好适应NF的范围。对于NF，作者设置了一个任意的范围[-1, 1]。因此，数据类型和神经网络权重的分位数都需要被归一化到这个范围。</p>
+<p>对于范围在[-1, 1]内的零均值正态分布，他们计算了信息理论上最优的数据类型。过程如下：</p>
+<ol>
+<li>估计理论\(N(0,1)\)分布的\( 2 ^k + 1\)个分位数，得到一个k位的分位数量化数据模型；</li>
+<li>将该NF的值归一化到[-1, 1]范围内；</li>
+<li>通过绝对最大值重标定，将输入权重张量归一化到[-1, 1]范围内；</li>
+<li>进行正常的量化。</li>
+</ol>
+<p>映射公式如下：</p>
+<p>\( \begin{align*}  q_i = \frac {1} {2} (Q_X(\frac {i} {2^k + 1}) + Q_X(\frac {i + 1} {2^k + 1})) \tag{9} \end{align*}\)</p>
+<p>其中\(Q_X\)指的是分位数函数。</p>
+<p>该过程等价于重新缩放权重张量的标准差，使其适配k位数据类型的标准差。</p>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script>window.MathJax = {     tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } ,     startup: {     pageReady() {       return MathJax.startup.defaultPageReady().then(function () {          window.mweb_mathjax_ready_val = 'yes';          if(window.mweb_mathjax_ready !== undefined){ mweb_mathjax_ready(); }       });     }   }};document.addEventListener('DOMContentLoaded', function(event) {    if (typeof Prism != 'undefined') {         Prism.highlightAll();     }});window.mweb_mathjax_ready_val = '';function theMWebMathJaxRenderIsReady(key){ return window.mweb_mathjax_ready_val; }</script><script>window.MathJax = { tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } }; </script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>
