@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    复现LoReFT - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            复现LoReFT   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/05/01</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_Llama3%20ReFTEng%20vs%20PEFT.html'>#Llama3 ReFTEng vs PEFT</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <h2><a id="1-prepare" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 Prepare</h2>
+<p>选择在VCLab实验室的主机上进行复现，因此首先利用conda进行虚拟环境构建。</p>
+<pre><code class="language-shell"># 激活conda
+source .bashrc
+
+# 新建名为&quot;LoReFT&quot;的conda环境，由于pyreft的setup.py中要求python_requires='&gt;=3.8'，因此设置python版本为3.8
+conda create -n &quot;LoReFT&quot; python=3.8 
+
+# 进入该conda环境
+conda activate LoReFT
+</code></pre>
+<p><br />
+在进入conda虚拟环境后，首先安装torch。观察到在<code>pyreft/requirements.txt</code>中要求<code>torch&gt;=2.0.0</code>，鉴于本实验室的cuda版本为11.7，因此采用<a href="https://pytorch.org/get-started/previous-versions/" title="torch">以下命令</a>进行安装2.0.0版本的torch：</p>
+<pre><code class="language-shell"># CUDA 11.7
+pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1
+</code></pre>
+<p><br />
+接着，用<code>pip install git+https://github.com/stanfordnlp/pyreft.git</code>安装<code>pyreft</code>，然而由于网络问题，报错如下：</p>
+<pre><code class="language-shell">Collecting git+https://github.com/stanfordnlp/pyreft.git
+  Cloning https://github.com/stanfordnlp/pyreft.git to /tmp/pip-req-build-eeva9wo9
+  Running command git clone --filter=blob:none --quiet https://github.com/stanfordnlp/pyreft.git /tmp/pip-req-build-eeva9wo9
+  error: RPC failed; curl 28 Failed to connect to github.com port 443: Connection timed out
+  fatal: the remote end hung up unexpectedly
+  error: subprocess-exited-with-error
+  
+  × git clone --filter=blob:none --quiet https://github.com/stanfordnlp/pyreft.git /tmp/pip-req-build-eeva9wo9 did not run successfully.
+  │ exit code: 128
+  ╰─&gt; See above for output.
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: subprocess-exited-with-error
+
+× git clone --filter=blob:none --quiet https://github.com/stanfordnlp/pyreft.git /tmp/pip-req-build-eeva9wo9 did not run successfully.
+│ exit code: 128
+╰─&gt; See above for output.
+
+note: This error originates from a subprocess, and is likely not a problem with pip.
+</code></pre>
+<p><br />
+因此我们采用两步的安装方式。如下所示：</p>
+<pre><code class="language-shell"># 首先下载pyreft的包
+git clone https://github.com/stanfordnlp/pyreft.git
+
+# 在解压后的包内完成安装
+cd pyreft
+
+python setup.py install
+</code></pre>
+<p><br />
+但是会报错，根据错误查看（例如要求numpy&gt;=1.26.4），发现应该将python版本设为3.9。因此删除该虚拟环境，重新安装新的虚拟环境。</p>
+<pre><code class="language-shell"># 退出当前虚拟环境
+conda deactivate
+
+# 删除虚拟环境
+conda env remove -p LoReFT_path
+
+# 新建虚拟环境
+conda create -n &quot;ReFT&quot; python=3.9
+
+# 进入虚拟环境
+conda activate ReFT
+
+# 安装torch
+/home/workspace/nanyang/anaconda3/envs/ReFT/bin/pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1
+
+# 安装pyreft
+/home/workspace/nanyang/anaconda3/envs/ReFT/bin/pip install pyreft
+</code></pre>
+<p><br />
+检查当前虚拟环境下的包：</p>
+<pre><code class="language-shell">(ReFT) nanyang@vclab-gpuserver-57:~$ conda list
+# packages in environment at /home/workspace/nanyang/anaconda3/envs/ReFT:
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                 conda_forge    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+_openmp_mutex             4.5                  2_kmp_llvm    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+accelerate                0.29.3                    &lt;pip&gt;
+aiohttp                   3.9.5                     &lt;pip&gt;
+aiosignal                 1.3.1                     &lt;pip&gt;
+annotated-types           0.6.0                     &lt;pip&gt;
+anyio                     4.3.0                     &lt;pip&gt;
+appdirs                   1.4.4                     &lt;pip&gt;
+argon2-cffi               23.1.0                    &lt;pip&gt;
+argon2-cffi-bindings      21.2.0                    &lt;pip&gt;
+arrow                     1.3.0                     &lt;pip&gt;
+asttokens                 2.4.1                     &lt;pip&gt;
+async-lru                 2.0.4                     &lt;pip&gt;
+async-timeout             4.0.3                     &lt;pip&gt;
+attrs                     23.2.0                    &lt;pip&gt;
+Babel                     2.14.0                    &lt;pip&gt;
+beautifulsoup4            4.12.3                    &lt;pip&gt;
+bleach                    6.1.0                     &lt;pip&gt;
+ca-certificates           2024.3.11            h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+cachetools                5.3.3                     &lt;pip&gt;
+certifi                   2024.2.2                  &lt;pip&gt;
+cffi                      1.16.0                    &lt;pip&gt;
+charset-normalizer        3.3.2                     &lt;pip&gt;
+click                     8.1.7                     &lt;pip&gt;
+cmake                     3.29.2                    &lt;pip&gt;
+comm                      0.2.2                     &lt;pip&gt;
+contourpy                 1.2.1                     &lt;pip&gt;
+cycler                    0.12.1                    &lt;pip&gt;
+dacite                    1.8.1                     &lt;pip&gt;
+datasets                  2.18.0                    &lt;pip&gt;
+debugpy                   1.8.1                     &lt;pip&gt;
+decorator                 5.1.1                     &lt;pip&gt;
+defusedxml                0.7.1                     &lt;pip&gt;
+dill                      0.3.8                     &lt;pip&gt;
+docker-pycreds            0.4.0                     &lt;pip&gt;
+evaluate                  0.4.2                     &lt;pip&gt;
+exceptiongroup            1.2.1                     &lt;pip&gt;
+executing                 2.0.1                     &lt;pip&gt;
+fastjsonschema            2.19.1                    &lt;pip&gt;
+filelock                  3.14.0                    &lt;pip&gt;
+fonttools                 4.51.0                    &lt;pip&gt;
+fqdn                      1.5.1                     &lt;pip&gt;
+frozenlist                1.4.1                     &lt;pip&gt;
+fsspec                    2024.2.0                  &lt;pip&gt;
+gcsfs                     2024.2.0                  &lt;pip&gt;
+gitdb                     4.0.11                    &lt;pip&gt;
+GitPython                 3.1.43                    &lt;pip&gt;
+google-api-core           2.19.0                    &lt;pip&gt;
+google-auth               2.29.0                    &lt;pip&gt;
+google-auth-oauthlib      1.2.0                     &lt;pip&gt;
+google-cloud-core         2.4.1                     &lt;pip&gt;
+google-cloud-storage      2.16.0                    &lt;pip&gt;
+google-crc32c             1.5.0                     &lt;pip&gt;
+google-resumable-media    2.7.0                     &lt;pip&gt;
+googleapis-common-protos  1.63.0                    &lt;pip&gt;
+h11                       0.14.0                    &lt;pip&gt;
+htmlmin                   0.1.12                    &lt;pip&gt;
+httpcore                  1.0.5                     &lt;pip&gt;
+httpx                     0.27.0                    &lt;pip&gt;
+huggingface-hub           0.20.3                    &lt;pip&gt;
+idna                      3.7                       &lt;pip&gt;
+ImageHash                 4.3.1                     &lt;pip&gt;
+importlib_metadata        7.1.0                     &lt;pip&gt;
+importlib_resources       6.4.0                     &lt;pip&gt;
+ipykernel                 6.29.4                    &lt;pip&gt;
+ipython                   8.18.1                    &lt;pip&gt;
+ipywidgets                8.1.2                     &lt;pip&gt;
+isoduration               20.11.0                   &lt;pip&gt;
+jedi                      0.19.1                    &lt;pip&gt;
+Jinja2                    3.1.3                     &lt;pip&gt;
+joblib                    1.4.0                     &lt;pip&gt;
+json5                     0.9.25                    &lt;pip&gt;
+jsonpointer               2.4                       &lt;pip&gt;
+jsonschema                4.22.0                    &lt;pip&gt;
+jsonschema-specifications 2023.12.1                 &lt;pip&gt;
+jupyter                   1.0.0                     &lt;pip&gt;
+jupyter-console           6.6.3                     &lt;pip&gt;
+jupyter-events            0.10.0                    &lt;pip&gt;
+jupyter-lsp               2.2.5                     &lt;pip&gt;
+jupyter_client            8.6.1                     &lt;pip&gt;
+jupyter_core              5.7.2                     &lt;pip&gt;
+jupyter_server            2.14.0                    &lt;pip&gt;
+jupyter_server_terminals  0.5.3                     &lt;pip&gt;
+jupyterlab                4.1.8                     &lt;pip&gt;
+jupyterlab_pygments       0.3.0                     &lt;pip&gt;
+jupyterlab_server         2.27.1                    &lt;pip&gt;
+jupyterlab_widgets        3.0.10                    &lt;pip&gt;
+kiwisolver                1.4.5                     &lt;pip&gt;
+ld_impl_linux-64          2.38                 h1181459_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libffi                    3.4.4                h6a678d5_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libgcc-ng                 12.2.0              h65d4601_19    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+libstdcxx-ng              12.2.0              h46fd767_19    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+lit                       18.1.4                    &lt;pip&gt;
+llvm-openmp               14.0.6               h9e868ea_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+llvmlite                  0.42.0                    &lt;pip&gt;
+MarkupSafe                2.1.5                     &lt;pip&gt;
+matplotlib                3.8.4                     &lt;pip&gt;
+matplotlib-inline         0.1.7                     &lt;pip&gt;
+mistune                   3.0.2                     &lt;pip&gt;
+mizani                    0.11.2                    &lt;pip&gt;
+mpmath                    1.3.0                     &lt;pip&gt;
+multidict                 6.0.5                     &lt;pip&gt;
+multimethod               1.11.2                    &lt;pip&gt;
+multiprocess              0.70.16                   &lt;pip&gt;
+nbclient                  0.10.0                    &lt;pip&gt;
+nbconvert                 7.16.4                    &lt;pip&gt;
+nbformat                  5.10.4                    &lt;pip&gt;
+ncurses                   6.4                  h6a678d5_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+nest-asyncio              1.6.0                     &lt;pip&gt;
+networkx                  3.2.1                     &lt;pip&gt;
+notebook                  7.1.3                     &lt;pip&gt;
+notebook_shim             0.2.4                     &lt;pip&gt;
+numba                     0.59.1                    &lt;pip&gt;
+numpy                     1.26.4                    &lt;pip&gt;
+nvidia-cublas-cu11        11.10.3.66                &lt;pip&gt;
+nvidia-cuda-cupti-cu11    11.7.101                  &lt;pip&gt;
+nvidia-cuda-nvrtc-cu11    11.7.99                   &lt;pip&gt;
+nvidia-cuda-runtime-cu11  11.7.99                   &lt;pip&gt;
+nvidia-cudnn-cu11         8.5.0.96                  &lt;pip&gt;
+nvidia-cufft-cu11         10.9.0.58                 &lt;pip&gt;
+nvidia-curand-cu11        10.2.10.91                &lt;pip&gt;
+nvidia-cusolver-cu11      11.4.0.1                  &lt;pip&gt;
+nvidia-cusparse-cu11      11.7.4.91                 &lt;pip&gt;
+nvidia-nccl-cu11          2.14.3                    &lt;pip&gt;
+nvidia-nvtx-cu11          11.7.91                   &lt;pip&gt;
+oauthlib                  3.2.2                     &lt;pip&gt;
+openssl                   3.0.13               h7f8727e_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+overrides                 7.7.0                     &lt;pip&gt;
+packaging                 24.0                      &lt;pip&gt;
+pandas                    2.2.2                     &lt;pip&gt;
+pandocfilters             1.5.1                     &lt;pip&gt;
+parso                     0.8.4                     &lt;pip&gt;
+patsy                     0.5.6                     &lt;pip&gt;
+pexpect                   4.9.0                     &lt;pip&gt;
+phik                      0.12.4                    &lt;pip&gt;
+pillow                    10.3.0                    &lt;pip&gt;
+pip                       23.3.1           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+platformdirs              4.2.1                     &lt;pip&gt;
+plotnine                  0.13.5                    &lt;pip&gt;
+prometheus_client         0.20.0                    &lt;pip&gt;
+prompt-toolkit            3.0.43                    &lt;pip&gt;
+proto-plus                1.23.0                    &lt;pip&gt;
+protobuf                  4.25.3                    &lt;pip&gt;
+psutil                    5.9.8                     &lt;pip&gt;
+ptyprocess                0.7.0                     &lt;pip&gt;
+pure-eval                 0.2.2                     &lt;pip&gt;
+pyarrow                   16.0.0                    &lt;pip&gt;
+pyarrow-hotfix            0.6                       &lt;pip&gt;
+pyasn1                    0.6.0                     &lt;pip&gt;
+pyasn1_modules            0.4.0                     &lt;pip&gt;
+pycparser                 2.22                      &lt;pip&gt;
+pydantic                  2.7.1                     &lt;pip&gt;
+pydantic_core             2.18.2                    &lt;pip&gt;
+Pygments                  2.17.2                    &lt;pip&gt;
+pyparsing                 3.1.2                     &lt;pip&gt;
+pyreft                    0.0.5                     &lt;pip&gt;
+python                    3.9.19               h955ad1f_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+python-dateutil           2.9.0.post0               &lt;pip&gt;
+python-json-logger        2.0.7                     &lt;pip&gt;
+pytz                      2024.1                    &lt;pip&gt;
+pyvene                    0.1.1                     &lt;pip&gt;
+PyWavelets                1.6.0                     &lt;pip&gt;
+PyYAML                    6.0.1                     &lt;pip&gt;
+pyzmq                     26.0.2                    &lt;pip&gt;
+qtconsole                 5.5.1                     &lt;pip&gt;
+QtPy                      2.4.1                     &lt;pip&gt;
+readline                  8.2                  h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+referencing               0.35.0                    &lt;pip&gt;
+regex                     2024.4.28                 &lt;pip&gt;
+requests                  2.31.0                    &lt;pip&gt;
+requests-oauthlib         2.0.0                     &lt;pip&gt;
+rfc3339-validator         0.1.4                     &lt;pip&gt;
+rfc3986-validator         0.1.1                     &lt;pip&gt;
+rpds-py                   0.18.0                    &lt;pip&gt;
+rsa                       4.9                       &lt;pip&gt;
+safetensors               0.4.3                     &lt;pip&gt;
+scikit-learn              1.4.2                     &lt;pip&gt;
+scipy                     1.11.4                    &lt;pip&gt;
+seaborn                   0.12.2                    &lt;pip&gt;
+Send2Trash                1.8.3                     &lt;pip&gt;
+sentencepiece             0.2.0                     &lt;pip&gt;
+sentry-sdk                2.0.1                     &lt;pip&gt;
+setproctitle              1.3.3                     &lt;pip&gt;
+setuptools                68.2.2           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+six                       1.16.0                    &lt;pip&gt;
+smmap                     5.0.1                     &lt;pip&gt;
+sniffio                   1.3.1                     &lt;pip&gt;
+soupsieve                 2.5                       &lt;pip&gt;
+sqlite                    3.45.3               h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+stack-data                0.6.3                     &lt;pip&gt;
+statsmodels               0.14.2                    &lt;pip&gt;
+sympy                     1.12                      &lt;pip&gt;
+terminado                 0.18.1                    &lt;pip&gt;
+threadpoolctl             3.5.0                     &lt;pip&gt;
+tinycss2                  1.3.0                     &lt;pip&gt;
+tk                        8.6.12               h1ccaba5_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tokenizers                0.19.1                    &lt;pip&gt;
+tomli                     2.0.1                     &lt;pip&gt;
+torch                     2.0.0                     &lt;pip&gt;
+torchaudio                2.0.1                     &lt;pip&gt;
+torchvision               0.15.1                    &lt;pip&gt;
+tornado                   6.4                       &lt;pip&gt;
+tqdm                      4.66.2                    &lt;pip&gt;
+traitlets                 5.14.3                    &lt;pip&gt;
+transformers              4.40.1                    &lt;pip&gt;
+triton                    2.0.0                     &lt;pip&gt;
+typeguard                 4.2.1                     &lt;pip&gt;
+types-python-dateutil     2.9.0.20240316            &lt;pip&gt;
+typing_extensions         4.11.0                    &lt;pip&gt;
+tzdata                    2024a                h04d1e81_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tzdata                    2024.1                    &lt;pip&gt;
+uri-template              1.3.0                     &lt;pip&gt;
+urllib3                   2.2.1                     &lt;pip&gt;
+visions                   0.7.6                     &lt;pip&gt;
+wandb                     0.16.6                    &lt;pip&gt;
+wcwidth                   0.2.13                    &lt;pip&gt;
+webcolors                 1.13                      &lt;pip&gt;
+webencodings              0.5.1                     &lt;pip&gt;
+websocket-client          1.8.0                     &lt;pip&gt;
+wheel                     0.41.2           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+widgetsnbextension        4.0.10                    &lt;pip&gt;
+wordcloud                 1.9.3                     &lt;pip&gt;
+xxhash                    3.4.1                     &lt;pip&gt;
+xz                        5.4.6                h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+yarl                      1.9.4                     &lt;pip&gt;
+ydata-profiling           4.7.0                     &lt;pip&gt;
+zipp                      3.18.1                    &lt;pip&gt;
+zlib                      1.2.13               h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+</code></pre>
+<h2><a id="2-reproduction" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 Reproduction</h2>
+<p>首先通过git命令下载pyreft源码：</p>
+<pre><code class="language-shell">git clone https://github.com/stanfordnlp/pyreft.git
+</code></pre>
+<h3><a id="2-1-data-creation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.1 Data Creation</h3>
+<p>进入到LoReFT的文件夹中，并通过命令行生成所需要的数据：</p>
+<pre><code class="language-shell">cd examples/loreft
+
+bash load_datasets.sh
+</code></pre>
+<p><br />
+接着观察其<code>train.py</code>，由于我们需要测试llama3-8b的base模型和instruct模型，因此在model_name处做修改：</p>
+<pre><code class="language-python"># load tokenizer
+if &quot;Meta-Llama-3-8B&quot; in model_name:
+    tokenizer = AutoTokenizer.from_pretrained(
+        &quot;meta-llama/Meta-Llama-3-8B&quot;, # use instruct for the template.
+        model_max_length=max_length,
+        padding_side=&quot;right&quot;,
+        use_fast=False,
+    )
+elif &quot;Meta-Llama-3-8B-Instruct&quot; in model_name:
+    tokenizer = AutoTokenizer.from_pretrained(
+        &quot;meta-llama/Meta-Llama-3-8B-Instruct&quot;, # use instruct for the template.
+        model_max_length=max_length,
+        padding_side=&quot;right&quot;,
+        use_fast=False,
+    )
+else:
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        model_max_length=max_length,
+        padding_side=&quot;right&quot;,
+        use_fast=False,
+    )
+</code></pre>
+<p><br />
+接着通过<code>nvidia-smi</code>命令查看未使用的显卡，并开始训练：</p>
+<pre><code class="language-shell">CUDA_VISIBLE_DIVICES=1 python train.py -task commonsense \
+-data_dir dataset \
+-model Meta-Llama-3-8B \
+-seed 42 \
+-l all -r 8 -p f7+l7 -e 6 -lr 9e-4 \
+-type LoreftIntervention \
+-gradient_accumulation_steps 2 \
+-batch_size 16 \
+-eval_batch_size 4 \
+--dropout 0.00 \
+--test_split test \
+--use_normalized_template \
+--share_weights \
+--warmup_ratio 0.1 \
+--greedy_decoding
+</code></pre>
+<p><br />
+报错如下：</p>
+<pre><code class="language-shell">task: commonsense, model: Meta-Llama-3-8B, intervention_type: LoreftIntervention, layers: all, rank: 8, position: f7+l7, epoch: 6, train_on_inputs: False, max_length: 512, allow_cls_grad: False
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/connection.py&quot;, line 198, in _new_conn
+    sock = connection.create_connection(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/util/connection.py&quot;, line 85, in create_connection
+    raise err
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/util/connection.py&quot;, line 73, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/connectionpool.py&quot;, line 793, in urlopen
+    response = self._make_request(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/connectionpool.py&quot;, line 491, in _make_request
+    raise new_e
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/connectionpool.py&quot;, line 467, in _make_request
+    self._validate_conn(conn)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/connectionpool.py&quot;, line 1099, in _validate_conn
+    conn.connect()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/connection.py&quot;, line 616, in connect
+    self.sock = sock = self._new_conn()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/connection.py&quot;, line 207, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (&lt;urllib3.connection.HTTPSConnection object at 0x7f65ec50d5e0&gt;, 'Connection to huggingface.co timed out. (connect timeout=10)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/requests/adapters.py&quot;, line 486, in send
+    resp = conn.urlopen(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/connectionpool.py&quot;, line 847, in urlopen
+    retries = retries.increment(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/urllib3/util/retry.py&quot;, line 515, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /Meta-Llama-3-8B/resolve/main/config.json (Caused by ConnectTimeoutError(&lt;urllib3.connection.HTTPSConnection object at 0x7f65ec50d5e0&gt;, 'Connection to huggingface.co timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 1238, in hf_hub_download
+    metadata = get_hf_file_metadata(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/utils/_validators.py&quot;, line 118, in _inner_fn
+    return fn(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 1631, in get_hf_file_metadata
+    r = _request_wrapper(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 385, in _request_wrapper
+    response = _request_wrapper(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 408, in _request_wrapper
+    response = get_session().request(method=method, url=url, **params)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/requests/sessions.py&quot;, line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/requests/sessions.py&quot;, line 703, in send
+    r = adapter.send(request, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/utils/_http.py&quot;, line 67, in send
+    return super().send(request, *args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/requests/adapters.py&quot;, line 507, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: (MaxRetryError(&quot;HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /Meta-Llama-3-8B/resolve/main/config.json (Caused by ConnectTimeoutError(&lt;urllib3.connection.HTTPSConnection object at 0x7f65ec50d5e0&gt;, 'Connection to huggingface.co timed out. (connect timeout=10)'))&quot;), '(Request ID: 4aa9cce0-b0ea-43ed-ab01-d537e90a1652)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/utils/hub.py&quot;, line 398, in cached_file
+    resolved_file = hf_hub_download(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/utils/_validators.py&quot;, line 118, in _inner_fn
+    return fn(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 1371, in hf_hub_download
+    raise LocalEntryNotFoundError(
+huggingface_hub.utils._errors.LocalEntryNotFoundError: An error happened while trying to locate the file on the Hub and we cannot find the requested files in the local cache. Please check your connection and try again or make sure your Internet connection is on.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 494, in &lt;module&gt;
+    main()
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 490, in main
+    finetune(**vars(args), args=args)
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 147, in finetune
+    temp_config = AutoConfig.from_pretrained(model)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/models/auto/configuration_auto.py&quot;, line 928, in from_pretrained
+    config_dict, unused_kwargs = PretrainedConfig.get_config_dict(pretrained_model_name_or_path, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/configuration_utils.py&quot;, line 631, in get_config_dict
+    config_dict, kwargs = cls._get_config_dict(pretrained_model_name_or_path, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/configuration_utils.py&quot;, line 686, in _get_config_dict
+    resolved_config_file = cached_file(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/utils/hub.py&quot;, line 441, in cached_file
+    raise EnvironmentError(
+OSError: We couldn't connect to 'https://huggingface.co' to load this file, couldn't find it in the cached files and it looks like Meta-Llama-3-8B is not the path to a directory containing a file named config.json.
+Checkout your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.
+</code></pre>
+<p><br />
+起初以为是预训练模型路径不对，在用了默认的预训练模型<code>yahma/llama-7b-hf</code>后同样产生这样的报错，因而将问题定位在网络连接上。应用群里的改变HF环境变量如下：</p>
+<pre><code class="language-shell"># in .bashrc
+# &gt;&gt;&gt; hugging face init &gt;&gt;&gt;
+export HF_DATASETS_CACHE=/home/share/nanyang/HuggingFace/.catch
+export HF_CACHE_DIR=/home/share/nanyang/HuggingFace/.catch
+export HF_HOME=/home/share/nanyang/HuggingFace/.catch/huggingface
+export HF_HUB_CACHE=/home/share/nanyang/HuggingFace/.catch/huggingface/hub
+export HF_ENDPOINT=https://hf-mirror.com/meta-llama
+export HF_TOKEN=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
+# &lt;&lt;&lt; hugging face init &lt;&lt;&lt;
+</code></pre>
+<p><br />
+在<code>source .bashrc</code>后，运行<code>train.py</code>，报错如下：</p>
+<pre><code class="language-shell">task: commonsense, model: Meta-Llama-3-8B, intervention_type: LoreftIntervention, layers: all, rank: 8, position: f7+l7, epoch: 6, train_on_inputs: False, max_length: 512, allow_cls_grad: False
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/utils/_errors.py&quot;, line 286, in hf_raise_for_status
+    response.raise_for_status()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/requests/models.py&quot;, line 1021, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://hf-mirror.com/Meta-Llama-3-8B/resolve/main/config.json
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/utils/hub.py&quot;, line 398, in cached_file
+    resolved_file = hf_hub_download(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/utils/_validators.py&quot;, line 118, in _inner_fn
+    return fn(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 1368, in hf_hub_download
+    raise head_call_error
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 1238, in hf_hub_download
+    metadata = get_hf_file_metadata(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/utils/_validators.py&quot;, line 118, in _inner_fn
+    return fn(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 1631, in get_hf_file_metadata
+    r = _request_wrapper(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 385, in _request_wrapper
+    response = _request_wrapper(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/file_download.py&quot;, line 409, in _request_wrapper
+    hf_raise_for_status(response)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/huggingface_hub/utils/_errors.py&quot;, line 323, in hf_raise_for_status
+    raise RepositoryNotFoundError(message, response) from e
+huggingface_hub.utils._errors.RepositoryNotFoundError: 404 Client Error. (Request ID: Root=1-663247eb-195d3af1450531d11c40c61c;7306600f-6215-45e4-a6c4-a9aa32ddcd73)
+
+Repository Not Found for url: https://hf-mirror.com/Meta-Llama-3-8B/resolve/main/config.json.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 494, in &lt;module&gt;
+    main()
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 490, in main
+    finetune(**vars(args), args=args)
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 147, in finetune
+    temp_config = AutoConfig.from_pretrained(model)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/models/auto/configuration_auto.py&quot;, line 928, in from_pretrained
+    config_dict, unused_kwargs = PretrainedConfig.get_config_dict(pretrained_model_name_or_path, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/configuration_utils.py&quot;, line 631, in get_config_dict
+    config_dict, kwargs = cls._get_config_dict(pretrained_model_name_or_path, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/configuration_utils.py&quot;, line 686, in _get_config_dict
+    resolved_config_file = cached_file(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/utils/hub.py&quot;, line 421, in cached_file
+    raise EnvironmentError(
+OSError: Meta-Llama-3-8B is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=&lt;your_token&gt;`
+</code></pre>
+<p><br />
+可以看到错误是源于<code>Repository Not Found for url: https://hf-mirror.com/Meta-Llama-3-8B/resolve/main/config.json.</code>，而实际上他的位置应该是<code>https://hf-mirror.com/meta-llama/Meta-Llama-3-8B/resolve/main/config.json.</code> 思考可能是因为调成镜像网站后，有些数据集的路径对不上，因此做以下两点改动：</p>
+<ul>
+<li>在.bashrc中将<code>export HF_ENDPOINT=https://hf-mirror.com</code>改为<code>export HF_ENDPOINT=https://hf-mirror.com/meta-llama</code>；</li>
+<li>在<code>train.py</code>中作如下修改：</li>
+</ul>
+<pre><code class="language-python"># 原始代码
+if &quot;Meta-Llama-3-8B&quot; in model_name:
+    tokenizer = AutoTokenizer.from_pretrained(
+        &quot;meta-llama/Meta-Llama-3-8B&quot;, # use instruct for the template.
+        model_max_length=max_length,
+        padding_side=&quot;right&quot;,
+        use_fast=False,
+    )
+elif &quot;Meta-Llama-3-8B-Instruct&quot; in model_name:
+    tokenizer = AutoTokenizer.from_pretrained(
+        &quot;meta-llama/Meta-Llama-3-8B-Instruct&quot;, # use instruct for the template.
+        model_max_length=max_length,
+        padding_side=&quot;right&quot;,
+        use_fast=False,
+    )
+else:
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        model_max_length=max_length,
+        padding_side=&quot;right&quot;,
+        use_fast=False,
+    )
+
+# 修改后代码
+tokenizer = AutoTokenizer.from_pretrained(
+    model_name,
+    model_max_length=max_length,
+    padding_side=&quot;right&quot;,
+    use_fast=False,
+)
+</code></pre>
+<p>经过该改动后，数据集被成功加载如下（以Meta-Llama-3-8B-Instruct为例）：</p>
+<pre><code class="language-shell">(ReFT) nanyang@vclab-gpuserver-57:/home/workspace/nanyang/pyreft/examples/loreft$ CUDA_VISIBLE_DIVICES=1 python train.py -task commonsense \
+&gt; -data_dir dataset \
+&gt; -model Meta-Llama-3-8B-Instruct \
+&gt; -seed 42 \
+&gt; -l all -r 8 -p f7+l7 -e 6 -lr 9e-4 \
+&gt; -type LoreftIntervention \
+&gt; -gradient_accumulation_steps 2 \
+&gt; -batch_size 16 \
+&gt; -eval_batch_size 4 \
+&gt; --dropout 0.00 \
+&gt; --test_split test \
+&gt; --use_normalized_template \
+&gt; --share_weights \
+&gt; --warmup_ratio 0.1 \
+&gt; --greedy_decoding
+task: commonsense, model: Meta-Llama-3-8B-Instruct, intervention_type: LoreftIntervention, layers: all, rank: 8, position: f7+l7, epoch: 6, train_on_inputs: False, max_length: 512, allow_cls_grad: False
+config.json: 654B [00:00, 56.6kB/s]                                                                 
+tokenizer_config.json: 50.6kB [00:00, 4.04MB/s]                                                     
+tokenizer.json: 9.09MB [00:11, 777kB/s] 
+special_tokens_map.json: 100%|███████████████████████████████████| 73.0/73.0 [00:00&lt;00:00, 6.54kB/s]
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+adding a special padding token...
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True, 'test_split': 'test'}
+loading data for dataset:  dataset/commonsense_170k/train.json
+100%|██████████████████████████████████████████████████████| 170420/170420 [03:21&lt;00:00, 845.06it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/boolq/test.json
+100%|█████████████████████████████████████████████████████████| 3270/3270 [00:01&lt;00:00, 2315.61it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/piqa/test.json
+100%|█████████████████████████████████████████████████████████| 1838/1838 [00:01&lt;00:00, 1724.39it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/social_i_qa/test.json
+100%|█████████████████████████████████████████████████████████| 1954/1954 [00:01&lt;00:00, 1831.40it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/hellaswag/test.json
+100%|████████████████████████████████████████████████████████| 10042/10042 [00:11&lt;00:00, 875.58it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/winogrande/test.json
+100%|█████████████████████████████████████████████████████████| 1267/1267 [00:00&lt;00:00, 1925.84it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/ARC-Easy/test.json
+100%|█████████████████████████████████████████████████████████| 2376/2376 [00:01&lt;00:00, 1730.06it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/ARC-Challenge/test.json
+100%|█████████████████████████████████████████████████████████| 1172/1172 [00:00&lt;00:00, 1622.61it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/openbookqa/test.json
+100%|███████████████████████████████████████████████████████████| 500/500 [00:00&lt;00:00, 1803.62it/s]
+model.safetensors.index.json: 23.9kB [00:00, 1.84MB/s]                                              
+model-00001-of-00004.safetensors: 100%|████████████████████████| 4.98G/4.98G [01:24&lt;00:00, 59.1MB/s]
+model-00002-of-00004.safetensors: 100%|████████████████████████| 5.00G/5.00G [01:26&lt;00:00, 58.1MB/s]
+model-00003-of-00004.safetensors: 100%|████████████████████████| 4.92G/4.92G [01:29&lt;00:00, 54.9MB/s]
+model-00004-of-00004.safetensors: 100%|████████████████████████| 1.17G/1.17G [00:18&lt;00:00, 63.3MB/s]
+Downloading shards: 100%|█████████████████████████████████████████████| 4/4 [04:40&lt;00:00, 70.08s/it]
+Loading checkpoint shards: 100%|██████████████████████████████████████| 4/4 [00:13&lt;00:00,  3.50s/it]
+generation_config.json: 100%|██████████████████████████████████████| 187/187 [00:00&lt;00:00, 17.5kB/s]
+trainable intervention params: 2,097,408 || trainable model params: 0
+model params: 8,030,269,440 || trainable%: 0.0261187749137344
+</code></pre>
+<p><br />
+然而又有新问题：</p>
+<pre><code class="language-shell">huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+  0%|                                                                      | 0/3996 [00:00&lt;?, ?it/s]Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 494, in &lt;module&gt;
+    main()
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 490, in main
+    finetune(**vars(args), args=args)
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 389, in finetune
+    trainer.train()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 1859, in train
+    return inner_training_loop(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 2203, in _inner_training_loop
+    tr_loss_step = self.training_step(model, inputs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 3130, in training_step
+    model.train()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 2288, in train
+    module.train(mode)
+TypeError: train() takes 1 positional argument but 2 were given
+  0%|                                                                      | 0/3996 [00:02&lt;?, ?it/s]
+</code></pre>
+<p><br />
+在<a href="https://github.com/stanfordnlp/pyreft/issues/31" title="link-1">link-1</a>中得到答案，命令行未识别到<code>CUDA_VISIBLE_DIVICES=1</code>，需要先将其export：</p>
+<pre><code class="language-shell">export CUDA_VISIBLE_DIVICES=1
+...
+</code></pre>
+<p><br />
+然而又遇到问题：显示<code>triu_tril_cuda_template</code>模版并不适配<code>BFloat16</code>。</p>
+<pre><code class="language-shell">huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+  0%|                                                                     | 0/31956 [00:00&lt;?, ?it/s]Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 494, in &lt;module&gt;
+    main()
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 490, in main
+    finetune(**vars(args), args=args)
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 389, in finetune
+    trainer.train()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 1859, in train
+    return inner_training_loop(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 2203, in _inner_training_loop
+    tr_loss_step = self.training_step(model, inputs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 3138, in training_step
+    loss = self.compute_loss(model, inputs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/pyreft/reft_trainer.py&quot;, line 82, in compute_loss
+    _, cf_outputs = intervenable(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/pyvene/models/intervenable_base.py&quot;, line 1460, in forward
+    raise e
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/pyvene/models/intervenable_base.py&quot;, line 1443, in forward
+    counterfactual_outputs = self.model(**base, labels=labels)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/models/llama/modeling_llama.py&quot;, line 1208, in forward
+    outputs = self.model(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/models/llama/modeling_llama.py&quot;, line 992, in forward
+    causal_mask = self._update_causal_mask(attention_mask, inputs_embeds, cache_position, past_seen_tokens)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/ReFT/lib/python3.9/site-packages/transformers/models/llama/modeling_llama.py&quot;, line 1095, in _update_causal_mask
+    causal_mask = torch.triu(causal_mask, diagonal=1)
+RuntimeError: &quot;triu_tril_cuda_template&quot; not implemented for 'BFloat16'
+  0%|                                                                     | 0/31956 [00:02&lt;?, ?it/s]
+</code></pre>
+<p><br />
+在[link-2][3]上找到答案，需要将torch版本升级为2.1.0。（心态爆炸的一天～嘻嘻）</p>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script><script>!function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;var l=a.element.classList;if(l.contains('language-mermaid') || l.contains('language-echarts') || l.contains('language-plantuml')){return;} if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.css"><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><style>div.code-toolbar > .toolbar > .toolbar-item > a, div.code-toolbar > .toolbar > .toolbar-item > button, div.code-toolbar > .toolbar > .toolbar-item > span {padding: 4px .5em; background: #f5f2f0; background: rgba(224, 224, 224, 0.4);}</style>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>
