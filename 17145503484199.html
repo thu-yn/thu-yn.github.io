@@ -750,8 +750,21 @@ TypeError: train() takes 1 positional argument but 2 were given
 </code></pre>
 <p><br />
 在<a href="https://github.com/stanfordnlp/pyreft/issues/31" title="link-1">link-1</a>中得到答案，命令行未识别到<code>CUDA_VISIBLE_DIVICES=1</code>，需要先将其export：</p>
-<pre><code class="language-shell">export CUDA_VISIBLE_DIVICES=1
-...
+<pre><code class="language-shell">export CUDA_VISIBLE_DIVICES=1 python train.py -task commonsense \
+-data_dir dataset \
+-model Meta-Llama-3-8B \
+-seed 42 \
+-l all -r 8 -p f7+l7 -e 6 -lr 9e-4 \
+-type LoreftIntervention \
+-gradient_accumulation_steps 2 \
+-batch_size 16 \
+-eval_batch_size 4 \
+--dropout 0.00 \
+--test_split test \
+--use_normalized_template \
+--share_weights \
+--warmup_ratio 0.1 \
+--greedy_decoding
 </code></pre>
 <p><br />
 然而又遇到问题：显示<code>triu_tril_cuda_template</code>模版并不适配<code>BFloat16</code>。</p>
@@ -795,7 +808,385 @@ RuntimeError: &quot;triu_tril_cuda_template&quot; not implemented for 'BFloat16'
   0%|                                                                     | 0/31956 [00:02&lt;?, ?it/s]
 </code></pre>
 <p><br />
-在[link-2][3]上找到答案，需要将torch版本升级为2.1.0。（心态爆炸的一天～嘻嘻）</p>
+在<a href="https://www.zhihu.com/question/622711856/answer/3339303390" title="link-2">link-2</a>上找到答案：</p>
+<ul>
+<li>需要将torch版本升级为2.1.0；</li>
+<li>将BFloat修改为half tensor。（可能对精度会造成影响）</li>
+</ul>
+<p>因此首先要考虑的是升级torch版本，然而发现目前实验室服务器的3090显卡最高只支持cuda11.7的版本，而2.1.0的torch支持的最低cuda版本为11.8，<del>因此考虑第二种做法。</del></p>
+<blockquote>
+<p>发现实验室另一个服务器上最高支持12.4版本的CUDA！火速找管理员申请账号ing...<br />
+ok，管理员不让多个账号，那我只好先用用学长的了...（小气管理员一枚哈哈哈哈哈哈哈哈哈哈哈）</p>
+</blockquote>
+<hr />
+<p>然而情况并没有那么顺利：我用学长的账号死活无法连接到对应的服务器：</p>
+<ul>
+<li>
+<p>对于工位的主机：终端连接一次成功；vscode无法连接（显示超时）</p>
+</li>
+<li>
+<p>对于自己的笔记本电脑：终端、vscode均无法连接（超时）</p>
+</li>
+</ul>
+<p>最终在<a href="https://www.zhihu.com/question/622711856/answer/3339303390" title="link-2">link-2</a>上找到答案：其实可以在nvidia-smi显示的cuda版本为11.7的显卡上，在conda环境中安装cuda为11.8版本对应的pytorch。因此考虑重新配一个环境：</p>
+<pre><code class="language-shell">conda create -n &quot;reft&quot; python=3.9
+
+conda activate reft
+
+/home/workspace/nanyang/anaconda3/envs/reft/bin/pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu118
+</code></pre>
+<p><br />
+经过一下测试，表明torch安装成功，并且可以使用cuda：</p>
+<pre><code class="language-shell">python
+
+Python 3.9.19 (main, Mar 21 2024, 17:11:28) 
+[GCC 11.2.0] :: Anaconda, Inc. on linux
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; import torch
+&gt;&gt;&gt; torch.cuda.is_available()
+True
+</code></pre>
+<p><br />
+接着安装<code>pyreft</code>：</p>
+<pre><code class="language-shell">/home/workspace/nanyang/anaconda3/envs/reft/bin/pip install pyreft
+</code></pre>
+<p><br />
+查看当前情况下虚拟环境安装的包：</p>
+<pre><code class="language-shell">conda list
+
+# packages in environment at /home/workspace/nanyang/anaconda3/envs/reft:
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                 conda_forge    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+_openmp_mutex             4.5                  2_kmp_llvm    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+accelerate                0.29.3                    &lt;pip&gt;
+aiohttp                   3.9.5                     &lt;pip&gt;
+aiosignal                 1.3.1                     &lt;pip&gt;
+annotated-types           0.6.0                     &lt;pip&gt;
+anyio                     4.3.0                     &lt;pip&gt;
+appdirs                   1.4.4                     &lt;pip&gt;
+argon2-cffi               23.1.0                    &lt;pip&gt;
+argon2-cffi-bindings      21.2.0                    &lt;pip&gt;
+arrow                     1.3.0                     &lt;pip&gt;
+asttokens                 2.4.1                     &lt;pip&gt;
+async-lru                 2.0.4                     &lt;pip&gt;
+async-timeout             4.0.3                     &lt;pip&gt;
+attrs                     23.2.0                    &lt;pip&gt;
+Babel                     2.14.0                    &lt;pip&gt;
+beautifulsoup4            4.12.3                    &lt;pip&gt;
+bleach                    6.1.0                     &lt;pip&gt;
+ca-certificates           2024.3.11            h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+cachetools                5.3.3                     &lt;pip&gt;
+certifi                   2022.12.7                 &lt;pip&gt;
+cffi                      1.16.0                    &lt;pip&gt;
+charset-normalizer        2.1.1                     &lt;pip&gt;
+click                     8.1.7                     &lt;pip&gt;
+comm                      0.2.2                     &lt;pip&gt;
+contourpy                 1.2.1                     &lt;pip&gt;
+cycler                    0.12.1                    &lt;pip&gt;
+dacite                    1.8.1                     &lt;pip&gt;
+datasets                  2.18.0                    &lt;pip&gt;
+debugpy                   1.8.1                     &lt;pip&gt;
+decorator                 5.1.1                     &lt;pip&gt;
+defusedxml                0.7.1                     &lt;pip&gt;
+dill                      0.3.8                     &lt;pip&gt;
+docker-pycreds            0.4.0                     &lt;pip&gt;
+evaluate                  0.4.2                     &lt;pip&gt;
+exceptiongroup            1.2.1                     &lt;pip&gt;
+executing                 2.0.1                     &lt;pip&gt;
+fastjsonschema            2.19.1                    &lt;pip&gt;
+filelock                  3.13.1                    &lt;pip&gt;
+fonttools                 4.51.0                    &lt;pip&gt;
+fqdn                      1.5.1                     &lt;pip&gt;
+frozenlist                1.4.1                     &lt;pip&gt;
+fsspec                    2024.2.0                  &lt;pip&gt;
+gcsfs                     2024.2.0                  &lt;pip&gt;
+gitdb                     4.0.11                    &lt;pip&gt;
+GitPython                 3.1.43                    &lt;pip&gt;
+google-api-core           2.19.0                    &lt;pip&gt;
+google-auth               2.29.0                    &lt;pip&gt;
+google-auth-oauthlib      1.2.0                     &lt;pip&gt;
+google-cloud-core         2.4.1                     &lt;pip&gt;
+google-cloud-storage      2.16.0                    &lt;pip&gt;
+google-crc32c             1.5.0                     &lt;pip&gt;
+google-resumable-media    2.7.0                     &lt;pip&gt;
+googleapis-common-protos  1.63.0                    &lt;pip&gt;
+h11                       0.14.0                    &lt;pip&gt;
+htmlmin                   0.1.12                    &lt;pip&gt;
+httpcore                  1.0.5                     &lt;pip&gt;
+httpx                     0.27.0                    &lt;pip&gt;
+huggingface-hub           0.20.3                    &lt;pip&gt;
+idna                      3.4                       &lt;pip&gt;
+ImageHash                 4.3.1                     &lt;pip&gt;
+importlib_metadata        7.1.0                     &lt;pip&gt;
+importlib_resources       6.4.0                     &lt;pip&gt;
+ipykernel                 6.29.4                    &lt;pip&gt;
+ipython                   8.18.1                    &lt;pip&gt;
+ipywidgets                8.1.2                     &lt;pip&gt;
+isoduration               20.11.0                   &lt;pip&gt;
+jedi                      0.19.1                    &lt;pip&gt;
+Jinja2                    3.1.3                     &lt;pip&gt;
+joblib                    1.4.2                     &lt;pip&gt;
+json5                     0.9.25                    &lt;pip&gt;
+jsonpointer               2.4                       &lt;pip&gt;
+jsonschema                4.22.0                    &lt;pip&gt;
+jsonschema-specifications 2023.12.1                 &lt;pip&gt;
+jupyter                   1.0.0                     &lt;pip&gt;
+jupyter-console           6.6.3                     &lt;pip&gt;
+jupyter-events            0.10.0                    &lt;pip&gt;
+jupyter-lsp               2.2.5                     &lt;pip&gt;
+jupyter_client            8.6.1                     &lt;pip&gt;
+jupyter_core              5.7.2                     &lt;pip&gt;
+jupyter_server            2.14.0                    &lt;pip&gt;
+jupyter_server_terminals  0.5.3                     &lt;pip&gt;
+jupyterlab                4.1.8                     &lt;pip&gt;
+jupyterlab_pygments       0.3.0                     &lt;pip&gt;
+jupyterlab_server         2.27.1                    &lt;pip&gt;
+jupyterlab_widgets        3.0.10                    &lt;pip&gt;
+kiwisolver                1.4.5                     &lt;pip&gt;
+ld_impl_linux-64          2.38                 h1181459_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libffi                    3.4.4                h6a678d5_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libgcc-ng                 12.2.0              h65d4601_19    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+libstdcxx-ng              12.2.0              h46fd767_19    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+llvm-openmp               14.0.6               h9e868ea_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+llvmlite                  0.42.0                    &lt;pip&gt;
+MarkupSafe                2.1.5                     &lt;pip&gt;
+matplotlib                3.8.4                     &lt;pip&gt;
+matplotlib-inline         0.1.7                     &lt;pip&gt;
+mistune                   3.0.2                     &lt;pip&gt;
+mizani                    0.11.2                    &lt;pip&gt;
+mpmath                    1.3.0                     &lt;pip&gt;
+multidict                 6.0.5                     &lt;pip&gt;
+multimethod               1.11.2                    &lt;pip&gt;
+multiprocess              0.70.16                   &lt;pip&gt;
+nbclient                  0.10.0                    &lt;pip&gt;
+nbconvert                 7.16.4                    &lt;pip&gt;
+nbformat                  5.10.4                    &lt;pip&gt;
+ncurses                   6.4                  h6a678d5_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+nest-asyncio              1.6.0                     &lt;pip&gt;
+networkx                  3.2.1                     &lt;pip&gt;
+notebook                  7.1.3                     &lt;pip&gt;
+notebook_shim             0.2.4                     &lt;pip&gt;
+numba                     0.59.1                    &lt;pip&gt;
+numpy                     1.26.4                    &lt;pip&gt;
+oauthlib                  3.2.2                     &lt;pip&gt;
+openssl                   3.0.13               h7f8727e_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+overrides                 7.7.0                     &lt;pip&gt;
+packaging                 24.0                      &lt;pip&gt;
+pandas                    2.2.2                     &lt;pip&gt;
+pandocfilters             1.5.1                     &lt;pip&gt;
+parso                     0.8.4                     &lt;pip&gt;
+patsy                     0.5.6                     &lt;pip&gt;
+pexpect                   4.9.0                     &lt;pip&gt;
+phik                      0.12.4                    &lt;pip&gt;
+pillow                    10.2.0                    &lt;pip&gt;
+pip                       23.3.1           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+platformdirs              4.2.1                     &lt;pip&gt;
+plotnine                  0.13.5                    &lt;pip&gt;
+prometheus_client         0.20.0                    &lt;pip&gt;
+prompt-toolkit            3.0.43                    &lt;pip&gt;
+proto-plus                1.23.0                    &lt;pip&gt;
+protobuf                  4.25.3                    &lt;pip&gt;
+psutil                    5.9.8                     &lt;pip&gt;
+ptyprocess                0.7.0                     &lt;pip&gt;
+pure-eval                 0.2.2                     &lt;pip&gt;
+pyarrow                   16.0.0                    &lt;pip&gt;
+pyarrow-hotfix            0.6                       &lt;pip&gt;
+pyasn1                    0.6.0                     &lt;pip&gt;
+pyasn1_modules            0.4.0                     &lt;pip&gt;
+pycparser                 2.22                      &lt;pip&gt;
+pydantic                  2.7.1                     &lt;pip&gt;
+pydantic_core             2.18.2                    &lt;pip&gt;
+Pygments                  2.17.2                    &lt;pip&gt;
+pyparsing                 3.1.2                     &lt;pip&gt;
+pyreft                    0.0.5                     &lt;pip&gt;
+python                    3.9.19               h955ad1f_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+python-dateutil           2.9.0.post0               &lt;pip&gt;
+python-json-logger        2.0.7                     &lt;pip&gt;
+pytz                      2024.1                    &lt;pip&gt;
+pyvene                    0.1.1                     &lt;pip&gt;
+PyWavelets                1.6.0                     &lt;pip&gt;
+PyYAML                    6.0.1                     &lt;pip&gt;
+pyzmq                     26.0.3                    &lt;pip&gt;
+qtconsole                 5.5.1                     &lt;pip&gt;
+QtPy                      2.4.1                     &lt;pip&gt;
+readline                  8.2                  h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+referencing               0.35.1                    &lt;pip&gt;
+regex                     2024.4.28                 &lt;pip&gt;
+requests                  2.31.0                    &lt;pip&gt;
+requests-oauthlib         2.0.0                     &lt;pip&gt;
+rfc3339-validator         0.1.4                     &lt;pip&gt;
+rfc3986-validator         0.1.1                     &lt;pip&gt;
+rpds-py                   0.18.0                    &lt;pip&gt;
+rsa                       4.9                       &lt;pip&gt;
+safetensors               0.4.3                     &lt;pip&gt;
+scikit-learn              1.4.2                     &lt;pip&gt;
+scipy                     1.11.4                    &lt;pip&gt;
+seaborn                   0.12.2                    &lt;pip&gt;
+Send2Trash                1.8.3                     &lt;pip&gt;
+sentencepiece             0.2.0                     &lt;pip&gt;
+sentry-sdk                2.0.1                     &lt;pip&gt;
+setproctitle              1.3.3                     &lt;pip&gt;
+setuptools                68.2.2           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+six                       1.16.0                    &lt;pip&gt;
+smmap                     5.0.1                     &lt;pip&gt;
+sniffio                   1.3.1                     &lt;pip&gt;
+soupsieve                 2.5                       &lt;pip&gt;
+sqlite                    3.45.3               h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+stack-data                0.6.3                     &lt;pip&gt;
+statsmodels               0.14.2                    &lt;pip&gt;
+sympy                     1.12                      &lt;pip&gt;
+terminado                 0.18.1                    &lt;pip&gt;
+threadpoolctl             3.5.0                     &lt;pip&gt;
+tinycss2                  1.3.0                     &lt;pip&gt;
+tk                        8.6.12               h1ccaba5_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tokenizers                0.19.1                    &lt;pip&gt;
+tomli                     2.0.1                     &lt;pip&gt;
+torch                     2.1.0+cu118               &lt;pip&gt;
+torchaudio                2.1.0+cu118               &lt;pip&gt;
+torchvision               0.16.0+cu118              &lt;pip&gt;
+tornado                   6.4                       &lt;pip&gt;
+tqdm                      4.66.2                    &lt;pip&gt;
+traitlets                 5.14.3                    &lt;pip&gt;
+transformers              4.40.1                    &lt;pip&gt;
+triton                    2.1.0                     &lt;pip&gt;
+typeguard                 4.2.1                     &lt;pip&gt;
+types-python-dateutil     2.9.0.20240316            &lt;pip&gt;
+typing_extensions         4.11.0                    &lt;pip&gt;
+tzdata                    2024a                h04d1e81_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tzdata                    2024.1                    &lt;pip&gt;
+uri-template              1.3.0                     &lt;pip&gt;
+urllib3                   1.26.13                   &lt;pip&gt;
+visions                   0.7.6                     &lt;pip&gt;
+wandb                     0.16.6                    &lt;pip&gt;
+wcwidth                   0.2.13                    &lt;pip&gt;
+webcolors                 1.13                      &lt;pip&gt;
+webencodings              0.5.1                     &lt;pip&gt;
+websocket-client          1.8.0                     &lt;pip&gt;
+wheel                     0.41.2           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+widgetsnbextension        4.0.10                    &lt;pip&gt;
+wordcloud                 1.9.3                     &lt;pip&gt;
+xxhash                    3.4.1                     &lt;pip&gt;
+xz                        5.4.6                h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+yarl                      1.9.4                     &lt;pip&gt;
+ydata-profiling           4.7.0                     &lt;pip&gt;
+zipp                      3.18.1                    &lt;pip&gt;
+zlib                      1.2.13               h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+</code></pre>
+<p><br />
+接着开始加载数据集和训练，主要首先要在<code>train.py</code>的<code>import os</code>的下一行添加<code>os.environ['CUDA_VISIBLE_DEVICES'] = gpu_ids</code>：</p>
+<pre><code class="language-shell">cd examples/loreft
+
+bash load_datasets.sh
+
+python train.py -task commonsense \
+-data_dir dataset \
+-model Meta-Llama-3-8B \
+-seed 42 \
+-l all -r 8 -p f7+l7 -e 6 -lr 9e-4 \
+-type LoreftIntervention \
+-gradient_accumulation_steps 2 \
+-batch_size 16 \
+-eval_batch_size 4 \
+--dropout 0.00 \
+--test_split test \
+--use_normalized_template \
+--share_weights \
+--warmup_ratio 0.1 \
+--greedy_decoding
+</code></pre>
+<p><br />
+然而，OOM了：</p>
+<pre><code class="language-shell">task: commonsense, model: Meta-Llama-3-8B, intervention_type: LoreftIntervention, layers: all, rank: 8, position: f7+l7, epoch: 6, train_on_inputs: False, max_length: 512, allow_cls_grad: False
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+adding a special padding token...
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True, 'test_split': 'test'}
+loading data for dataset:  dataset/commonsense_170k/train.json
+100%|██████████████████████████████████████████████████████| 170420/170420 [03:35&lt;00:00, 790.43it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/boolq/test.json
+100%|█████████████████████████████████████████████████████████| 3270/3270 [00:01&lt;00:00, 2125.64it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/piqa/test.json
+100%|█████████████████████████████████████████████████████████| 1838/1838 [00:01&lt;00:00, 1547.68it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/social_i_qa/test.json
+100%|█████████████████████████████████████████████████████████| 1954/1954 [00:01&lt;00:00, 1671.51it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/hellaswag/test.json
+100%|████████████████████████████████████████████████████████| 10042/10042 [00:12&lt;00:00, 801.31it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/winogrande/test.json
+100%|█████████████████████████████████████████████████████████| 1267/1267 [00:00&lt;00:00, 1791.21it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/ARC-Easy/test.json
+100%|█████████████████████████████████████████████████████████| 2376/2376 [00:01&lt;00:00, 1588.23it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/ARC-Challenge/test.json
+100%|█████████████████████████████████████████████████████████| 1172/1172 [00:00&lt;00:00, 1445.56it/s]
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True}
+loading data for dataset:  dataset/openbookqa/test.json
+100%|███████████████████████████████████████████████████████████| 500/500 [00:00&lt;00:00, 1674.78it/s]
+Loading checkpoint shards: 100%|██████████████████████████████████████| 4/4 [00:09&lt;00:00,  2.43s/it]
+trainable intervention params: 2,097,408 || trainable model params: 0
+model params: 8,030,269,440 || trainable%: 0.0261187749137344
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+  0%|                                                                     | 0/31956 [00:00&lt;?, ?it/s]Traceback (most recent call last):
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 481, in &lt;module&gt;
+    main()
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 477, in main
+    finetune(**vars(args), args=args)
+  File &quot;/home/workspace/nanyang/pyreft/examples/loreft/train.py&quot;, line 376, in finetune
+    trainer.train()
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 1859, in train
+    return inner_training_loop(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 2203, in _inner_training_loop
+    tr_loss_step = self.training_step(model, inputs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/transformers/trainer.py&quot;, line 3138, in training_step
+    loss = self.compute_loss(model, inputs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/pyreft/reft_trainer.py&quot;, line 82, in compute_loss
+    _, cf_outputs = intervenable(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/pyvene/models/intervenable_base.py&quot;, line 1460, in forward
+    raise e
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/pyvene/models/intervenable_base.py&quot;, line 1443, in forward
+    counterfactual_outputs = self.model(**base, labels=labels)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/transformers/models/llama/modeling_llama.py&quot;, line 1208, in forward
+    outputs = self.model(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/transformers/models/llama/modeling_llama.py&quot;, line 1018, in forward
+    layer_outputs = decoder_layer(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1568, in _call_impl
+    result = forward_call(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/transformers/models/llama/modeling_llama.py&quot;, line 741, in forward
+    hidden_states, self_attn_weights, present_key_value = self.self_attn(
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/modules/module.py&quot;, line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/transformers/models/llama/modeling_llama.py&quot;, line 378, in forward
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query_states.dtype)
+  File &quot;/home/workspace/nanyang/anaconda3/envs/reft/lib/python3.9/site-packages/torch/nn/functional.py&quot;, line 1858, in softmax
+    ret = input.softmax(dim, dtype=dtype)
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 132.00 MiB. GPU 0 has a total capacty of 23.70 GiB of which 7.69 MiB is free. Including non-PyTorch memory, this process has 23.69 GiB memory in use. Of the allocated memory 22.28 GiB is allocated by PyTorch, and 145.95 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+  0%|                                                                     | 0/31956 [00:03&lt;?, ?it/s]
+</code></pre>
 
                   </article>
                   <div class="comments-wrap">
