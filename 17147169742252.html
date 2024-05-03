@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    LLM Process - Prepare for the FUTURE
+    REFT - Prepare for the FUTURE
     
     </title>
     
@@ -77,7 +77,7 @@
                   <div class="post-body single-content">
                     
                     <h1 class="title">
-                            LLM Process   
+                            REFT   
                       </h1>
                      
                     
@@ -86,7 +86,7 @@
                             <div class="media-content">
                               <div class="content">
                                 <p>
-                                 <span class="date">2024/04/24</span>
+                                 <span class="date">2024/05/03</span>
                                   
                                          
                                   
@@ -106,40 +106,7 @@
                     </div>
                 </div>
                   <article class="markdown-body single-content">
-                    <h2><a id="%E6%9E%84%E5%BB%BA%E6%B5%81%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>构建流程</h2>
-<p><img src="media/17139441752638/17139442169128.jpg" alt="" /></p>
-<h4><a id="%E9%A2%84%E8%AE%AD%E7%BB%83%EF%BC%9A%E9%80%9A%E8%BF%87%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%EF%BC%8C%E6%9E%84%E5%BB%BA%E5%9F%BA%E7%A1%80%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8Bbase-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>预训练：通过海量数据，构建基础语言模型Base Model</h4>
-<ul>
-<li>
-<p>Base模型构建长文本的建模能力，使模型有语言生成能力，根据输入的提示词Prompt，模型可以生成文本补全句子。</p>
-</li>
-<li>
-<p>难点：提升分布式计算效率；让模型训练稳定收敛。</p>
-</li>
-</ul>
-<h4><a id="%E6%9C%89%E7%9B%91%E7%9D%A3%E5%BE%AE%E8%B0%83%EF%BC%9A%E9%80%9A%E8%BF%87%E5%B0%91%E9%87%8F%E9%AB%98%E8%B4%A8%E9%87%8F%E6%95%B0%E6%8D%AE%E9%9B%86%E5%90%88%EF%BC%88prompt%E8%BE%93%E5%87%BA%EF%BC%89%EF%BC%8C%E6%9E%84%E5%BB%BA%E6%9C%89%E7%9B%91%E7%9D%A3%E5%BE%AE%E8%B0%83%E6%A8%A1%E5%9E%8B-sft-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>有监督微调：通过少量高质量数据集合（Prompt+输出），构建有监督微调模型SFT Model</h4>
-<ul>
-<li>
-<p>SFT模型具备初步的指令理解能力和上下文理解能力，具备初步的任务完成能力。</p>
-</li>
-<li>
-<p>难点：如何构造少量高质量的训练数据。</p>
-</li>
-</ul>
-<h4><a id="%E5%A5%96%E5%8A%B1%E5%BB%BA%E6%A8%A1%EF%BC%9A%E5%AF%B9%E4%BA%8E%EF%BC%88%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%AF%B9%E6%AF%94%E6%95%B0%E6%8D%AE%E6%A0%87%E6%B3%A8%EF%BC%89%E5%90%8C%E4%B8%80%E4%B8%AAprompt%EF%BC%8Csft%E7%BB%99%E5%87%BA%E7%9A%84%E5%A4%9A%E4%B8%AA%E4%B8%8D%E5%90%8C%E8%BE%93%E5%87%BA%E7%BB%93%E6%9E%9C%E7%9A%84%E8%B4%A8%E9%87%8F%E8%BF%9B%E8%A1%8C%E6%8E%92%E5%BA%8F%EF%BC%8C%E6%9E%84%E5%BB%BA%E5%A5%96%E5%8A%B1%E6%A8%A1%E5%9E%8Breward-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>奖励建模：对于（大规模对比数据标注）同一个Prompt，SFT给出的多个不同输出结果的质量进行排序，构建奖励模型Reward Model</h4>
-<ul>
-<li>难点：标注工作量巨大；保持标注人员人员之间的一致性；奖励模型的泛化能力边界。</li>
-</ul>
-<h4><a id="%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%9A%E6%A0%B9%E6%8D%AE%E4%BC%97%E5%A4%9A%E6%8F%90%E7%A4%BA%E8%AF%8D%EF%BC%8C%E5%88%A9%E7%94%A8rm%E6%A8%A1%E5%9E%8B%EF%BC%8C%E7%BB%99%E5%87%BAsft%E6%A8%A1%E5%9E%8B%E5%AF%B9%E7%94%A8%E6%88%B7%E6%8F%90%E7%A4%BA%E8%AF%8D%E8%A1%A5%E5%85%A8%E7%BB%93%E6%9E%9C%E7%9A%84%E8%B4%A8%E9%87%8F%E8%AF%84%E4%BC%B0%EF%BC%8C%E5%B9%B6%E4%B8%8E%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E5%BB%BA%E6%A8%A1%E7%9B%AE%E6%A0%87%E8%BF%9B%E8%A1%8C%E7%BB%BC%E5%90%88%EF%BC%8C%E5%BE%97%E5%88%B0%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%95%88%E6%9E%9C%E3%80%82%EF%BC%88%E5%B0%91%E9%87%8F%E6%95%B0%E6%8D%AE%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>强化学习：根据众多提示词，利用RM模型，给出SFT模型对用户提示词补全结果的质量评估，并与语言模型建模目标进行综合，得到更好的效果。（少量数据）</h4>
-<ul>
-<li>
-<p>使用强化学习，在SFT模型基础上调整超参数，使得最终生成的文本可以获得更高的奖励。</p>
-</li>
-<li>
-<p>难点：强化学习方法稳定性差，如何在LLM上有效应用强化学习</p>
-</li>
-</ul>
-
+                    
                   </article>
                   <div class="comments-wrap">
                     <div class="share-comments">
