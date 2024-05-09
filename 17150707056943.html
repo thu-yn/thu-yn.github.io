@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    LoReFT-Llama3-8B-Base-Code-122k - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            LoReFT-Llama3-8B-Base-Code-122k   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/05/07</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_Llama3%20ReFTEng%20vs%20PEFT.html'>#Llama3 ReFTEng vs PEFT</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <blockquote>
+<p>自从 llama3-8b-base 的 commonsense 微调跑通之后，对于 base 和 instruct 的模型的 commonsense 或 math 微调就只是时间问题。因此将目标放在利用 ReFT 实现 llama3-8b 在 code 任务上的微调。</p>
+</blockquote>
+<h2><a id="prepare" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prepare</h2>
+<p>具体可以参考之前的博客 <a href="https://thu-yn.github.io/17147464283285.html" title="LoReFT-Llama3-8B-Base-Commonsense-170k">LoReFT-Llama3-8B-Base-Commonsense-170k</a> 的相关配置。</p>
+<h2><a id="dataset" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dataset</h2>
+<p>由于缺乏对应的 train&amp;eval 数据集，因此需要自己去找开源的数据集。</p>
+<h3><a id="train-dataset" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Train Dataset</h3>
+<p>在训练数据集方面，选择 hugging face 上的 <a href="https://huggingface.co/datasets/TokenBender/code_instructions_122k_alpaca_style" title="TokenBender/code_instructions_122k_alpaca_style">code_instructions_122k_alpaca_style</a> 数据集，该数据集采用经典的 alpaca 格式进行 prompt。首先将其下载到本地并改名：</p>
+<pre><code class="language-shell"># 默认已经进入 LoReFT 虚拟环境，并进入到 /root/auto-tmp/pyreft/examples/loreft 中
+# 创建文件夹
+cd dataset &amp;&amp; mkdir code_122k &amp;&amp; cd code_122k
+
+# 下载数据集（用 hf-mirror.com 更快）
+# 注：下载链接：将鼠标放在数据集上，右键复制链接。
+wget https://hf-mirror.com/datasets/TokenBender/code_instructions_122k_alpaca_style/resolve/main/code_instructions_120k.json?download=true
+
+--2024-05-07 16:25:03--  https://cdn-lfs.hf-mirror.com/repos/ab/1d/***&amp;response-content-type=***&amp;Expires=***&amp;Policy=***&amp;Signature=***&amp;Key-Pair-Id=***
+Resolving cdn-lfs.hf-mirror.com (cdn-lfs.hf-mirror.com)... *.*.*.*, *.*.*.*, *.*.*.*, ...
+Connecting to cdn-lfs.hf-mirror.com (cdn-lfs.hf-mirror.com)|*.*.*.*|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 169499006 (162M) [application/json]
+Saving to: ‘code_instructions_120k.json?download=true’
+
+code_instruction 100%[========&gt;] 161.65M  16.9MB/s    in 9.7s    
+
+# 改名（右键也可以）
+mv code_instructions_120k.json\?download\=true train.json
+
+# 检查
+ls
+train.json
+</code></pre>
+<p><br />
+接下来输出其中一个训练样本，观察其特征：</p>
+<pre><code class="language-python"># 在 /root/auto-tmp/pyreft/examples/loreft/dataset/code_122k 下
+
+&gt;&gt;&gt; from datasets import load_dataset
+&gt;&gt;&gt; dataset = load_dataset(&quot;json&quot;, data_files=&quot;train.json&quot;, split=&quot;train&quot;)
+Generating train split: 121959 examples [00:01, 96800.40 examples/Generating train split: 121959 examples [00:01, 92617.72 examples/s]
+&gt;&gt;&gt; dataset[0]
+{'output': '# Python code\ndef sum_sequence(sequence):\n  sum = 0\n  for num in sequence:\n    sum += num\n  return sum', 'input': '[1, 2, 3, 4, 5]', 'instruction': 'Create a function to calculate the sum of a sequence of integers.', 'text': 'Below is an instruction that describes a task. Write a response that appropriately completes the request. ### Instruction: Create a function to calculate the sum of a sequence of integers. ### Input: [1, 2, 3, 4, 5] ### Output: # Python code\ndef sum_sequence(sequence):\n  sum = 0\n  for num in sequence:\n    sum += num\n  return sum'}
+</code></pre>
+<p><br />
+可以看到，其样本按照以下表格形式分布：</p>
+<table>
+<thead>
+<tr>
+<th>instruction</th>
+<th style="text-align: left">input</th>
+<th>output</th>
+<th>text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create a function to calculate the sum of a sequence of integers.</td>
+<td style="text-align: left">[1, 2, 3, 4, 5]</td>
+<td># Python code\ndef sum_sequence(sequence):\n  sum = 0\n  for num in sequence:\n    sum += num\n  return sum</td>
+<td>Below is an instruction that describes a task. Write a response that appropriately completes the request. ### Instruction: Create a function to calculate the sum of a sequence of integers. ### Input: [1, 2, 3, 4, 5] ### Output: # Python code\ndef sum_sequence(sequence):\n  sum = 0\n  for num in sequence:\n    sum += num\n  return sum</td>
+</tr>
+</tbody>
+</table>
+<p>在 <code>/loreft/templates.py</code> 内找到对应的模版 <code>alpaca_prompt_template</code>，同时注意到某些 inpur 是空的，因此需要相应的 <code>alpaca_prompt_no_input_template</code>，如下所示：</p>
+<pre><code class="language-python">alpaca_prompt_template = &quot;&quot;&quot;Below is an instruction that \
+describes a task, paired with an input that provides \
+further context. Write a response that appropriately \
+completes the request.
+
+### Instruction:
+%s
+
+### Input:
+%s
+
+### Response:
+&quot;&quot;&quot;
+
+alpaca_prompt_no_input_template = &quot;&quot;&quot;Below is an instruction that \
+describes a task. Write a response that appropriately \
+completes the request.
+
+### Instruction:
+%s
+
+### Response:
+&quot;&quot;&quot;
+</code></pre>
+<h3><a id="eval-dataset" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eval Dataset</h3>
+<p>~~ 在验证数据集上，采用 <a href="https://github.com/openai/human-eval" title="human-eval">Human-Eval</a> 和<a href="https://github.com/google-research/google-research/tree/master/mbpp" title="mbpp">MBPP</a>共同作为评分的指标。~~<br />
+采用 <a href="https://github.com/bigcode-project/bigcode-evaluation-harness" title="bigcode-evaluation-harness">bigcode-evaluation-harness</a> 来进行各个指标的评估。</p>
+<h4><a id="human-eval" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Human-Eval</h4>
+<p>首先是 Human-Eval 数据集，将其 git 到 <code>/root/auto-tmp/</code> 路径下，并安装相关包：</p>
+<pre><code class="language-shell"># 同样在虚拟环境下
+cd /root/auto-tmp
+
+# git
+git clone https://github.com/openai/human-eval
+
+# installation
+/root/miniconda3/envs/LoReFT/bin/pip install -e human-eval
+
+Looking in indexes: http://mirrors.aliyun.com/pypi/simple
+Obtaining file:///root/autodl-tmp/human-eval
+  Preparing metadata (setup.py) ... done
+Requirement already satisfied: tqdm in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from human-eval==1.0) (4.66.4)
+Requirement already satisfied: fire in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from human-eval==1.0) (0.6.0)
+Requirement already satisfied: numpy in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from human-eval==1.0) (1.26.4)
+Requirement already satisfied: six in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from fire-&gt;human-eval==1.0) (1.16.0)
+Requirement already satisfied: termcolor in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from fire-&gt;human-eval==1.0) (2.4.0)
+Installing collected packages: human-eval
+  Running setup.py develop for human-eval
+Successfully installed human-eval-1.0
+</code></pre>
+<p><br />
+可以看到其采取的评估样本的示例（在 <code>human-eval/data/HumanEval.jsonl.gz</code> 中）：</p>
+<pre><code class="language-python">{&quot;task_id&quot;: &quot;HumanEval/0&quot;, &quot;prompt&quot;: &quot;from typing import List\n\n\ndef has_close_elements(numbers: List[float], threshold: float)-&gt; bool:\n    \&quot;\&quot;\&quot; Check if in given list of numbers, are any two numbers closer to each other than\n    given threshold.\n    &gt;&gt;&gt; has_close_elements([1.0, 2.0, 3.0], 0.5)\n    False\n    &gt;&gt;&gt; has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3)\n    True\n    \&quot;\&quot;\&quot;\n&quot;, &quot;entry_point&quot;: &quot;has_close_elements&quot;, &quot;canonical_solution&quot;: &quot;for idx, elem in enumerate(numbers):\n        for idx2, elem2 in enumerate(numbers):\n            if idx != idx2:\n                distance = abs(elem - elem2)\n                if distance &lt; threshold:\n                    return True\n\n    return False\n&quot;, &quot;test&quot;: &quot;\n\nMETADATA = {\n'author':'jt',\n'dataset':'test'\n}\n\n\ndef check(candidate):\n    assert candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2], 0.3)== True\n    assert candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2], 0.05)== False\n    assert candidate([1.0, 2.0, 5.9, 4.0, 5.0], 0.95)== True\n    assert candidate([1.0, 2.0, 5.9, 4.0, 5.0], 0.8)== False\n    assert candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.0], 0.1)== True\n    assert candidate([1.1, 2.2, 3.1, 4.1, 5.1], 1.0)== True\n    assert candidate([1.1, 2.2, 3.1, 4.1, 5.1], 0.5)== False\n\n&quot;}
+</code></pre>
+<p><br />
+通过了解得知，human-eval 一共只有 164 条测试用例，每个测试用例由以下部分组成：</p>
+<pre><code class="language-shell">├── example
+│   ├── task_id：任务 id
+│   ├── prompt： 题目
+│   ├── entry_point：唯一标记
+│   ├── canonical_solution：参考答案
+│   ├── test：测试用例
+</code></pre>
+<p><br />
+若想对生成模型进行评估，则只需要两步：</p>
+<ul>
+<li>定义 <code>generate_one_completion</code> 函数，其作用是调用当前微调后的大模型对测试用例中的每个样本的 prompt 进行代码生成。</li>
+</ul>
+<pre><code class="language-python">from human_eval.data import write_jsonl, read_problems
+
+problems = read_problems()
+
+num_samples_per_task = 200
+samples = [dict(task_id=task_id, completion=generate_one_completion(problems[task_id][&quot;prompt&quot;]))
+    for task_id in problems
+    for _ in range(num_samples_per_task)
+]
+write_jsonl(&quot;samples.jsonl&quot;, samples)
+</code></pre>
+<ul>
+<li>调用 <code>evaluate_functional_correctness</code> 对上一步生成的 <code>&quot;samples.jsonl&quot;</code> 进行评估：</li>
+</ul>
+<pre><code class="language-shell">evaluate_functional_correctness samples.jsonl
+</code></pre>
+<h4><a id="bigcode-evaluation-harness" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>bigcode-evaluation-harness</h4>
+<p>这是一个开源的 github 库，用于评估代码生成模型的框架。一共有 7 个代码生成任务。</p>
+<pre><code class="language-shell"># 同样在虚拟环境下
+cd /root/auto-tmp
+
+# git
+git clone https://github.com/bigcode-project/bigcode-evaluation-harness.git
+
+# installation
+/root/miniconda3/envs/LoReFT/bin/pip install -e bigcode-evaluation-harness
+</code></pre>
+<p><br />
+然而却报错：</p>
+<pre><code class="language-shell">Looking in indexes: http://mirrors.aliyun.com/pypi/simple
+Obtaining file:///root/autodl-tmp/bigcode-evaluation-harness
+  Preparing metadata (setup.py) ... done
+Requirement already satisfied: transformers&gt;=4.25.1 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from bigcode-eval==0.0.0) (4.40.1)
+Requirement already satisfied: accelerate&gt;=0.13.2 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from bigcode-eval==0.0.0) (0.29.3)
+Requirement already satisfied: datasets&gt;=2.6.1 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from bigcode-eval==0.0.0) (2.18.0)
+Requirement already satisfied: evaluate&gt;=0.3.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from bigcode-eval==0.0.0) (0.4.2)
+Collecting pyext==0.7 (from bigcode-eval==0.0.0)
+  Downloading http://mirrors.aliyun.com/pypi/packages/b0/be/9b6005ac644aaef022527ce49617263379e49dbdbd433d1d3dd66d71f570/pyext-0.7.tar.gz (7.8 kB)
+  Preparing metadata (setup.py) ... done
+Collecting mosestokenizer==1.0.0 (from bigcode-eval==0.0.0)
+  Downloading http://mirrors.aliyun.com/pypi/packages/45/c6/913c968e5cbcaff6cdd2a54a1008330c01a573ecadcdf9f526058e3d33a0/mosestokenizer-1.0.0-py3-none-any.whl (51 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.2/51.2 kB 2.5 MB/s eta 0:00:00
+Requirement already satisfied: huggingface_hub&gt;=0.11.1 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from bigcode-eval==0.0.0) (0.20.3)
+Collecting fsspec&lt;2023.10.0 (from bigcode-eval==0.0.0)
+  Downloading http://mirrors.aliyun.com/pypi/packages/fe/d3/e1aa96437d944fbb9cc95d0316e25583886e9cd9e6adc07baad943524eda/fsspec-2023.9.2-py3-none-any.whl (173 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 173.4/173.4 kB 7.0 MB/s eta 0:00:00
+Collecting docopt (from mosestokenizer==1.0.0-&gt;bigcode-eval==0.0.0)
+  Downloading http://mirrors.aliyun.com/pypi/packages/a2/55/8f8cab2afd404cf578136ef2cc5dfb50baa1761b68c9da1fb1e4eed343c9/docopt-0.6.2.tar.gz (25 kB)
+  Preparing metadata (setup.py) ... done
+Collecting openfile (from mosestokenizer==1.0.0-&gt;bigcode-eval==0.0.0)
+  Downloading http://mirrors.aliyun.com/pypi/packages/93/e6/805db6867faacb488b44ba8e0829ef4de151dd0499f3c5da5f4ad11698a7/openfile-0.0.7-py3-none-any.whl (2.4 kB)
+Collecting toolwrapper (from mosestokenizer==1.0.0-&gt;bigcode-eval==0.0.0)
+  Downloading http://mirrors.aliyun.com/pypi/packages/41/7b/34bf8fb69426d8a18bcc61081e9d126f4fcd41c3c832072bef39af1602cd/toolwrapper-2.1.0.tar.gz (3.2 kB)
+  Preparing metadata (setup.py) ... done
+Requirement already satisfied: numpy&gt;=1.17 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (1.26.4)
+Requirement already satisfied: packaging&gt;=20.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (24.0)
+Requirement already satisfied: psutil in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (5.9.8)
+Requirement already satisfied: pyyaml in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (6.0.1)
+Requirement already satisfied: torch&gt;=1.10.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (2.1.0+cu118)
+Requirement already satisfied: safetensors&gt;=0.3.1 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (0.4.3)
+Requirement already satisfied: filelock in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (3.13.1)
+Requirement already satisfied: pyarrow&gt;=12.0.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (16.0.0)
+Requirement already satisfied: pyarrow-hotfix in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (0.6)
+Requirement already satisfied: dill&lt;0.3.9,&gt;=0.3.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (0.3.8)
+Requirement already satisfied: pandas in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (2.2.2)
+Requirement already satisfied: requests&gt;=2.19.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (2.31.0)
+Requirement already satisfied: tqdm&gt;=4.62.1 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (4.66.4)
+Requirement already satisfied: xxhash in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (3.4.1)
+Requirement already satisfied: multiprocess in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (0.70.16)
+Requirement already satisfied: aiohttp in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (3.9.5)
+Requirement already satisfied: typing-extensions&gt;=3.7.4.3 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from huggingface_hub&gt;=0.11.1-&gt;bigcode-eval==0.0.0) (4.11.0)
+Requirement already satisfied: regex!=2019.12.17 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from transformers&gt;=4.25.1-&gt;bigcode-eval==0.0.0) (2024.4.28)
+Requirement already satisfied: tokenizers&lt;0.20,&gt;=0.19 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from transformers&gt;=4.25.1-&gt;bigcode-eval==0.0.0) (0.19.1)
+Requirement already satisfied: aiosignal&gt;=1.1.2 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from aiohttp-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (1.3.1)
+Requirement already satisfied: attrs&gt;=17.3.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from aiohttp-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (23.2.0)
+Requirement already satisfied: frozenlist&gt;=1.1.1 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from aiohttp-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (1.4.1)
+Requirement already satisfied: multidict&lt;7.0,&gt;=4.5 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from aiohttp-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (6.0.5)
+Requirement already satisfied: yarl&lt;2.0,&gt;=1.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from aiohttp-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (1.9.4)
+Requirement already satisfied: async-timeout&lt;5.0,&gt;=4.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from aiohttp-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (4.0.3)
+Requirement already satisfied: charset-normalizer&lt;4,&gt;=2 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from requests&gt;=2.19.0-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (2.1.1)
+Requirement already satisfied: idna&lt;4,&gt;=2.5 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from requests&gt;=2.19.0-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (3.4)
+Requirement already satisfied: urllib3&lt;3,&gt;=1.21.1 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from requests&gt;=2.19.0-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (1.26.13)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from requests&gt;=2.19.0-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (2022.12.7)
+Requirement already satisfied: sympy in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from torch&gt;=1.10.0-&gt;accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (1.12)
+Requirement already satisfied: networkx in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from torch&gt;=1.10.0-&gt;accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (3.2.1)
+Requirement already satisfied: jinja2 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from torch&gt;=1.10.0-&gt;accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (3.1.3)
+Requirement already satisfied: triton==2.1.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from torch&gt;=1.10.0-&gt;accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (2.1.0)
+Requirement already satisfied: python-dateutil&gt;=2.8.2 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from pandas-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (2.9.0.post0)
+Requirement already satisfied: pytz&gt;=2020.1 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from pandas-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (2024.1)
+Requirement already satisfied: tzdata&gt;=2022.7 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from pandas-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (2024.1)
+Requirement already satisfied: six&gt;=1.5 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from python-dateutil&gt;=2.8.2-&gt;pandas-&gt;datasets&gt;=2.6.1-&gt;bigcode-eval==0.0.0) (1.16.0)
+Requirement already satisfied: MarkupSafe&gt;=2.0 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from jinja2-&gt;torch&gt;=1.10.0-&gt;accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (2.1.5)
+Requirement already satisfied: mpmath&gt;=0.19 in /root/miniconda3/envs/LoReFT/lib/python3.9/site-packages (from sympy-&gt;torch&gt;=1.10.0-&gt;accelerate&gt;=0.13.2-&gt;bigcode-eval==0.0.0) (1.3.0)
+Building wheels for collected packages: pyext, docopt, toolwrapper
+  Building wheel for pyext (setup.py) ... done
+  Created wheel for pyext: filename=pyext-0.7-py3-none-any.whl size=7220 sha256=994385fc51239f3e8d82ca21b8a3152bf873f832e6674ea3279ad1c3d91f5695
+  Stored in directory: /root/.cache/pip/wheels/ec/9f/a2/3c50fa0f513c656523a3724295f8fb37c5f09572774be10570
+  Building wheel for docopt (setup.py) ... done
+  Created wheel for docopt: filename=docopt-0.6.2-py2.py3-none-any.whl size=13705 sha256=b4fd6997789d860074a28b0c07dd98c58a140d51772496452e0e381582202ad4
+  Stored in directory: /root/.cache/pip/wheels/74/2f/07/7824901723b560c9c8114388098d86bd51f940c34590d6fc9d
+  Building wheel for toolwrapper (setup.py) ... done
+  Created wheel for toolwrapper: filename=toolwrapper-2.1.0-py3-none-any.whl size=3337 sha256=e31b2a9a94ac66dde5bca830e2501efd620542b9ec5e285a1a640a34e6566dac
+  Stored in directory: /root/.cache/pip/wheels/5b/11/5e/a30eaffc02989a636edaaf1f336808e521019cd739756366e1
+Successfully built pyext docopt toolwrapper
+Installing collected packages: toolwrapper, pyext, openfile, docopt, mosestokenizer, fsspec, bigcode-eval
+  Attempting uninstall: fsspec
+    Found existing installation: fsspec 2024.2.0
+    Uninstalling fsspec-2024.2.0:
+      Successfully uninstalled fsspec-2024.2.0
+  Running setup.py develop for bigcode-eval
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+gcsfs 2024.2.0 requires fsspec==2024.2.0, but you have fsspec 2023.9.2 which is incompatible.
+pyreft 0.0.5 requires fsspec&gt;=2024.2.0, but you have fsspec 2023.9.2 which is incompatible.
+Successfully installed bigcode-eval-0.0.0 docopt-0.6.2 fsspec-2023.9.2 mosestokenizer-1.0.0 openfile-0.0.7 pyext-0.7 toolwrapper-2.1.0
+</code></pre>
+<p><br />
+可以看到 bigcode-evaluation-harness 和 pyreft 所需要的共同库 <code>fsspec</code> 发生了版本冲突，因此考虑新开一个虚拟环境，安装 bigcode-evaluation-harness。</p>
+<blockquote>
+<p>注：在 bigcode-evaluation-harness 的 README.md 中，指出要进行 <code>DS-1000</code> 的指标评估，需要 <code>python==3.7.10</code> 和 <code>torch==1.12.1</code>。</p>
+</blockquote>
+<pre><code class="language-shell"># 新建虚拟环境
+conda create -n &quot;CodeEval&quot; python=3.7
+
+cd /root/auto-tmp/bigcode-evaluation-harness
+
+# installation
+# 注：在这行该命令时，会自动安装 1.12.1 版本的 torch，但是需要卸载掉它，然后重新安装 1.12.1+cu116 版本的 torch。
+/root/miniconda3/envs/CodeEval/bin/pip install -e &quot;.[ds1000]&quot;
+
+# install pytorch
+/root/miniconda3/envs/CodeEval/bin/pip install torch==1.12.1+cu116 --extra-index-url https://download.pytorch.org/whl/cu116
+
+# 查看安装的库
+conda list
+
+# packages in environment at /root/miniconda3/envs/CodeEval:
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                        main    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+_openmp_mutex             5.1                       1_gnu    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+absl-py                   2.1.0                    pypi_0    pypi
+accelerate                0.20.3                   pypi_0    pypi
+aiohttp                   3.8.6                    pypi_0    pypi
+aiosignal                 1.3.1                    pypi_0    pypi
+astunparse                1.6.3                    pypi_0    pypi
+async-timeout             4.0.3                    pypi_0    pypi
+asynctest                 0.13.0                   pypi_0    pypi
+attrs                     23.2.0                   pypi_0    pypi
+bigcode-eval              0.0.0                     dev_0    &lt;develop&gt;
+ca-certificates           2024.3.11            h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+cachetools                5.3.3                    pypi_0    pypi
+certifi                   2022.12.7        py37h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+charset-normalizer        3.3.2                    pypi_0    pypi
+cycler                    0.11.0                   pypi_0    pypi
+datasets                  2.13.2                   pypi_0    pypi
+datetime                  4.7                      pypi_0    pypi
+dill                      0.3.6                    pypi_0    pypi
+docopt                    0.6.2                    pypi_0    pypi
+et-xmlfile                1.1.0                    pypi_0    pypi
+evaluate                  0.4.1                    pypi_0    pypi
+filelock                  3.12.2                   pypi_0    pypi
+flatbuffers               24.3.25                  pypi_0    pypi
+fonttools                 4.38.0                   pypi_0    pypi
+frozenlist                1.3.3                    pypi_0    pypi
+fsspec                    2023.1.0                 pypi_0    pypi
+gast                      0.4.0                    pypi_0    pypi
+gensim                    4.2.0                    pypi_0    pypi
+google-auth               2.29.0                   pypi_0    pypi
+google-auth-oauthlib      0.4.6                    pypi_0    pypi
+google-pasta              0.2.0                    pypi_0    pypi
+grpcio                    1.62.2                   pypi_0    pypi
+h5py                      3.8.0                    pypi_0    pypi
+huggingface-hub           0.16.4                   pypi_0    pypi
+idna                      3.7                      pypi_0    pypi
+importlib-metadata        6.7.0                    pypi_0    pypi
+joblib                    1.3.2                    pypi_0    pypi
+keras                     2.10.0                   pypi_0    pypi
+keras-preprocessing       1.1.2                    pypi_0    pypi
+kiwisolver                1.4.5                    pypi_0    pypi
+ld_impl_linux-64          2.38                 h1181459_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libclang                  18.1.1                   pypi_0    pypi
+libffi                    3.4.4                h6a678d5_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libgcc-ng                 11.2.0               h1234567_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libgomp                   11.2.0               h1234567_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libstdcxx-ng              11.2.0               h1234567_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+lxml                      5.2.1                    pypi_0    pypi
+markdown                  3.4.4                    pypi_0    pypi
+markupsafe                2.1.5                    pypi_0    pypi
+matplotlib                3.5.2                    pypi_0    pypi
+mosestokenizer            1.0.0                    pypi_0    pypi
+multidict                 6.0.5                    pypi_0    pypi
+multiprocess              0.70.14                  pypi_0    pypi
+ncurses                   6.4                  h6a678d5_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+numpy                     1.21.6                   pypi_0    pypi
+oauthlib                  3.2.2                    pypi_0    pypi
+openai                    0.23.0                   pypi_0    pypi
+openfile                  0.0.7                    pypi_0    pypi
+openpyxl                  3.1.2                    pypi_0    pypi
+openssl                   1.1.1w               h7f8727e_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+opt-einsum                3.3.0                    pypi_0    pypi
+packaging                 24.0                     pypi_0    pypi
+pandas                    1.3.5                    pypi_0    pypi
+pandas-datareader         0.10.0                   pypi_0    pypi
+pandas-stubs              1.2.0.62                 pypi_0    pypi
+pathlib                   1.0.1                    pypi_0    pypi
+patsy                     0.5.6                    pypi_0    pypi
+pillow                    9.2.0                    pypi_0    pypi
+pip                       22.3.1           py37h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+protobuf                  3.19.6                   pypi_0    pypi
+psutil                    5.9.8                    pypi_0    pypi
+pyarrow                   12.0.1                   pypi_0    pypi
+pyasn1                    0.5.1                    pypi_0    pypi
+pyasn1-modules            0.3.0                    pypi_0    pypi
+pyext                     0.7                      pypi_0    pypi
+pyparsing                 3.1.2                    pypi_0    pypi
+python                    3.7.16               h7a1cb2a_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+python-dateutil           2.9.0.post0              pypi_0    pypi
+pytz                      2024.1                   pypi_0    pypi
+pyyaml                    6.0.1                    pypi_0    pypi
+readline                  8.2                  h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+regex                     2024.4.16                pypi_0    pypi
+requests                  2.31.0                   pypi_0    pypi
+requests-oauthlib         2.0.0                    pypi_0    pypi
+responses                 0.18.0                   pypi_0    pypi
+rsa                       4.9                      pypi_0    pypi
+safetensors               0.4.3                    pypi_0    pypi
+scikit-learn              1.0.2                    pypi_0    pypi
+scipy                     1.7.3                    pypi_0    pypi
+seaborn                   0.11.2                   pypi_0    pypi
+setuptools                65.6.3           py37h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+six                       1.16.0                   pypi_0    pypi
+smart-open                7.0.4                    pypi_0    pypi
+sqlite                    3.45.3               h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+statsmodels               0.13.2                   pypi_0    pypi
+tensorboard               2.10.1                   pypi_0    pypi
+tensorboard-data-server   0.6.1                    pypi_0    pypi
+tensorboard-plugin-wit    1.8.1                    pypi_0    pypi
+tensorflow                2.10.0                   pypi_0    pypi
+tensorflow-estimator      2.10.0                   pypi_0    pypi
+tensorflow-io-gcs-filesystem 0.34.0                   pypi_0    pypi
+termcolor                 2.3.0                    pypi_0    pypi
+threadpoolctl             3.1.0                    pypi_0    pypi
+tk                        8.6.14               h39e8969_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tokenizers                0.12.1                   pypi_0    pypi
+toolwrapper               2.1.0                    pypi_0    pypi
+torch                     1.12.1+cu116           pypi_0    pypi
+torchvision               0.13.1                   pypi_0    pypi
+tqdm                      4.64.1                   pypi_0    pypi
+transformers              4.30.2                   pypi_0    pypi
+typing-extensions         4.7.1                    pypi_0    pypi
+urllib3                   2.0.7                    pypi_0    pypi
+werkzeug                  2.2.3                    pypi_0    pypi
+wheel                     0.38.4           py37h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+wrapt                     1.16.0                   pypi_0    pypi
+xgboost                   1.6.2                    pypi_0    pypi
+xxhash                    3.4.1                    pypi_0    pypi
+xz                        5.4.6                h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+yarl                      1.9.4                    pypi_0    pypi
+zipp                      3.15.0                   pypi_0    pypi
+zlib                      1.2.13               h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+zope-interface            6.3                      pypi_0    pypi
+</code></pre>
+<p><br />
+到时候我们将微调好的模型在 <code>CodeEval</code> 环境中进行指标评估即可。</p>
+<h2><a id="modify" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modify</h2>
+<p>本节要沿着 train.py 逐步推进，对可能进行修改的地方进行修改。</p>
+<h3><a id="task-config-py" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>task_config.py</h3>
+<p>在该文件中我们要添加 <strong>code</strong> 任务配置，添加如下：</p>
+<blockquote>
+<p>注：由于我们采用额外的方式进行验证指标，因此不会有 <code>generation_args</code> 参数。</p>
+</blockquote>
+<pre><code class="language-python">&quot;code&quot;: {&quot;train_datasets&quot;: [&quot;code_122k&quot;],
+    &quot;eval_datasets&quot;: None,
+    &quot;task_prompt_template&quot;: alpaca_prompt_template,
+    &quot;trigger_tokens&quot;: &quot;### Response:&quot;
+},
+</code></pre>
+<h3><a id="train-py" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>train.py</h3>
+<ul>
+<li>将 code task 加入到 assert 中：</li>
+</ul>
+<pre><code class="language-python">    assert task in {
+        &quot;commonsense&quot;, &quot;math&quot;, &quot;alpaca&quot;, &quot;instruct&quot;, &quot;ultrafeedback&quot;, &quot;glue&quot;, &quot;gsm8k&quot;,
+        &quot;ultrafeedback_pair&quot;, &quot;code&quot;
+    }
+</code></pre>
+<ul>
+<li>在所有 eval 的部分，对 <code>task == code</code> 做以区分：若是 code 任务则不进行 eval 环节：</li>
+</ul>
+<pre><code class="language-python"># 1
+if task != &quot;code&quot;:
+    if task == &quot;glue&quot;:
+        eval_datasets = [train_dataset]
+    else:
+        eval_datasets = task_config[task][&quot;eval_datasets&quot;] if eval_dataset is None else [eval_dataset]
+
+# 2
+if task != &quot;code&quot;:
+    # 产生测试数据集
+    all_eval_datasets = {}
+    for eval_dataset in eval_datasets:
+        test_splits = test_split.split(&quot;;&quot;)
+        all_eval_datasets[eval_dataset] = {}
+        for split in test_splits:
+            raw_eval = ReftDataset(task, eval_dataset if task == &quot;glue&quot; else os.path.join(data_dir, eval_dataset), 
+                tokenizer, data_split=split, seed=seed, max_n_example=max_n_eval_example,
+                **{&quot;num_interventions&quot;: len(layers), &quot;position&quot;: position, 
+                &quot;share_weights&quot;: share_weights}
+            )all_eval_datasets[eval_dataset][split] = [raw_eval, raw_eval.raw_dataset]
+    eval_datasets = all_eval_datasets
+
+# 3
+if task != &quot;code&quot;:
+    # ensure everything is in eval mode
+    reft_model.model.eval()for k,v in reft_model.interventions.items():
+        _ = v[0].eval()print({&quot;n_params&quot;: n_params})
+    # do eval
+    eval_results = {}
+    for dataset_name in eval_datasets:
+        # split evalset into chunks
+        for split, (eval_dataset, data_items) in eval_datasets[dataset_name].items():
+            
+            generations, stats = compute_metrics(
+                task, dataset_name, reft_model, tokenizer, eval_dataset, data_items,
+                trigger_tokens, run_name, eval_batch_size, 
+                data_collator if task in classification_tasks else None,
+                split, greedy_decoding, temperature, top_p, top_k
+            )
+            
+            # log
+            eval_results.update(stats)
+            if is_wandb:
+                wandb.log(stats)
+            generations = stats if generations is None else generations
+            result_json_file_name = f&quot;{output_dir}/{run_name}/{dataset_name}_{split}_outputs.json&quot;
+            with open(result_json_file_name, 'w') as json_file:
+                json.dump(generations, json_file, indent=4)
+
+    # log final eval stats
+    result_json_file_name = f&quot;{output_dir}/{run_name}/eval_results.json&quot;
+    eval_results[&quot;n_params&quot;] = n_params
+    with open(result_json_file_name, 'w') as json_file:
+        json.dump(eval_results, json_file, indent=4)
+
+    print(f&quot;Training results can be found in {output_dir}/{run_name}&quot;)
+</code></pre>
+<h3><a id="dataset-py-in-loreft" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>dataset.py(in loreft)</h3>
+<ul>
+<li>由于我们已经将数据集改成和 commonsense 相同类型的训练数据集名称，因此我们需要在<br />
+类 <code>LoReftSupervisedDataset(ReftDataset)</code> 中修改其 <code>preprocess</code> 函数，同样添加 code 任务：</li>
+</ul>
+<pre><code class="language-python">elif self.task in [&quot;math&quot;, &quot;commonsense&quot;, &quot;ultrafeedback&quot;, &quot;code&quot;]:
+    self.data_path = os.path.join(self.data_path, self.data_split + &quot;.json&quot;)
+</code></pre>
+<ul>
+<li>同样的，在类 <code>LoReftSupervisedDataset(ReftDataset)</code> 中的 <code>tokenize</code> 函数中，需要将 code 任务添加到其中：</li>
+</ul>
+<pre><code class="language-python">elif self.task in [&quot;alpaca&quot;, &quot;instruct&quot;, &quot;ultrafeedback&quot;, &quot;ultrafeedback_pair&quot;, &quot;tatsu-lab/alpaca_eval&quot;, &quot;code&quot;]:
+    if 'input' not in data_item or data_item['input'] == &quot;&quot;:
+        base_prompt = alpaca_prompt_no_input_template % (data_item['instruction'])
+    else:
+        base_prompt = self.task_prompt_template % (data_item['instruction'], data_item['input'])
+</code></pre>
+<h2><a id="train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Train</h2>
+<p>在开始训练前，我们还需手动调整入参 <code>max_length</code>，它决定模型输入的最大长度。从 <a href="https://github.com/bigcode-project/bigcode-evaluation-harness" title="bigcode-evaluation-harness">bigcode-evaluation-harness</a> 的 <code>finetune</code> 文件夹可以看到，在微调不同数据集的数据集时，通常都是将 <code>max_length</code> 设置为 <strong>1024</strong>，因此我们也手动设置为 1024。</p>
+<p>同时由于 max_length 增大，相应对显存占用就会变高，因此将 batch_size 设为 2，gradient_accumulation_steps 设为 16。</p>
+<p>在终端输入以下命令，进行训练。</p>
+<pre><code class="language-shell"># 新建窗口
+screen -S LoReFT-llama3-8B-Base-Code
+
+# 训练
+python train.py -task code \
+-data_dir dataset \
+-model Meta-Llama-3-8B \
+-seed 42 \
+-l all -r 8 -p f7+l7 -e 6 -lr 9e-4 \
+-type LoreftIntervention \
+-batch_size 2 \
+-gradient_accumulation_steps 16 \
+-eval_batch_size 2 \
+--dropout 0.00 \
+--test_split test \
+--max_length 1024 \
+--use_normalized_template \
+--share_weights \
+--warmup_ratio 0.1 \
+--greedy_decoding \
+-is_wandb \
+-wandb_name prada-lab \
+--wandb_proj just_fot_test \
+--save_model    # 由于我们要额外的进行评测，因此需要保存模型
+</code></pre>
+<p><br />
+开始训练：</p>
+<pre><code class="language-shell">task: code, model: Meta-Llama-3-8B, intervention_type: LoreftIntervention, layers: all, rank: 8, position: f7+l7, epoch: 6, train_on_inputs: False, max_length: 1024, allow_cls_grad: False
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+adding a special padding token...
+{'num_interventions': 32, 'position': 'f7+l7', 'share_weights': True, 'test_split': 'test'}
+loading data for dataset:  dataset/code_122k/train.json
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 121959/121959 [02:17&lt;00:00, 889.70it/s]
+config.json: 654B [00:00, 148kB/s]                                                                                                                                                            
+config.json: 654B [00:00, 636kB/s]                                                                                                                                                            
+model.safetensors.index.json: 23.9kB [00:00, 17.4MB/s]                                                                                                                                        
+model-00001-of-00004.safetensors: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4.98G/4.98G [04:38&lt;00:00, 17.9MB/s]
+model-00002-of-00004.safetensors: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5.00G/5.00G [04:47&lt;00:00, 17.4MB/s]
+model-00003-of-00004.safetensors: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4.92G/4.92G [04:40&lt;00:00, 17.5MB/s]
+model-00004-of-00004.safetensors: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1.17G/1.17G [01:05&lt;00:00, 17.9MB/s]
+Downloading shards: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [15:14&lt;00:00, 228.52s/it]
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:08&lt;00:00,  2.06s/it]
+generation_config.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 177/177 [00:00&lt;00:00, 37.2kB/s]
+trainable intervention params: 2,097,408 || trainable model params: 0
+model params: 8,030,269,440 || trainable%: 0.0261187749137344
+wandb: Currently logged in as: nnyy (prada-lab). Use `wandb login --relogin` to force relogin
+wandb: WARNING Path wandb/wandb/ wasn't writable, using system temp directory.
+wandb: WARNING Path wandb/wandb/ wasn't writable, using system temp directory
+wandb: Tracking run with wandb version 0.17.0
+wandb: Run data is saved locally in /tmp/wandb/run-20240508_211702-56sh3v4t
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run Meta-Llama-3-8B.code.20240508205903869903
+wandb: ⭐️ View project at https://wandb.ai/prada-lab/just_fot_test
+wandb: 🚀 View run at https://wandb.ai/prada-lab/just_fot_test/runs/56sh3v4t
+{'loss': 0.7097, 'grad_norm': 2.599954843521118, 'learning_rate': 3.935286401399213e-07, 'epoch': 0.0}                                                                                        
+{'loss': 0.6133, 'grad_norm': 2.2335927486419678, 'learning_rate': 7.870572802798426e-07, 'epoch': 0.0}                                                                                       
+{'loss': 0.659, 'grad_norm': 2.338649034500122, 'learning_rate': 1.1805859204197638e-06, 'epoch': 0.0}                                                                                        
+  0%|                                                                                                                                                    | 3/22866 [00:20&lt;42:47:26,  6.74s/it]
+</code></pre>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script><script>!function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;var l=a.element.classList;if(l.contains('language-mermaid') || l.contains('language-echarts') || l.contains('language-plantuml')){return;} if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.css"><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><style>div.code-toolbar > .toolbar > .toolbar-item > a, div.code-toolbar > .toolbar > .toolbar-item > button, div.code-toolbar > .toolbar > .toolbar-item > span {padding: 4px .5em; background: #f5f2f0; background: rgba(224, 224, 224, 0.4);}</style>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>

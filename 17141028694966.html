@@ -205,17 +205,17 @@
 </ol>
 <h2><a id="5-dora" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 Dora</h2>
 <h3><a id="5-1-core" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.1 Core</h3>
-<p><a href="https://arxiv.org/pdf/2402.09353" title="Dora">Dora</a>在Lora的基础上，将预训练权重分解为幅度和方向两个部分，揭示了Lora和FT的差异化原因。</p>
-<p>将权重矩阵\( W \in \mathbb {R} ^{d \times k}\)按照幅度和方向分解如下：</p>
+<p><a href="https://arxiv.org/pdf/2402.09353" title="Dora">Dora</a>在 Lora 的基础上，将预训练权重分解为幅度和方向两个部分，揭示了 Lora 和 FT 的差异化原因。</p>
+<p>将权重矩阵 \( W \in \mathbb {R} ^{d \times k}\) 按照幅度和方向分解如下：</p>
 <p>\( \begin{align*}  W = m \frac {V} {|| V || _c} = || W || _c \frac {W} {|| W || _c} \tag{7} \end{align*}\)</p>
-<p>这里\( m \in \mathbb {R} ^{1 \times k}\)代表幅度向量，\( V \in \mathbb {R} ^{d \times k}\)代表方向矩阵。分别分析了FT和LoRA的权重矩阵中，幅度和方向的变化关系如下：</p>
+<p>这里 \( m \in \mathbb {R} ^{1 \times k}\) 代表幅度向量，\( V \in \mathbb {R} ^{d \times k}\) 代表方向矩阵。分别分析了 FT 和 LoRA 的权重矩阵中，幅度和方向的变化关系如下：</p>
 <div style="text-align: center">
 <img src="media/17141028694966/17144680586475.jpg"/>
 <p>图 6  FT vs LoRA</p>
 </div>
-<p>可以得出：LoRA的学习方式和FT有很大不同。</p>
+<p>可以得出：LoRA 的学习方式和 FT 有很大不同。</p>
 <h3><a id="5-2-pipeline" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5.2 Pipeline</h3>
-<p>在DoRA中，对于预训练后的权重\(W_0\)，将其分解为方向向量$ m = || w_0 || $和幅度矩阵\(V = W_0\)，在微调中，我们保持\(V\)不变，将方向向量\(m\)作为一个可训练向量。DoRA的权重更新如下：</p>
+<p>在 DoRA 中，对于预训练后的权重 \(W_0\)，将其分解为方向向量 $ m = || w_0 || $ 和幅度矩阵 \(V = W_0\)，在微调中，我们保持 \(V\) 不变，将方向向量 \(m\) 作为一个可训练向量。DoRA 的权重更新如下：</p>
 <p>\( \begin{align*}  W' = \underline {m} \frac {V + \Delta V} {|| V + \Delta V || _c} = \underline {m} \frac {W_0 + \underline {BA}} {|| W_0 + \underline {BA} || _c} \tag{8} \end{align*}\)</p>
 <div style="text-align: center">
 <img src="media/17141028694966/17144667718371.jpg"/>
@@ -226,7 +226,7 @@
 <img src="media/17141028694966/17144733945433.jpg"/>
 <p>图 6  DoRA Performance</p>
 </div>
-<p>可以看到，经过修改后，DoRA的学习方式与FT更加接近。</p>
+<p>可以看到，经过修改后，DoRA 的学习方式与 FT 更加接近。</p>
 <h2><a id="6-qlora" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6 QLoRA</h2>
 <blockquote>
 <p>显著减少内存使用。</p>
@@ -237,19 +237,19 @@
 <p>图 7  QLoRA Method</p>
 </div>
 <h3><a id="6-2-4-bit-normalfloat-quantization" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6.2 4-bit NormalFloat Quantization</h3>
-<p>NormalFloat (简称NF)是一种数据类型，它是建立在 Quantile quantization（后译为分位数量化）基础上的，它是一种信息论上最优的数据类型，可以确保每个量化区间从输入张量中分配相同数量的值。分位数量化通过经验累积分布函数估计输入张量的分位数来工作。</p>
-<p>在神经网络中，预训练的权重通常具有0中心的正态分布，标准差为σ。通过缩放σ，可以使得分布恰好适应NF的范围。对于NF，作者设置了一个任意的范围[-1, 1]。因此，数据类型和神经网络权重的分位数都需要被归一化到这个范围。</p>
-<p>对于范围在[-1, 1]内的零均值正态分布，他们计算了信息理论上最优的数据类型。过程如下：</p>
+<p>NormalFloat (简称 NF)是一种数据类型，它是建立在 Quantile quantization（后译为分位数量化）基础上的，它是一种信息论上最优的数据类型，可以确保每个量化区间从输入张量中分配相同数量的值。分位数量化通过经验累积分布函数估计输入张量的分位数来工作。</p>
+<p>在神经网络中，预训练的权重通常具有 0 中心的正态分布，标准差为σ。通过缩放σ，可以使得分布恰好适应 NF 的范围。对于 NF，作者设置了一个任意的范围[-1, 1]。因此，数据类型和神经网络权重的分位数都需要被归一化到这个范围。</p>
+<p>对于范围在 [-1, 1] 内的零均值正态分布，他们计算了信息理论上最优的数据类型。过程如下：</p>
 <ol>
-<li>估计理论\(N(0,1)\)分布的\( 2 ^k + 1\)个分位数，得到一个k位的分位数量化数据模型；</li>
-<li>将该NF的值归一化到[-1, 1]范围内；</li>
-<li>通过绝对最大值重标定，将输入权重张量归一化到[-1, 1]范围内；</li>
+<li>估计理论 \(N(0,1)\) 分布的 \( 2 ^k + 1\) 个分位数，得到一个 k 位的分位数量化数据模型；</li>
+<li>将该 NF 的值归一化到 [-1, 1] 范围内；</li>
+<li>通过绝对最大值重标定，将输入权重张量归一化到 [-1, 1] 范围内；</li>
 <li>进行正常的量化。</li>
 </ol>
 <p>映射公式如下：</p>
 <p>\( \begin{align*}  q_i = \frac {1} {2} (Q_X(\frac {i} {2^k + 1}) + Q_X(\frac {i + 1} {2^k + 1})) \tag{9} \end{align*}\)</p>
-<p>其中\(Q_X\)指的是分位数函数。</p>
-<p>该过程等价于重新缩放权重张量的标准差，使其适配k位数据类型的标准差。</p>
+<p>其中 \(Q_X\) 指的是分位数函数。</p>
+<p>该过程等价于重新缩放权重张量的标准差，使其适配 k 位数据类型的标准差。</p>
 
                   </article>
                   <div class="comments-wrap">

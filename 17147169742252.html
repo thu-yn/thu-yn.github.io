@@ -120,62 +120,62 @@
 </ul>
 <h2><a id="1-reft" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 ReFT</h2>
 <h3><a id="1-1-prepare" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.1 Prepare</h3>
-<p>假设模型架构是基于Transformer的生成标记序列的上下文表示的语言模型。</p>
+<p>假设模型架构是基于 Transformer 的生成标记序列的上下文表示的语言模型。</p>
 <ul>
-<li>给定长度为\(n\)输入token序列\(\boldsymbol {x} = (x_1, ..., x_n)\)，模型首先将输入embedding到列表中：\(\boldsymbol {h} ^{(0)} = (\boldsymbol {h} ^{(0)} _1, ..., \boldsymbol {h} ^{(0)} _n)\)。</li>
-<li>接着，\(m\)个层连续不断的计算下一隐藏层的表示\(\boldsymbol {h} ^{(j)}\)，作为上一隐藏层表示\(\boldsymbol {h} ^{(j - 1)}\)的函数（每个隐藏层表示均为向量\(\boldsymbol {h} \in \mathbb {R} ^d\)）。</li>
-<li>语言模型通过最后一个隐藏层表示\(\boldsymbol {h} ^{(m)}\)来产生预测。对于自回归语言模型，其预测为$ p(x_{n+1} | x_1, ..., x_n) = softmax( \boldsymbol {W} \boldsymbol {h} ^{(m)} _{n}) $；对于掩码语言模型，其预测为$ p(x_i | x_1, ..., x_{i-1}, x_{i+1}, ..., x_n) = softmax( \boldsymbol {W} \boldsymbol {h} ^{(m)} _i) $。其中\(\boldsymbol {W}\)是词汇空间上从表示到逻辑的学习矩阵映射。</li>
+<li>给定长度为 \(n\) 输入 token 序列 \(\boldsymbol {x} = (x_1, ..., x_n)\)，模型首先将输入 embedding 到列表中：\(\boldsymbol {h} ^{(0)} = (\boldsymbol {h} ^{(0)} _1, ..., \boldsymbol {h} ^{(0)} _n)\)。</li>
+<li>接着，\(m\) 个层连续不断的计算下一隐藏层的表示 \(\boldsymbol {h} ^{(j)}\)，作为上一隐藏层表示 \(\boldsymbol {h} ^{(j - 1)}\) 的函数（每个隐藏层表示均为向量 \(\boldsymbol {h} \in \mathbb {R} ^d\)）。</li>
+<li>语言模型通过最后一个隐藏层表示 \(\boldsymbol {h} ^{(m)}\) 来产生预测。对于自回归语言模型，其预测为 $ p(x_{n+1} | x_1, ..., x_n)= softmax( \boldsymbol {W} \boldsymbol {h} ^{(m)} _{n}) $；对于掩码语言模型，其预测为 $ p(x_i | x_1, ..., x_{i-1}, x_{i+1}, ..., x_n)= softmax( \boldsymbol {W} \boldsymbol {h} ^{(m)} _i)$。其中 \(\boldsymbol {W}\) 是词汇空间上从表示到逻辑的学习矩阵映射。</li>
 </ul>
 <h3><a id="1-2-motivation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.2 Motivation</h3>
-<p><strong>线性表示假说</strong>声称概念被编码在神经网络表示的线性子空间中。</p>
-<p>在可解释性研究中，因果抽象框架使用<strong>交换干预</strong>来因果地建立神经网络组件在实施特定行为中的作用。 交换干预的逻辑如下：如果将表示固定为反事实输入的表示，并且这种干预以我们关于生成该表示的组件的声明所预测的方式一致地影响模型输出，则该组件在所研究的行为中起着因果作用。</p>
-<p>为了测试一个概念是否如线性表示所说被编码在表示的线性子空间中，使用<strong>分布式交换干预</strong>进行验证。假设\(\boldsymbol {b}\)为模型处理输入\(b\)时在第\(i\)行和第\(k\)列创建的隐藏表示，并设\(\boldsymbol {s}\)为同一模型处理输入\(\boldsymbol {s}\)时的相应表示。 给定反事实源表示\(s\)，对\(\boldsymbol {b}\)的分布式交换干预定义为：</p>
+<p>** 线性表示假说 ** 声称概念被编码在神经网络表示的线性子空间中。</p>
+<p>在可解释性研究中，因果抽象框架使用 ** 交换干预 ** 来因果地建立神经网络组件在实施特定行为中的作用。 交换干预的逻辑如下：如果将表示固定为反事实输入的表示，并且这种干预以我们关于生成该表示的组件的声明所预测的方式一致地影响模型输出，则该组件在所研究的行为中起着因果作用。</p>
+<p>为了测试一个概念是否如线性表示所说被编码在表示的线性子空间中，使用 ** 分布式交换干预 ** 进行验证。假设 \(\boldsymbol {b}\) 为模型处理输入 \(b\) 时在第 \(i\) 行和第 \(k\) 列创建的隐藏表示，并设 \(\boldsymbol {s}\) 为同一模型处理输入 \(\boldsymbol {s}\) 时的相应表示。 给定反事实源表示 \(s\)，对 \(\boldsymbol {b}\) 的分布式交换干预定义为：</p>
 <p>\( \begin{align}  \mathrm {D||}(\boldsymbol {b}, \boldsymbol {s}, \boldsymbol {R}) = \boldsymbol {b} + \boldsymbol {R} ^{T} (\boldsymbol {R} \boldsymbol {s} - \boldsymbol {R} \boldsymbol {b}) \end{align}\)</p>
-<p>其中\(\boldsymbol {R} \in \mathbb {R} ^{r \times d}\)是具有正交行的低秩投影矩阵，\(d\)是representation的维数，\(r\)是我们干预的子空间的维数。 我们使用分布式对齐搜索（DAS）来学习子空间\(\boldsymbol {R}\)，它找到使干预后预期反事实输出的概率最大化的子空间。</p>
+<p>其中 \(\boldsymbol {R} \in \mathbb {R} ^{r \times d}\) 是具有正交行的低秩投影矩阵，\(d\) 是 representation 的维数，\(r\) 是我们干预的子空间的维数。 我们使用分布式对齐搜索（DAS）来学习子空间 \(\boldsymbol {R}\)，它找到使干预后预期反事实输出的概率最大化的子空间。</p>
 <p>基于以上，我们寻求使用分布式交换干预操作来制定一种新的参数有效的方法，以适应下游任务的语言模型。</p>
 <h3><a id="1-3-loreft" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.3 LoReFT</h3>
-<p>式(1)提供了一种通过干预控制模型生成的方式。指导直觉是可以学通过习如何执行干预措施，使模型准确预测我们的任务标签。LoReFT定义如下：</p>
+<p>式 (1) 提供了一种通过干预控制模型生成的方式。指导直觉是可以学通过习如何执行干预措施，使模型准确预测我们的任务标签。LoReFT 定义如下：</p>
 <p>\( \begin{align}  \Phi _{\mathrm {LoReFT}} (\boldsymbol {h}) = \boldsymbol {h} + \boldsymbol {R} ^T (\boldsymbol {W} \boldsymbol {h} + \boldsymbol {b} - \boldsymbol {R} \boldsymbol {h}) \end{align}\)</p>
-<p>与式(1)相同，只是采用了可学习的投影源\(\boldsymbol {R} \boldsymbol {s} = \boldsymbol {W} \boldsymbol {h} + \boldsymbol {b}\)。从直观上看，LoReFT采用线性投影\(\boldsymbol {W} \boldsymbol {h} + \boldsymbol {b}\)的值修改矩阵\(\boldsymbol {R}\)列所跨越的\(r\)维子空间的表示。</p>
-<p>待学习参数为\( \phi = \{\boldsymbol {R}, \boldsymbol {W}. \boldsymbol {b}\}\)。与式(1)相同，\(\boldsymbol {R} \in \mathbb {R} ^{r \times d}\)是具有正交行的低秩矩阵，\(d\)是隐藏状态的维数，\(r \leq d\)是子空间的维数。语言模型的参数被冻结。</p>
-<p>对于LM，预训练模型是token序列\(p(·)\)的分布，定义\(p_{\Phi} (·)\)为\(p(·)\)由可训练参数\(\phi\)经过LoReFT干预后的结果。定义对于LM的输入\(\boldsymbol {x}\)的隐藏表示为\(\boldsymbol {h} (\boldsymbol {x})\)，经过干预化后的LM为\(\boldsymbol {h} _{\Phi} (\boldsymbol {x})\)。</p>
-<p>对于生成任务，训练目标是语言建模，通过给定\(n\)个输入token的prompt：\(\boldsymbol {x} = (x_1, ..., x_n)\)，目标是预测具有\(m\)个输出token的序列\(\boldsymbol {y} = (y_1, ..., y_m)\)。通过在所有输出位置上进行teacher-forcing来最小化交叉熵损失：</p>
-<p>\( \begin{align}  \min \limits_{\phi} \{ -\sum \limits_{i = 1} ^{m} \log p_{\Phi} (y_i | \boldsymbol {x} \boldsymbol {y} _{&lt; i}) \} \end{align}\)</p>
-<p>对于单一label的分类任务，通过添加分类头\(H_{\theta}(·)\)，将最后一层表示的第一个token(CLS)作为输入，输出一个关于类别的分布。其中\(H\)具有可学习参数\(\theta = \{ \boldsymbol {W}_o, \boldsymbol {b}_o, \boldsymbol {W}_d, \boldsymbol {b}_d \}\)</p>
-<p>\( \begin{align}  \boldsymbol {H}_{\theta} (·|\boldsymbol {h}) = softmax(\boldsymbol {W}_o (\tanh (\boldsymbol {W}_d \boldsymbol {h}_1^{(m)} + \boldsymbol {b}_d)) + \boldsymbol {b}_o) \end{align}\)</p>
-<p>通过学习分类头和干预函数\(\Phi\)的参数，最小化给定输入\(\boldsymbol {x}\)的情况下目标类别\(\boldsymbol {y}\)的交叉熵损失：</p>
-<p>\( \begin{align}  \min \limits_{\phi,. \theta} \{ - \log H_{\theta} (y | \boldsymbol {h}_{\Phi} (\boldsymbol {x})) \} \end{align}\)</p>
+<p>与式 (1) 相同，只是采用了可学习的投影源 \(\boldsymbol {R} \boldsymbol {s} = \boldsymbol {W} \boldsymbol {h} + \boldsymbol {b}\)。从直观上看，LoReFT 采用线性投影 \(\boldsymbol {W} \boldsymbol {h} + \boldsymbol {b}\) 的值修改矩阵 \(\boldsymbol {R}\) 列所跨越的 \(r\) 维子空间的表示。</p>
+<p>待学习参数为 \( \phi = \{\boldsymbol {R}, \boldsymbol {W}. \boldsymbol {b}\}\)。与式 (1) 相同，\(\boldsymbol {R} \in \mathbb {R} ^{r \times d}\) 是具有正交行的低秩矩阵，\(d\) 是隐藏状态的维数，\(r \leq d\) 是子空间的维数。语言模型的参数被冻结。</p>
+<p>对于 LM，预训练模型是 token 序列 \(p(·)\) 的分布，定义 \(p_{\Phi} (·)\) 为 \(p(·)\) 由可训练参数 \(\phi\) 经过 LoReFT 干预后的结果。定义对于 LM 的输入 \(\boldsymbol {x}\) 的隐藏表示为 \(\boldsymbol {h} (\boldsymbol {x})\)，经过干预化后的 LM 为 \(\boldsymbol {h} _{\Phi} (\boldsymbol {x})\)。</p>
+<p>对于生成任务，训练目标是语言建模，通过给定 \(n\) 个输入 token 的 prompt：\(\boldsymbol {x} = (x_1, ..., x_n)\)，目标是预测具有 \(m\) 个输出 token 的序列 \(\boldsymbol {y} = (y_1, ..., y_m)\)。通过在所有输出位置上进行 teacher-forcing 来最小化交叉熵损失：</p>
+<p>\( \begin{align}  \min \limits_{\phi} \{-\sum \limits_{i = 1} ^{m} \log p_{\Phi} (y_i | \boldsymbol {x} \boldsymbol {y} _{&lt; i}) \} \end{align}\)</p>
+<p>对于单一 label 的分类任务，通过添加分类头 \(H_{\theta}(·)\)，将最后一层表示的第一个 token(CLS)作为输入，输出一个关于类别的分布。其中 \(H\) 具有可学习参数 \(\theta = \{\boldsymbol {W}_o, \boldsymbol {b}_o, \boldsymbol {W}_d, \boldsymbol {b}_d \}\)</p>
+<p>\( \begin{align}  \boldsymbol {H}_{\theta} (·|\boldsymbol {h}) = softmax(\boldsymbol {W}_o (\tanh (\boldsymbol {W}_d \boldsymbol {h}_1^{(m)} + \boldsymbol {b}_d))+ \boldsymbol {b}_o)\end{align}\)</p>
+<p>通过学习分类头和干预函数 \(\Phi\) 的参数，最小化给定输入 \(\boldsymbol {x}\) 的情况下目标类别 \(\boldsymbol {y}\) 的交叉熵损失：</p>
+<p>\( \begin{align}  \min \limits_{\phi,. \theta} \{- \log H_{\theta} (y | \boldsymbol {h}_{\Phi} (\boldsymbol {x})) \} \end{align}\)</p>
 <h3><a id="1-4-the-reft-family-of-methods" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.4 The ReFT family of methods</h3>
 <h4><a id="definition-intervention" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Definition: Intervention</h4>
-<p>定义干预\(I\)是一个元组\(\langle \Phi, P, L \rangle\)，它封装了由基于Transformer的LM计算的representation的单个推理时间修改。干预的三个组成如下：</p>
+<p>定义干预 \(I\) 是一个元组 \(\langle \Phi, P, L \rangle\)，它封装了由基于 Transformer 的 LM 计算的 representation 的单个推理时间修改。干预的三个组成如下：</p>
 <ul>
-<li>干预函数\(\Phi : \mathbb {R} ^{d} \to \mathbb {R} ^{d}\)，具有可学习参数\(\phi\)；</li>
-<li>应用干预的输入位置的集合\( P \subseteq \{ 1, ..., n \}\)；</li>
-<li>应用干预的层\( L \in \{ 1, ..., m \}\)。</li>
+<li>干预函数 \(\Phi : \mathbb {R} ^{d} \to \mathbb {R} ^{d}\)，具有可学习参数 \(\phi\)；</li>
+<li>应用干预的输入位置的集合 \( P \subseteq \{1, ..., n \}\)；</li>
+<li>应用干预的层 \( L \in \{1, ..., m \}\)。</li>
 </ul>
-<p>干预实施的具体操作是修改一些原有representation \(\boldsymbol {h}\)：</p>
+<p>干预实施的具体操作是修改一些原有 representation \(\boldsymbol {h}\)：</p>
 <p>\( \begin{align}  \boldsymbol {h} ^{(L)} \gets (\Phi (\boldsymbol {h} _p ^{(L)}) \; if \; p \in P \; else \; \boldsymbol {h}_p ^{(L)}) _{p \in 1, ..., n} \end{align}\)</p>
-<p>在\(\boldsymbol {h} ^{(L)}\)计算完成后，干预就会立马实施，并影响后续representation \( \boldsymbol {h} ^{(L + 1)}, ..., \boldsymbol {h} ^{(m)}\)的计算。</p>
+<p>在 \(\boldsymbol {h} ^{(L)}\) 计算完成后，干预就会立马实施，并影响后续 representation \( \boldsymbol {h} ^{(L + 1)}, ..., \boldsymbol {h} ^{(m)}\) 的计算。</p>
 <h4><a id="definition-reft" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Definition: ReFT</h4>
-<p>定义ReFT是具有\(f\)个干预\(I\)的集合\(\boldsymbol {I} = \{ I_1, ..., I_f \}\)。并规定对于任意两个作用于同一层\(L_j = L_k\)的干预\(I_j, I_k \in \boldsymbol {I}\)，其干预位置必须是不相干的：\(P_j \cap P_k = \emptyset\)。</p>
+<p>定义 ReFT 是具有 \(f\) 个干预 \(I\) 的集合 \(\boldsymbol {I} = \{I_1, ..., I_f \}\)。并规定对于任意两个作用于同一层 \(L_j = L_k\) 的干预 \(I_j, I_k \in \boldsymbol {I}\)，其干预位置必须是不相干的：\(P_j \cap P_k = \emptyset\)。</p>
 <div style="text-align: center">
 <img src="media/17147169742252/17149837240323.jpg"/>
 <p>图 1  ReFT Method</p>
 </div>
 <h2><a id="2-loreft" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 LoReFT</h2>
 <h3><a id="2-1-hyperparameter-configuration" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2.1 Hyperparameter configuration</h3>
-<p>对于LoReFT，固定地在prompt的\(p\)个字首和\(s\)个字尾处施加intervention，主要调整的超参数有以下四个：</p>
+<p>对于 LoReFT，固定地在 prompt 的 \(p\) 个字首和 \(s\) 个字尾处施加 intervention，主要调整的超参数有以下四个：</p>
 <ul>
-<li>施加干预的字首个数\(p\)，即\(positions \{ 1, ..., p \}\)；</li>
-<li>施加干预的字尾个数\(s\)，即\(positions \{ n - s + 1, ..., n \}\)；</li>
-<li>施加干预的层的集合\(\boldsymbol {L}\)；</li>
-<li>对同一层中的干预，是否共享其参数\(\phi\)。</li>
+<li>施加干预的字首个数 \(p\)，即 \(positions \{1, ..., p \}\)；</li>
+<li>施加干预的字尾个数 \(s\)，即 \(positions \{n - s + 1, ..., n \}\)；</li>
+<li>施加干预的层的集合 \(\boldsymbol {L}\)；</li>
+<li>对同一层中的干预，是否共享其参数 \(\phi\)。</li>
 </ul>
-<p>定义LoReFT的变量如下：</p>
-<p>\( \begin{align}  \boldsymbol {P} = \{ 1, ..., p \} \cup \{n - s + 1, ..., n \} \end{align}\)</p>
-<p>\( \begin{align}  \boldsymbol {I} _{untied} = \{ \langle \Phi _{LoReFT}, \{p\}, l \rangle | p \in \boldsymbol {P}, l \in \boldsymbol {L} \} \end{align}\)</p>
-<p>\( \begin{align}  \boldsymbol {I} _{tied} = \{ \langle \Phi _{LoReFT}, \boldsymbol {P}, l \rangle | l \in \boldsymbol {L} \} \end{align}\)</p>
-<p>当prompt的长度为\(n\)且 \(n &lt; p + s\)时，修改\(p \gets \min (p, \lfloor \frac {n} {2} \rfloor),  s \gets \min (s, \lfloor \frac {n} {2} \rfloor)\)，并且不应用\(\boldsymbol {I} _{untied}\)中被截断的干预。</p>
+<p>定义 LoReFT 的变量如下：</p>
+<p>\( \begin{align}  \boldsymbol {P} = \{1, ..., p \} \cup \{n - s + 1, ..., n \} \end{align}\)</p>
+<p>\( \begin{align}  \boldsymbol {I} _{untied} = \{\langle \Phi _{LoReFT}, \{p\}, l \rangle | p \in \boldsymbol {P}, l \in \boldsymbol {L} \} \end{align}\)</p>
+<p>\( \begin{align}  \boldsymbol {I} _{tied} = \{\langle \Phi _{LoReFT}, \boldsymbol {P}, l \rangle | l \in \boldsymbol {L} \} \end{align}\)</p>
+<p>当 prompt 的长度为 \(n\) 且 \(n &lt; p + s\) 时，修改 \( p \gets \min (p, \lfloor \frac {n} {2} \rfloor),  s \gets \min (s, \lfloor \frac {n} {2} \rfloor)\)，并且不应用 \(\boldsymbol {I} _{untied}\) 中被截断的干预。</p>
 
                   </article>
                   <div class="comments-wrap">

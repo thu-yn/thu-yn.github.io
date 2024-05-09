@@ -108,7 +108,7 @@
                   <article class="markdown-body single-content">
                     <h2><a id="1-prepare" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 Prepare</h2>
 <h3><a id="1-1-preprocess" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.1 Preprocess</h3>
-<p>首先将<code>pyreft</code>git到/root/autodl-tmp（因为是扩容盘，容量大）中，并修改huggingface的环境变量：</p>
+<p>首先将 <code>pyreft</code>git 到 /root/autodl-tmp（因为是扩容盘，容量大）中，并修改 huggingface 的环境变量：</p>
 <pre><code class="language-shell">cd /root/autodl-tmp
 
 git clone https://github.com/stanfordnlp/pyreft.git
@@ -127,21 +127,21 @@ export HF_TOKEN=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
 <p>创建虚拟环境：</p>
 <pre><code class="language-shell">conda create -n &quot;LoReFT&quot; python=3.9
 
-# 首次需要该命令，否则conda activate ***会报错
+# 首次需要该命令，否则 conda activate *** 会报错
 source activate
 
 conda activate LoReFT
 </code></pre>
 <p><br />
-接着在conda虚拟环境中安装torch和pyreft：（需要指定conda环境下的pip进行安装）</p>
-<pre><code class="language-shell"># 安装pytorch
+接着在 conda 虚拟环境中安装 torch 和 pyreft：（需要指定 conda 环境下的 pip 进行安装）</p>
+<pre><code class="language-shell"># 安装 pytorch
 /root/miniconda3/envs/LoReFT/bin/pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu118
 
-# 安装pyreft
+# 安装 pyreft
 /root/miniconda3/envs/LoReFT/bin/pip install pyreft
 </code></pre>
 <p><br />
-此时conda安装的包及版本如下：</p>
+此时 conda 安装的包及版本如下：</p>
 <pre><code class="language-shell">conda list
 # packages in environment at /root/miniconda3/envs/LoReFT:
 #
@@ -362,8 +362,8 @@ zipp                      3.18.1                   pypi_0    pypi
 zlib                      1.2.13               h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
 </code></pre>
 <h3><a id="1-3-wandb" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.3 Wandb</h3>
-<p>安装wandb，结果发现已经有了，所以直接login</p>
-<pre><code class="language-shell"># 登录wandb
+<p>安装 wandb，结果发现已经有了，所以直接 login</p>
+<pre><code class="language-shell"># 登录 wandb
 wandb login
 </code></pre>
 <h2><a id="2-data-loading" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 Data Loading</h2>
@@ -373,7 +373,7 @@ wandb login
 bash load_datasets.sh
 </code></pre>
 <h2><a id="3-debug" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 Debug</h2>
-<p>首先需要在train.py中添加：</p>
+<p>首先需要在 train.py 中添加：</p>
 <pre><code class="language-python">os.environ['CUDA_VISIBLE_DEVICES']='0'
 </code></pre>
 <p><br />
@@ -410,39 +410,33 @@ tokenizer = AutoTokenizer.from_pretrained(
 )
 </code></pre>
 <p><br />
-并在wandb处作如下修改：</p>
+并在 wandb 处作如下修改：</p>
 <pre><code class="language-python"># 原始代码
 # start wandb logging
 if is_wandb:
-    run = wandb.init(
-        project=f&quot;{wandb_proj}_{task}&quot;, 
+    run = wandb.init(project=f&quot;{wandb_proj}_{task}&quot;, 
         entity=wandb_name,
         name=run_name,
         dir=wandb_dir,
-    )
-    run.summary.update(vars(args))
-    wandb.log(
-        {&quot;train/n_params&quot;: n_params})
+    )run.summary.update(vars(args))
+    wandb.log({&quot;train/n_params&quot;: n_params})
 
 
 # 修改后代码
 # start wandb logging
 if is_wandb:
-    run = wandb.init(
-        project=f&quot;{wandb_proj}&quot;, 
+    run = wandb.init(project=f&quot;{wandb_proj}&quot;, 
         entity=wandb_name,
         name=run_name,
         dir=wandb_dir,
-    )
-    run.summary.update(vars(args))
-    wandb.log(
-        {&quot;train/n_params&quot;: n_params})
+    )run.summary.update(vars(args))
+    wandb.log({&quot;train/n_params&quot;: n_params})
 
 </code></pre>
 <p><br />
-为了避免可能的死锁问题，在train.py中新增<code>os.environ[&quot;TOKENIZERS_PARALLELISM&quot;] = &quot;false&quot;</code>。</p>
+为了避免可能的死锁问题，在 train.py 中新增 <code>os.environ[&quot;TOKENIZERS_PARALLELISM&quot;] = &quot;false&quot;</code>。</p>
 <h2><a id="train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Train</h2>
-<p>由于经验得知，在math任务微调的loss下降非常快，因此只应用2个epoch。</p>
+<p>由于经验得知，在 math 任务微调的 loss 下降非常快，因此只应用 2 个 epoch。</p>
 <pre><code class="language-shell">python train.py -task math \
 -data_dir dataset \
 -model Meta-Llama-3-8B \
@@ -504,8 +498,8 @@ wandb: 🚀 View run at https://wandb.ai/prada-lab/just_fot_test/runs/6mrps7vr
   0%|▏                                                           | 2/620 [00:15&lt;1:17:43,  7.55s/it]
 </code></pre>
 <p><br />
-为了避免ssh断连，我们采用screen的方式避免：</p>
-<pre><code class="language-shell"># （在当前&quot;LoReFT&quot;的conda虚拟环境下）新建一个screen，名为LoReFT-llama3-8B-Math
+为了避免 ssh 断连，我们采用 screen 的方式避免：</p>
+<pre><code class="language-shell"># （在当前 &quot;LoReFT&quot; 的 conda 虚拟环境下）新建一个 screen，名为 LoReFT-llama3-8B-Math
 screen -S LoReFT-llama3-8B-Base-Math
 
 # 运行程序
@@ -529,8 +523,8 @@ python train.py -task math \
 --wandb_proj just_fot_test
 </code></pre>
 <p><br />
-要临时关闭该screen窗口，只需在该窗口下执行<code>control + A + D (for mac)</code>即可，若要恢复，可以采取如下方式：</p>
-<pre><code class="language-shell"># 查看当前已有的screen窗口
+要临时关闭该 screen 窗口，只需在该窗口下执行 <code>control + A + D (for mac)</code> 即可，若要恢复，可以采取如下方式：</p>
+<pre><code class="language-shell"># 查看当前已有的 screen 窗口
 screen -ls
 
 There is a screen on:
@@ -542,13 +536,45 @@ screen -r 89528
 </code></pre>
 <h2><a id="result" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Result</h2>
 <h3><a id="evaluation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Evaluation</h3>
-<p>该部分检验微调后的llama3-8b-base在不同数据集下的得分情况。</p>
+<p>该部分检验微调后的 llama3-8b-base 在不同数据集下的得分情况。</p>
 <p>各部分详细得分见下表所示：</p>
+<p><img src="media/17149995832589/AddSub.png" alt="AddSub" /></p>
+<p><img src="media/17149995832589/AQuA.png" alt="AQuA" /></p>
+<p><img src="media/17149995832589/gsm8k.png" alt="gsm8k" /></p>
+<p><img src="media/17149995832589/mawps.png" alt="mawps" /></p>
+<p><img src="media/17149995832589/MultiArith.png" alt="MultiArith" /></p>
+<p><img src="media/17149995832589/SingleEq.png" alt="SingleEq" /></p>
+<p><img src="media/17149995832589/SVAMP.png" alt="SVAMP" /></p>
 <p>柱状图如下所示：</p>
+<p><img src="media/17149995832589/LoReFT-Llama3-8B-Base-Math-10k-Eval-Score.jpg" alt="LoReFT-Llama3-8B-Base-Math-10k-Eval-Score" /></p>
 <h3><a id="train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Train</h3>
-<p>该部分检验llama3-8b-base在训练时的训练参数情况。</p>
+<p>该部分检验 llama3-8b-base 在训练时的训练参数情况。</p>
+<p><img src="media/17149995832589/epoch.png" alt="epoch" /></p>
+<p><img src="media/17149995832589/global_step.png" alt="global_step" /></p>
+<p><img src="media/17149995832589/grad_norm.png" alt="grad_norm" /></p>
+<p><img src="media/17149995832589/learning_rate.png" alt="learning_rate" /></p>
+<p><img src="media/17149995832589/loss.png" alt="loss" /></p>
+<p><img src="media/17149995832589/n_params.png" alt="n_params" /></p>
 <h3><a id="system" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>System</h3>
-<p>该部分检验llama3-8b-base在训练时的系统情况。</p>
+<p>该部分检验 llama3-8b-base 在训练时的系统情况。</p>
+<p><img src="media/17149995832589/Disk%20I_O%20Utilization%20-MB-.png" alt="Disk I_O Utilization -MB-" /></p>
+<p><img src="media/17149995832589/Disk%20Utilization%20-%25-.png" alt="Disk Utilization -%-" /></p>
+<p><img src="media/17149995832589/Disk%20Utilization%20-GB-.png" alt="Disk Utilization -GB-" /></p>
+<p><img src="media/17149995832589/GPU%20Memory%20Allocated%20-%25-.png" alt="GPU Memory Allocated -%-" /></p>
+<p><img src="media/17149995832589/GPU%20Power%20Usage%20-%25-.png" alt="GPU Power Usage -%-" /></p>
+<p><img src="media/17149995832589/GPU%20Power%20Usage%20-W-.png" alt="GPU Power Usage -W-" /></p>
+<p><img src="media/17149995832589/GPU%20Temp%20-%E2%84%83-.png" alt="GPU Temp -℃-" /></p>
+<p><img src="media/17149995832589/GPU%20Time%20Spent%20Accessing%20Memory%20-%25-.png" alt="GPU Time Spent Accessing Memory -%-" /></p>
+<p><img src="media/17149995832589/GPU%20Utilization%20-%25-.png" alt="GPU Utilization -%-" /></p>
+<p><img src="media/17149995832589/gpu.0.memoryAllocatedBytes.png" alt="gpu.0.memoryAllocatedBytes" /></p>
+<p><img src="media/17149995832589/Network%20Traffic%20-bytes-.png" alt="Network Traffic -bytes-" /></p>
+<p><img src="media/17149995832589/Process%20CPU%20Threads%20In%20Use.png" alt="Process CPU Threads In Use" /></p>
+<p><img src="media/17149995832589/Process%20CPU%20Utilization%20-%25-.png" alt="Process CPU Utilization -%-" /></p>
+<p><img src="media/17149995832589/Process%20Memory%20Available%20-non-swap-%20-MB-.png" alt="Process Memory Available -non-swap- -MB-" /></p>
+<p><img src="media/17149995832589/Process%20Memory%20In%20Use%20-non-swap-%20-%25-.png" alt="Process Memory In Use -non-swap- -%-" /></p>
+<p><img src="media/17149995832589/Process%20Memory%20In%20Use%20-non-swap-%20-MB-.png" alt="Process Memory In Use -non-swap- -MB-" /></p>
+<p><img src="media/17149995832589/System%20CPU%20Utilization%20-per%20core-%20-%25-.png" alt="System CPU Utilization -per core- -%-" /></p>
+<p><img src="media/17149995832589/System%20Memory%20Utilization%20-%25-.png" alt="System Memory Utilization -%-" /></p>
 
                   </article>
                   <div class="comments-wrap">

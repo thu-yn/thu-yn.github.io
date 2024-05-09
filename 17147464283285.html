@@ -107,9 +107,9 @@
                 </div>
                   <article class="markdown-body single-content">
                     <h2><a id="1-prepare" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 Prepare</h2>
-<p>虽然用实验室的服务器让我遇到了很多问题。。。然而这根本难不倒我，在找Hu学姐要到autodl账号后，便申请了一个L20显卡的实例（内存整整48G omg），愉快的开始训练！！！</p>
+<p>虽然用实验室的服务器让我遇到了很多问题。。。然而这根本难不倒我，在找 Hu 学姐要到 autodl 账号后，便申请了一个 L20 显卡的实例（内存整整 48G omg），愉快的开始训练！！！</p>
 <h3><a id="1-1-preprocess" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.1 Preprocess</h3>
-<p>首先将<code>pyreft</code>git到/root/autodl-tmp（因为是扩容盘，容量大）中，并修改huggingface的环境变量：</p>
+<p>首先将 <code>pyreft</code>git 到 /root/autodl-tmp（因为是扩容盘，容量大）中，并修改 huggingface 的环境变量：</p>
 <pre><code class="language-shell">cd /root/autodl-tmp
 
 git clone https://github.com/stanfordnlp/pyreft.git
@@ -128,21 +128,21 @@ export HF_TOKEN=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
 <p>创建虚拟环境：</p>
 <pre><code class="language-shell">conda create -n &quot;LoReFT&quot; python=3.9
 
-# 首次需要该命令，否则conda activate ***会报错
+# 首次需要该命令，否则 conda activate *** 会报错
 source activate
 
 conda activate LoReFT
 </code></pre>
 <p><br />
-接着在conda虚拟环境中安装torch和pyreft：（需要指定conda环境下的pip进行安装）</p>
-<pre><code class="language-shell"># 安装pytorch
+接着在 conda 虚拟环境中安装 torch 和 pyreft：（需要指定 conda 环境下的 pip 进行安装）</p>
+<pre><code class="language-shell"># 安装 pytorch
 /root/miniconda3/envs/LoReFT/bin/pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu118
 
-# 安装pyreft
+# 安装 pyreft
 /root/miniconda3/envs/LoReFT/bin/pip install pyreft
 </code></pre>
 <p><br />
-此时conda安装的包及版本如下：</p>
+此时 conda 安装的包及版本如下：</p>
 <pre><code class="language-shell">conda list
 # packages in environment at /root/miniconda3/envs/LoReFT:
 #
@@ -363,11 +363,11 @@ zipp                      3.18.1                   pypi_0    pypi
 zlib                      1.2.13               h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
 </code></pre>
 <h3><a id="1-3-wandb" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1.3 Wandb</h3>
-<p>安装wandb，结果发现已经有了，所以直接login</p>
-<pre><code class="language-shell"># 安装wandb
+<p>安装 wandb，结果发现已经有了，所以直接 login</p>
+<pre><code class="language-shell"># 安装 wandb
 /root/miniconda3/envs/LoReFT/bin/pip install wandb
 
-# 登录wandb
+# 登录 wandb
 wandb login
 </code></pre>
 <h2><a id="2-data-loading" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 Data Loading</h2>
@@ -377,7 +377,7 @@ wandb login
 bash load_datasets.sh
 </code></pre>
 <h2><a id="3-debug" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 Debug</h2>
-<p>首先需要在train.py中添加：</p>
+<p>首先需要在 train.py 中添加：</p>
 <pre><code class="language-python">os.environ['CUDA_VISIBLE_DEVICES']='0'
 </code></pre>
 <p><br />
@@ -415,33 +415,27 @@ tokenizer = AutoTokenizer.from_pretrained(
 
 </code></pre>
 <p><br />
-并在wandb处作如下修改：</p>
+并在 wandb 处作如下修改：</p>
 <pre><code class="language-python"># 原始代码
 # start wandb logging
 if is_wandb:
-    run = wandb.init(
-        project=f&quot;{wandb_proj}_{task}&quot;, 
+    run = wandb.init(project=f&quot;{wandb_proj}_{task}&quot;, 
         entity=wandb_name,
         name=run_name,
         dir=wandb_dir,
-    )
-    run.summary.update(vars(args))
-    wandb.log(
-        {&quot;train/n_params&quot;: n_params})
+    )run.summary.update(vars(args))
+    wandb.log({&quot;train/n_params&quot;: n_params})
 
 
 # 修改后代码
 # start wandb logging
 if is_wandb:
-    run = wandb.init(
-        project=f&quot;{wandb_proj}&quot;, 
+    run = wandb.init(project=f&quot;{wandb_proj}&quot;, 
         entity=wandb_name,
         name=run_name,
         dir=wandb_dir,
-    )
-    run.summary.update(vars(args))
-    wandb.log(
-        {&quot;train/n_params&quot;: n_params})
+    )run.summary.update(vars(args))
+    wandb.log({&quot;train/n_params&quot;: n_params})
 
 </code></pre>
 <p><br />
@@ -466,7 +460,8 @@ if is_wandb:
 --greedy_decoding
 </code></pre>
 <p><br />
-出现报错：</p>
+注：~~ 若 <code>Downloading shards</code> 环节出现错误，可以在 <code>AutoModelForCausalLM.from_pretrained()</code> 参数重添加 <code>force_download=True, resume_download=False</code> 进行避免。~~ 千万不要这样，否则会强制重新下载模型文件并禁用断点续传，每次都要重新下载模型参数文件。</p>
+<p>然而出现报错：</p>
 <pre><code class="language-shell">task: commonsense, model: Meta-Llama-3-8B, intervention_type: LoreftIntervention, layers: all, rank: 8, position: f7+l7, epoch: 6, train_on_inputs: False, max_length: 512, allow_cls_grad: False
 Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
 adding a special padding token...
@@ -630,11 +625,11 @@ wandb: Synced 6 W&amp;B file(s), 0 media file(s), 0 artifact file(s) and 0 other
 wandb: Find logs at: wandb/wandb/run-20240504_021800-o4lc9d0b/logs
 </code></pre>
 <p><br />
-为了避免可能的死锁问题，在train.py中新增<code>os.environ[&quot;TOKENIZERS_PARALLELISM&quot;] = &quot;false&quot;</code>，然而还是发生OOM情况。故采用较小的batch_size进行实验。</p>
+为了避免可能的死锁问题，在 train.py 中新增 <code>os.environ[&quot;TOKENIZERS_PARALLELISM&quot;] = &quot;false&quot;</code>，然而还是发生 OOM 情况。故采用较小的 batch_size 进行实验。</p>
 <h2><a id="train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Train</h2>
-<p>终于，在我将训练时batch_size调小为4的时候，训练成功了！！！！！（相应的eval_batch_size也减少为2）</p>
+<p>终于，在我将训练时 batch_size 调小为 4 的时候，训练成功了！！！！！（相应的 eval_batch_size 也减少为 2）</p>
 <blockquote>
-<p>注：在修改batch_size的同时，也要修改gradient_accumulation_steps的大小，简单来说，batch_size和gradient_accumulation_steps共同决定采用多少条数据进行一次梯度更新（\(数据量 = batch\_size \times gradient\_accumulation\_steps\)）。因此对batch_size减小，相应的要对gradient_accumulation_step增大。</p>
+<p>注：在修改 batch_size 的同时，也要修改 gradient_accumulation_steps 的大小，简单来说，batch_size 和 gradient_accumulation_steps 共同决定采用多少条数据进行一次梯度更新（\(数据量 = batch\_size \times gradient\_accumulation\_steps\)）。因此对 batch_size 减小，相应的要对 gradient_accumulation_step 增大。</p>
 </blockquote>
 <pre><code class="language-shell">python train.py -task commonsense \
 -data_dir dataset \
@@ -656,9 +651,9 @@ wandb: Find logs at: wandb/wandb/run-20240504_021800-o4lc9d0b/logs
 --wandb_proj just_fot_test
 </code></pre>
 <p><br />
-为了避免ssh断连，我们采用screen的方式避免：</p>
-<pre><code class="language-shell"># （在当前&quot;LoReFT&quot;的conda虚拟环境下）新建一个screen，名为LoReFT-llama3-8B
-screen -S LoReFT-llama3-8B-Base
+为了避免 ssh 断连，我们采用 screen 的方式避免：</p>
+<pre><code class="language-shell"># （在当前 &quot;LoReFT&quot; 的 conda 虚拟环境下）新建一个 screen，名为 LoReFT-llama3-8B-Commonsense
+screen -S LoReFT-llama3-8B-Base-Commonsense
 
 # 运行程序
 python train.py -task commonsense \
@@ -681,11 +676,11 @@ python train.py -task commonsense \
 --wandb_proj just_fot_test
 </code></pre>
 <p><br />
-要临时关闭该screen窗口，只需在该窗口下执行<code>control + A + D (for mac)</code>即可，若要恢复，可以采取如下方式：</p>
-<pre><code class="language-shell"># 查看当前已有的screen窗口
+要临时关闭该 screen 窗口，只需在该窗口下执行 <code>control + A + D (for mac)</code> 即可，若要恢复，可以采取如下方式：</p>
+<pre><code class="language-shell"># 查看当前已有的 screen 窗口
 screen -ls
 There is a screen on:
-	5706.LoReFT-llama3-8B-Base	(05/04/24 12:45:29)	(Detached)
+	5706.LoReFT-llama3-8B-Base-Commonsense	(05/04/24 12:45:29)	(Detached)
 1 Socket in /run/screen/S-root.
 
 # 恢复该窗口
@@ -694,9 +689,9 @@ screen -r 5706
 <p><br />
 接下来就是安心等待了，希望训练平平安安...</p>
 <h2><a id="result" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Result</h2>
-<p>经过接近50个小时的训练，终于微调结束了！！！</p>
+<p>经过接近 50 个小时的训练，终于微调结束了！！！</p>
 <h3><a id="evaluation" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Evaluation</h3>
-<p>该部分检验微调后的llama3-8b-base在不同数据集下的得分情况。</p>
+<p>该部分检验微调后的 llama3-8b-base 在不同数据集下的得分情况。</p>
 <div style="text-align: center">
 <img src="media/17147464283285/ARC-Challenge.png"/>
 <p>图 1  ARC-Challenge Evaluation</p>
@@ -778,7 +773,7 @@ screen -r 5706
 <p>图 9 LoReFT-Llama3-8B-Base-Commonsense-170k-Eval-Score</p>
 </div>
 <h3><a id="train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Train</h3>
-<p>该部分检验llama3-8b-base在训练时的训练参数情况。</p>
+<p>该部分检验 llama3-8b-base 在训练时的训练参数情况。</p>
 <p><img src="media/17147464283285/epoch.png" alt="epoch" /></p>
 <p><img src="media/17147464283285/global_step.png" alt="global_step" /></p>
 <p><img src="media/17147464283285/grad_norm.png" alt="grad_norm" /></p>
@@ -786,7 +781,7 @@ screen -r 5706
 <p><img src="media/17147464283285/loss.png" alt="loss" /></p>
 <p><img src="media/17147464283285/n_params.png" alt="n_params" /></p>
 <h3><a id="system" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>System</h3>
-<p>该部分检验llama3-8b-base在训练时的系统情况。</p>
+<p>该部分检验 llama3-8b-base 在训练时的系统情况。</p>
 <p><img src="media/17147464283285/Disk%20I_O%20Utilization%20-MB-.png" alt="Disk I_O Utilization -MB-" /></p>
 <p><img src="media/17147464283285/Disk%20Utilization%20-%25-.png" alt="Disk Utilization -%-" /></p>
 <p><img src="media/17147464283285/Disk%20Utilization%20-GB-.png" alt="Disk Utilization -GB-" /></p>
