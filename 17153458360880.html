@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    LoReFT-Code-HumanEval - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            LoReFT-Code-HumanEval   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/05/10</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_Llama3%20ReFTEng%20vs%20PEFT.html'>#Llama3 ReFTEng vs PEFT</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <p>本文章是为了考察github上两个不同的库对微调后LLM的代码测评的效果的差异，比较对象为 <a href="https://github.com/bigcode-project/bigcode-evaluation-harness" title="bigcode-evaluation-harness">bigcode-evaluation-harness</a> 和<a href="https://github.com/deepseek-ai/DeepSeek-Coder" title="DeepSeek-Coder">DeepSeek-Coder</a>。由于测评均支持多卡评测，因此考虑均在实验室的服务器上运行。</p>
+<h2><a id="bigcode-evaluation-harness" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>bigcode-evaluation-harness</h2>
+<h3><a id="prepare" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prepare</h3>
+<p>我们先安装相应的包，配置环境。</p>
+<pre><code class="language-shell"># 新建虚拟环境
+conda create -n &quot;CodeEval&quot; python=3.7
+
+# git
+cd /home/workspace/nanyang
+git clone https://github.com/bigcode-project/bigcode-evaluation-harness.git
+
+# installation
+cd /home/workspace/nanyang/bigcode-evaluation-harness
+
+# 注：在这行该命令时，会自动安装 1.12.1 版本的 torch，但是需要卸载掉它，然后重新安装 1.12.1+cu116 版本的 torch。
+/home/workspace/nanyang/anaconda3/envs/CodeEval/bin/pip install -e &quot;.[ds1000]&quot;
+
+# uninstall torch
+/home/workspace/nanyang/anaconda3/envs/CodeEval/bin/pip uninstall torch
+
+# install pytorch
+/home/workspace/nanyang/anaconda3/envs/CodeEval/bin/pip install torch==1.12.1+cu116 --extra-index-url https://download.pytorch.org/whl/cu116
+
+# 查看安装的库
+conda list
+
+# packages in environment at /home/workspace/nanyang/anaconda3/CodeEval:
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                 conda_forge    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+_openmp_mutex             4.5                  2_kmp_llvm    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+accelerate                0.30.0                    &lt;pip&gt;
+aiohttp                   3.9.5                     &lt;pip&gt;
+aiosignal                 1.3.1                     &lt;pip&gt;
+async-timeout             4.0.3                     &lt;pip&gt;
+attrs                     23.2.0                    &lt;pip&gt;
+bigcode_eval              0.0.0                     &lt;pip&gt;
+ca-certificates           2024.3.11            h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+certifi                   2024.2.2                  &lt;pip&gt;
+charset-normalizer        3.3.2                     &lt;pip&gt;
+datasets                  2.19.1                    &lt;pip&gt;
+dill                      0.3.8                     &lt;pip&gt;
+docopt                    0.6.2                     &lt;pip&gt;
+evaluate                  0.4.2                     &lt;pip&gt;
+filelock                  3.14.0                    &lt;pip&gt;
+frozenlist                1.4.1                     &lt;pip&gt;
+fsspec                    2023.9.2                  &lt;pip&gt;
+huggingface-hub           0.23.0                    &lt;pip&gt;
+idna                      3.7                       &lt;pip&gt;
+Jinja2                    3.1.4                     &lt;pip&gt;
+ld_impl_linux-64          2.38                 h1181459_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libffi                    3.4.4                h6a678d5_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libgcc-ng                 12.2.0              h65d4601_19    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+libstdcxx-ng              12.2.0              h46fd767_19    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+llvm-openmp               14.0.6               h9e868ea_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+MarkupSafe                2.1.5                     &lt;pip&gt;
+mosestokenizer            1.0.0                     &lt;pip&gt;
+mpmath                    1.3.0                     &lt;pip&gt;
+multidict                 6.0.5                     &lt;pip&gt;
+multiprocess              0.70.16                   &lt;pip&gt;
+ncurses                   6.4                  h6a678d5_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+networkx                  3.2.1                     &lt;pip&gt;
+numpy                     1.26.4                    &lt;pip&gt;
+nvidia-cublas-cu12        12.1.3.1                  &lt;pip&gt;
+nvidia-cuda-cupti-cu12    12.1.105                  &lt;pip&gt;
+nvidia-cuda-nvrtc-cu12    12.1.105                  &lt;pip&gt;
+nvidia-cuda-runtime-cu12  12.1.105                  &lt;pip&gt;
+nvidia-cudnn-cu12         8.9.2.26                  &lt;pip&gt;
+nvidia-cufft-cu12         11.0.2.54                 &lt;pip&gt;
+nvidia-curand-cu12        10.3.2.106                &lt;pip&gt;
+nvidia-cusolver-cu12      11.4.5.107                &lt;pip&gt;
+nvidia-cusparse-cu12      12.1.0.106                &lt;pip&gt;
+nvidia-nccl-cu12          2.19.3                    &lt;pip&gt;
+nvidia-nvjitlink-cu12     12.4.127                  &lt;pip&gt;
+nvidia-nvtx-cu12          12.1.105                  &lt;pip&gt;
+openfile                  0.0.7                     &lt;pip&gt;
+openssl                   3.0.13               h7f8727e_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+packaging                 24.0                      &lt;pip&gt;
+pandas                    2.2.2                     &lt;pip&gt;
+pip                       24.0             py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+psutil                    5.9.8                     &lt;pip&gt;
+pyarrow                   16.0.0                    &lt;pip&gt;
+pyarrow-hotfix            0.6                       &lt;pip&gt;
+pyext                     0.7                       &lt;pip&gt;
+python                    3.9.19               h955ad1f_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+python-dateutil           2.9.0.post0               &lt;pip&gt;
+pytz                      2024.1                    &lt;pip&gt;
+PyYAML                    6.0.1                     &lt;pip&gt;
+readline                  8.2                  h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+regex                     2024.5.10                 &lt;pip&gt;
+requests                  2.31.0                    &lt;pip&gt;
+safetensors               0.4.3                     &lt;pip&gt;
+setuptools                69.5.1           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+six                       1.16.0                    &lt;pip&gt;
+sqlite                    3.45.3               h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+sympy                     1.12                      &lt;pip&gt;
+tk                        8.6.14               h39e8969_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tokenizers                0.19.1                    &lt;pip&gt;
+toolwrapper               2.1.0                     &lt;pip&gt;
+torch                     2.2.1+cu121               &lt;pip&gt;
+tqdm                      4.66.4                    &lt;pip&gt;
+transformers              4.40.2                    &lt;pip&gt;
+triton                    2.2.0                     &lt;pip&gt;
+typing_extensions         4.11.0                    &lt;pip&gt;
+tzdata                    2024a                h04d1e81_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tzdata                    2024.1                    &lt;pip&gt;
+urllib3                   2.2.1                     &lt;pip&gt;
+wheel                     0.43.0           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+xxhash                    3.4.1                     &lt;pip&gt;
+xz                        5.4.6                h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+yarl                      1.9.4                     &lt;pip&gt;
+zlib                      1.2.13               h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+</code></pre>
+<h3><a id="debug" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Debug</h3>
+<p>我们首先配置<code>accelerate config</code>，得到<code>default_config.yaml</code>如下：</p>
+<pre><code class="language-yaml">compute_environment: LOCAL_MACHINE
+distributed_type: MULTI_GPU
+downcast_bf16: 'no'
+gpu_ids: '4,5,6,7'
+machine_rank: 0
+main_training_function: main
+mixed_precision: 'no'
+num_machines: 1
+num_processes: 4
+rdzv_backend: static
+same_network: true
+tpu_env: []
+tpu_use_cluster: false
+tpu_use_sudo: false
+use_cpu: false
+</code></pre>
+<p><br />
+接着在基础的llama3-8b-base上进行实验，得到该模型在不同code评测下的指标。</p>
+<pre><code class="language-shell">accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --temperature 0.6 \
+  --do_sample True \
+  --n_samples 1 \
+  --batch_size 1 \
+  --precision bf16 \
+  --allow_code_execution \
+  --save_generations
+</code></pre>
+<p><br />
+然而却在加载本地模型时报错！！！！！！</p>
+<pre><code class="language-shell">2024-05-10 19:49:56.432777: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-05-10 19:49:56.598499: E tensorflow/stream_executor/cuda/cuda_blas.cc:2981] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2024-05-10 19:49:57.446740: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory
+2024-05-10 19:49:57.446849: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory
+2024-05-10 19:49:57.446862: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+Loading model in bf16
+Selected Tasks: ['humaneval']
+Loading checkpoint shards: 100%|███████████████████████████████| 4/4 [00:06&lt;00:00,  1.61s/it]
+Traceback (most recent call last):
+  File &quot;main.py&quot;, line 414, in &lt;module&gt;
+    main()
+  File &quot;main.py&quot;, line 296, in main
+    **model_kwargs,
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/models/auto/auto_factory.py&quot;, line 485, in from_pretrained
+    pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/modeling_utils.py&quot;, line 2896, in from_pretrained
+    keep_in_fp32_modules=keep_in_fp32_modules,
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/modeling_utils.py&quot;, line 3278, in _load_pretrained_model
+    raise RuntimeError(f&quot;Error(s) in loading state_dict for {model.__class__.__name__}:\n\t{error_msg}&quot;)
+RuntimeError: Error(s) in loading state_dict for LlamaForCausalLM:
+        size mismatch for model.layers.0.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.1.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.2.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.3.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.4.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.5.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.6.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.7.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.8.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.9.self_attn.k_proj.weight: copying a param with shape torch.Size([1024,
+        size mismatch for model.layers.10.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.11.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.12.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.13.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.14.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.15.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.16.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.17.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.18.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.19.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.20.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.21.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.22.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.23.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.24.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.25.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.26.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.27.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.28.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.29.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.30.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.31.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        You may consider adding `ignore_mismatched_sizes=True` in the model `from_pretrained` method.
+</code></pre>
+<p><br />
+可以看到，在加载模型时，对于模型中每一层，其K、V的size均loading出错。</p>
+<p>在查找了将近一个下午的资料后，仍然没有得到什么好结果，于是想着采用控制变量法试试：</p>
+<ul>
+<li>首先是在<code>reft</code>虚拟环境中，也即进行微调的虚拟环境中：</li>
+</ul>
+<pre><code class="language-python">$ python
+
+Python 3.9.19 (main, Mar 21 2024, 17:11:28) 
+[GCC 11.2.0] :: Anaconda, Inc. on linux
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; import os
+&gt;&gt;&gt; os.environ['CUDA_VISIBLE_DEVICES']='1'
+&gt;&gt;&gt; os.environ['TOKENIZERS_PARALLELISM']='false'
+&gt;&gt;&gt; import torch
+&gt;&gt;&gt; from transformers import AutoModelForCausalLM
+&gt;&gt;&gt; model = AutoModelForCausalLM.from_pretrained('/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df')
+Loading checkpoint shards: 100%|██████████████████████████████████████████████████████████████| 4/4 [00:02&lt;00:00,  1.59it/s]
+&gt;&gt;&gt; exit()
+</code></pre>
+<p><br />
+可以看到模型被成功的加载了出来！</p>
+<ul>
+<li>接着是在<code>CodeEval</code>环境中，也即将来进行指标评测的虚拟环境中：</li>
+</ul>
+<pre><code class="language-python">$ python
+
+Python 3.7.16 (default, Jan 17 2023, 22:20:44) 
+[GCC 11.2.0] :: Anaconda, Inc. on linux
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; import os
+&gt;&gt;&gt; os.environ['CUDA_VISIBLE_DEVICES']='1'
+&gt;&gt;&gt; os.environ['TOKENIZERS_PARALLELISM']='false'
+&gt;&gt;&gt; import torch
+&gt;&gt;&gt; from transformers import AutoModelForCausalLM
+&gt;&gt;&gt; model = AutoModelForCausalLM.from_pretrained('/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df')
+Loading checkpoint shards: 100%|██████████████████████████████████████████████████████████████| 4/4 [00:02&lt;00:00,  1.83it/s]
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/models/auto/auto_factory.py&quot;, line 485, in from_pretrained
+    pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/modeling_utils.py&quot;, line 2896, in from_pretrained
+    keep_in_fp32_modules=keep_in_fp32_modules,
+  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/modeling_utils.py&quot;, line 3278, in _load_pretrained_model
+    raise RuntimeError(f&quot;Error(s) in loading state_dict for {model.__class__.__name__}:\n\t{error_msg}&quot;)
+RuntimeError: Error(s) in loading state_dict for LlamaForCausalLM:
+        size mismatch for model.layers.0.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.0.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.1.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.1.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.2.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.2.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.3.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.3.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.4.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.4.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.5.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.5.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.6.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.6.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.7.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.7.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.8.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.8.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.9.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.9.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.10.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.10.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.11.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.11.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.12.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.12.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.13.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.13.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.14.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.14.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.15.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.15.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.16.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.16.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.17.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.17.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.18.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.18.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.19.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.19.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.20.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.20.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.21.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.21.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.22.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.22.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.23.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.23.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.24.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.24.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.25.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.25.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.26.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.26.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.27.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.27.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.28.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.28.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.29.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.29.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.30.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.30.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.31.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        size mismatch for model.layers.31.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
+        You may consider adding `ignore_mismatched_sizes=True` in the model `from_pretrained` method.
+&gt;&gt;&gt; exit()
+</code></pre>
+<p><br />
+到这一步基本可以确定问题：<strong>进行评测的虚拟环境中的transformers包的版本不对，无法解析当前的模型。</strong> 观察<code>CodeEval</code>虚拟环境中<code>transofrmers</code>版本为：</p>
+<pre><code class="language-shell">transformers              4.30.2                   pypi_0    pypi
+</code></pre>
+<p><br />
+而<code>LoReFT</code>虚拟环境中<code>transofrmers</code>版本为：</p>
+<pre><code class="language-shell">transformers              4.40.1                    &lt;pip&gt;
+</code></pre>
+<p><br />
+因此我们将<code>CodeEval</code>虚拟环境中原先的<code>transofrmers</code>卸载，更新为4.40.1版本的<code>transformers</code>：</p>
+<pre><code class="language-shell"># uninstall
+/home/workspace/nanyang/anaconda3/envs/CodeEval/bin/pip uninstall transformers
+
+# install
+/home/workspace/nanyang/anaconda3/envs/CodeEval/bin/pip install transformers==4.40.1
+
+ERROR: Ignored the following versions that require a different python version: 4.31.0 Requires-Python &gt;=3.8.0; 4.32.0 Requires-Python &gt;=3.8.0; 4.32.1 Requires-Python &gt;=3.8.0; 4.33.0 Requires-Python &gt;=3.8.0; 4.33.1 Requires-Python &gt;=3.8.0; 4.33.2 Requires-Python &gt;=3.8.0; 4.33.3 Requires-Python &gt;=3.8.0; 4.34.0 Requires-Python &gt;=3.8.0; 4.34.1 Requires-Python &gt;=3.8.0; 4.35.0 Requires-Python &gt;=3.8.0; 4.35.1 Requires-Python &gt;=3.8.0; 4.35.2 Requires-Python &gt;=3.8.0; 4.36.0 Requires-Python &gt;=3.8.0; 4.36.1 Requires-Python &gt;=3.8.0; 4.36.2 Requires-Python &gt;=3.8.0; 4.37.0 Requires-Python &gt;=3.8.0; 4.37.1 Requires-Python &gt;=3.8.0; 4.37.2 Requires-Python &gt;=3.8.0; 4.38.0 Requires-Python &gt;=3.8.0; 4.38.1 Requires-Python &gt;=3.8.0; 4.38.2 Requires-Python &gt;=3.8.0; 4.39.0 Requires-Python &gt;=3.8.0; 4.39.1 Requires-Python &gt;=3.8.0; 4.39.2 Requires-Python &gt;=3.8.0; 4.39.3 Requires-Python &gt;=3.8.0; 4.40.0 Requires-Python &gt;=3.8.0; 4.40.1 Requires-Python &gt;=3.8.0; 4.40.2 Requires-Python &gt;=3.8.0
+ERROR: Could not find a version that satisfies the requirement transformers==4.40.1 (from versions: 0.1, 2.0.0, 2.1.0, 2.1.1, 2.2.0, 2.2.1, 2.2.2, 2.3.0, 2.4.0, 2.4.1, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.11.0, 3.0.0, 3.0.1, 3.0.2, 3.1.0, 3.2.0, 3.3.0, 3.3.1, 3.4.0, 3.5.0, 3.5.1, 4.0.0rc1, 4.0.0, 4.0.1, 4.1.0, 4.1.1, 4.2.0, 4.2.1, 4.2.2, 4.3.0rc1, 4.3.0, 4.3.1, 4.3.2, 4.3.3, 4.4.0, 4.4.1, 4.4.2, 4.5.0, 4.5.1, 4.6.0, 4.6.1, 4.7.0, 4.8.0, 4.8.1, 4.8.2, 4.9.0, 4.9.1, 4.9.2, 4.10.0, 4.10.1, 4.10.2, 4.10.3, 4.11.0, 4.11.1, 4.11.2, 4.11.3, 4.12.0, 4.12.1, 4.12.2, 4.12.3, 4.12.4, 4.12.5, 4.13.0, 4.14.0, 4.14.1, 4.15.0, 4.16.0, 4.16.1, 4.16.2, 4.17.0, 4.18.0, 4.19.0, 4.19.1, 4.19.2, 4.19.3, 4.19.4, 4.20.0, 4.20.1, 4.21.0, 4.21.1, 4.21.2, 4.21.3, 4.22.0, 4.22.1, 4.22.2, 4.23.0, 4.23.1, 4.24.0, 4.25.0, 4.25.1, 4.26.0, 4.26.1, 4.27.0, 4.27.1, 4.27.2, 4.27.3, 4.27.4, 4.28.0, 4.28.1, 4.29.0, 4.29.1, 4.29.2, 4.30.0, 4.30.1, 4.30.2)
+ERROR: No matching distribution found for transformers==4.40.1
+</code></pre>
+<p><br />
+然而却报错：由于<code>python==3.7</code>最高只支持<code>transformers==4.30.2</code>的版本。思考由于<code>DS-1000</code>评测也不是那么必要（只有<code>DS-1000</code>需要<code>python==3.7</code>），因此考虑重新装一个<code>python&gt;=3.8</code>的虚拟环境。</p>
+<pre><code class="language-shell"># 退出当前虚拟环境
+conda deactivate CodeEval
+
+# 删除该环境
+conda remove -n CodeEval --all
+
+# 新建虚拟环境
+conda create -n &quot;reft-code-eval&quot; python=3.9
+
+# 安装依赖
+conda activate reft-code-eval
+
+cd /home/workspace/nanyang/bigcode-evaluation-harness
+
+/home/workspace/nanyang/anaconda3/envs/LoReFT-Code-Eval/bin/pip install -e .
+
+/home/workspace/nanyang/anaconda3/envs/LoReFT-Code-Eval/bin/pip uninstall torch
+
+/home/workspace/nanyang/anaconda3/envs/LoReFT-Code-Eval/bin/pip install torch==2.1.1 --index-url https://download.pytorch.org/whl/cu121
+
+# 查看安装的库
+conda list
+
+# packages in environment at /root/miniconda3/envs/LoReFT-Code-Eval:
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                        main    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+_openmp_mutex             5.1                       1_gnu    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+accelerate                0.30.0                   pypi_0    pypi
+aiohttp                   3.9.5                    pypi_0    pypi
+aiosignal                 1.3.1                    pypi_0    pypi
+async-timeout             4.0.3                    pypi_0    pypi
+attrs                     23.2.0                   pypi_0    pypi
+bigcode-eval              0.0.0                     dev_0    &lt;develop&gt;
+ca-certificates           2024.3.11            h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+certifi                   2024.2.2                 pypi_0    pypi
+charset-normalizer        3.3.2                    pypi_0    pypi
+datasets                  2.19.1                   pypi_0    pypi
+dill                      0.3.8                    pypi_0    pypi
+docopt                    0.6.2                    pypi_0    pypi
+evaluate                  0.4.2                    pypi_0    pypi
+filelock                  3.14.0                   pypi_0    pypi
+frozenlist                1.4.1                    pypi_0    pypi
+fsspec                    2023.9.2                 pypi_0    pypi
+huggingface-hub           0.23.0                   pypi_0    pypi
+idna                      3.7                      pypi_0    pypi
+jinja2                    3.1.4                    pypi_0    pypi
+ld_impl_linux-64          2.38                 h1181459_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libffi                    3.4.4                h6a678d5_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libgcc-ng                 11.2.0               h1234567_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libgomp                   11.2.0               h1234567_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libstdcxx-ng              11.2.0               h1234567_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+markupsafe                2.1.5                    pypi_0    pypi
+mosestokenizer            1.0.0                    pypi_0    pypi
+mpmath                    1.3.0                    pypi_0    pypi
+multidict                 6.0.5                    pypi_0    pypi
+multiprocess              0.70.16                  pypi_0    pypi
+ncurses                   6.4                  h6a678d5_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+networkx                  3.2.1                    pypi_0    pypi
+numpy                     1.26.4                   pypi_0    pypi
+nvidia-cublas-cu12        12.1.3.1                 pypi_0    pypi
+nvidia-cuda-cupti-cu12    12.1.105                 pypi_0    pypi
+nvidia-cuda-nvrtc-cu12    12.1.105                 pypi_0    pypi
+nvidia-cuda-runtime-cu12  12.1.105                 pypi_0    pypi
+nvidia-cudnn-cu12         8.9.2.26                 pypi_0    pypi
+nvidia-cufft-cu12         11.0.2.54                pypi_0    pypi
+nvidia-curand-cu12        10.3.2.106               pypi_0    pypi
+nvidia-cusolver-cu12      11.4.5.107               pypi_0    pypi
+nvidia-cusparse-cu12      12.1.0.106               pypi_0    pypi
+nvidia-nccl-cu12          2.20.5                   pypi_0    pypi
+nvidia-nvjitlink-cu12     12.4.127                 pypi_0    pypi
+nvidia-nvtx-cu12          12.1.105                 pypi_0    pypi
+openfile                  0.0.7                    pypi_0    pypi
+openssl                   3.0.13               h7f8727e_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+packaging                 24.0                     pypi_0    pypi
+pandas                    2.2.2                    pypi_0    pypi
+pip                       24.0             py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+psutil                    5.9.8                    pypi_0    pypi
+pyarrow                   16.0.0                   pypi_0    pypi
+pyarrow-hotfix            0.6                      pypi_0    pypi
+pyext                     0.7                      pypi_0    pypi
+python                    3.9.19               h955ad1f_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+python-dateutil           2.9.0.post0              pypi_0    pypi
+pytz                      2024.1                   pypi_0    pypi
+pyyaml                    6.0.1                    pypi_0    pypi
+readline                  8.2                  h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+regex                     2024.5.10                pypi_0    pypi
+requests                  2.31.0                   pypi_0    pypi
+safetensors               0.4.3                    pypi_0    pypi
+setuptools                69.5.1           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+six                       1.16.0                   pypi_0    pypi
+sqlite                    3.45.3               h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+sympy                     1.12                     pypi_0    pypi
+tk                        8.6.14               h39e8969_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tokenizers                0.19.1                   pypi_0    pypi
+toolwrapper               2.1.0                    pypi_0    pypi
+torch                     2.1.1+cu121              pypi_0    pypi
+tqdm                      4.66.4                   pypi_0    pypi
+transformers              4.40.2                   pypi_0    pypi
+triton                    2.1.0                    pypi_0    pypi
+typing-extensions         4.11.0                   pypi_0    pypi
+tzdata                    2024.1                   pypi_0    pypi
+urllib3                   2.2.1                    pypi_0    pypi
+wheel                     0.43.0           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+xxhash                    3.4.1                    pypi_0    pypi
+xz                        5.4.6                h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+yarl                      1.9.4                    pypi_0    pypi
+zlib                      1.2.13               h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+</code></pre>
+<p><br />
+可以观察到新的虚拟环境中，transformer库的版本为4.40.2，因此重新测试模型加载：</p>
+<pre><code class="language-python">python
+
+Python 3.9.19 (main, May  6 2024, 19:43:03) 
+[GCC 11.2.0] :: Anaconda, Inc. on linux
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; import os
+&gt;&gt;&gt; os.environ['CUDA_VISIBLE_DEVICES']='1'
+&gt;&gt;&gt; os.environ['TOKENIZERS_PARALLELISM']='false'
+&gt;&gt;&gt; import torch
+&gt;&gt;&gt; from transformers import AutoModelForCausalLM
+&gt;&gt;&gt; model = AutoModelForCausalLM.from_pretrained('/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df')
+Loading checkpoint shards: 100%|█████████████████████████████████████████| 4/4 [00:03&lt;00:00,  1.25it/s]
+</code></pre>
+<p><br />
+此时模型可以成功加载。接下来便开始测试。</p>
+<h3><a id="eval" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eval</h3>
+<h4><a id="llama3-8b-base-humaneval" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Llama3-8B-Base-HumanEval</h4>
+<p>我们通过下面这张图确定<code>n_samples</code>和<code>temperature</code>的关系：</p>
+<div style="text-align: center">
+<img src="media/17153458360880/17154057210348.jpg"/>
+<p>图 1  Best Temperature vs K</p>
+</div>
+---
+<p>先测试原始llama3-8b-base的pass@1的表现。</p>
+<blockquote>
+<p>由于该方法支持多卡加速，因此选用在实验室的服务器上进行测试(4*RTX3090_24GB)，虚拟环境等与autodl上设置的类似。</p>
+</blockquote>
+<p>首先配置<code>accelerate config</code>，得到<code>default_config.yaml</code>如下：</p>
+<pre><code class="language-shell">compute_environment: LOCAL_MACHINE
+distributed_type: MULTI_GPU
+downcast_bf16: 'no'
+gpu_ids: '4,5,6,7'
+machine_rank: 0
+main_training_function: main
+mixed_precision: 'no'
+num_machines: 1
+num_processes: 4
+rdzv_backend: static
+same_network: true
+tpu_env: []
+tpu_use_cluster: false
+tpu_use_sudo: false
+use_cpu: false
+</code></pre>
+<p><br />
+接着在<code>main.py</code>中对所有地方的的<code>use_auth_token</code>进行删除，并将其在<code>parse_args()</code>函数中也删除。（由于我们已经登录了hugging face，且已经设置了相应的key）</p>
+<p>之前在微调llama3时，对于<code>.bashrc</code>文件中的hugging face进行了环境变量的配置：<code>export HF_ENDPOINT=https://hf-mirror.com/meta-llama</code>，这里要改回<code>export HF_ENDPOINT=https://hf-mirror.com</code>，否则会报错&lt;没有找到数据集&gt;</p>
+<p>同时我们将<code>evaluator.py</code>中的<code>evaluate</code>函数进行修改，将其中的<code>save_generations_path</code>修改为<code>f&quot;{os.path.splitext(self.args.metric_output_path)[0]}-{task_name}.json&quot;</code>，方便我们保存结果。</p>
+<p>接着执行命令：（要测试pass@1，即<code>n_samples=1</code>时，<code>temperature=0.2</code>）</p>
+<pre><code class="language-shell">accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --temperature 0.2 \
+  --top_k 50 \
+  --top_p 0.95 \
+  --do_sample True \
+  --n_samples 1 \
+  --batch_size 1 \
+  --precision bf16 \
+  --allow_code_execution \
+  --save_generations \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/re
+sult/llama3-8b-base-humaneval-pass@1.json
+</code></pre>
+<p><br />
+输出如下：</p>
+<pre><code class="language-shell">Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+Selected Tasks: ['humaneval']
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:10&lt;00:00,  2.54s/it]
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:10&lt;00:00,  2.54s/it]
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:10&lt;00:00,  2.55s/it]
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:10&lt;00:00,  2.53s/it]
+number of problems for this task is 164
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 41/41 [03:34&lt;00:00,  5.22s/it]
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 41/41 [03:34&lt;00:00,  5.22s/it]
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 41/41 [03:34&lt;00:00,  5.22s/it]
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 41/41 [03:33&lt;00:00,  5.22s/it]
+generations were saved at /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-humaneval-pass@1-generations.json
+Evaluating generations...
+{
+  &quot;humaneval&quot;: {
+    &quot;pass@1&quot;: 0.2926829268292683
+  },
+  &quot;config&quot;: {
+    &quot;prefix&quot;: &quot;&quot;,
+    &quot;do_sample&quot;: true,
+    &quot;temperature&quot;: 0.2,
+    &quot;top_k&quot;: 0,
+    &quot;top_p&quot;: 0.95,
+    &quot;n_samples&quot;: 1,
+    &quot;eos&quot;: &quot;&lt;|endoftext|&gt;&quot;,
+    &quot;seed&quot;: 0,
+    &quot;model&quot;: &quot;/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df&quot;,
+    &quot;modeltype&quot;: &quot;causal&quot;,
+    &quot;peft_model&quot;: null,
+    &quot;revision&quot;: null,
+    &quot;trust_remote_code&quot;: false,
+    &quot;tasks&quot;: &quot;humaneval&quot;,
+    &quot;instruction_tokens&quot;: null,
+    &quot;batch_size&quot;: 1,
+    &quot;max_length_generation&quot;: 1024,
+    &quot;precision&quot;: &quot;bf16&quot;,
+    &quot;load_in_8bit&quot;: false,
+    &quot;load_in_4bit&quot;: false,
+    &quot;left_padding&quot;: false,
+    &quot;limit&quot;: null,
+    &quot;limit_start&quot;: 0,
+    &quot;save_every_k_tasks&quot;: -1,
+    &quot;postprocess&quot;: true,
+    &quot;allow_code_execution&quot;: true,
+    &quot;generation_only&quot;: false,
+    &quot;load_generations_path&quot;: null,
+    &quot;load_data_path&quot;: null,
+    &quot;metric_output_path&quot;: &quot;/home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-humaneval-pass@1.json&quot;,
+    &quot;save_generations&quot;: true,
+    &quot;load_generations_intermediate_paths&quot;: null,
+    &quot;save_generations_path&quot;: &quot;generations.json&quot;,
+    &quot;save_references&quot;: false,
+    &quot;save_references_path&quot;: &quot;references.json&quot;,
+    &quot;prompt&quot;: &quot;prompt&quot;,
+    &quot;max_memory_per_gpu&quot;: null,
+    &quot;check_references&quot;: false
+  }
+}
+</code></pre>
+<hr />
+<p>接着测试llama3-8b-base在pass@10的性能，输出如下：</p>
+<pre><code class="language-shell">accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --temperature 0.6 \
+  --do_sample True \
+  --n_samples 10 \
+  --batch_size 4 \
+  --precision bf16 \
+  --allow_code_execution \
+  --save_generations \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/re
+sult/llama3-8b-base-humaneval-pass@10.json
+
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+Selected Tasks: ['humaneval']
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:10&lt;00:00,  2.53s/it]
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:10&lt;00:00,  2.54s/it]
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:10&lt;00:00,  2.53s/it]
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:10&lt;00:00,  2.53s/it]
+number of problems for this task is 164
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 123/123 [23:43&lt;00:00, 11.57s/it]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 123/123 [23:46&lt;00:00, 11.59s/it]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 123/123 [23:43&lt;00:00, 11.57s/it]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 123/123 [23:43&lt;00:00, 11.57s/it]
+/home/workspace/nanyang/bigcode-evaluation-harness/bigcode_eval/evaluator.py:85: UserWarning: Number of tasks wasn't proportional to number of devices, we removed extra predictions to only keep nsamples=10
+  warnings.warn(
+/home/workspace/nanyang/bigcode-evaluation-harness/bigcode_eval/evaluator.py:85: UserWarning: Number of tasks wasn't proportional to number of devices, we removed extra predictions to only keep nsamples=10
+  warnings.warn(
+/home/workspace/nanyang/bigcode-evaluation-harness/bigcode_eval/evaluator.py:85: UserWarning: Number of tasks wasn't proportional to number of devices, we removed extra predictions to only keep nsamples=10
+  warnings.warn(
+/home/workspace/nanyang/bigcode-evaluation-harness/bigcode_eval/evaluator.py:85: UserWarning: Number of tasks wasn't proportional to number of devices, we removed extra predictions to only keep nsamples=10
+  warnings.warn(
+generations were saved at /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-humaneval-pass@10-generations.json
+Evaluating generations...
+{
+  &quot;humaneval&quot;: {
+    &quot;pass@1&quot;: 0.27439024390243905,
+    &quot;pass@10&quot;: 0.6402439024390244
+  },
+  &quot;config&quot;: {
+    &quot;prefix&quot;: &quot;&quot;,
+    &quot;do_sample&quot;: true,
+    &quot;temperature&quot;: 0.6,
+    &quot;top_k&quot;: 0,
+    &quot;top_p&quot;: 0.95,
+    &quot;n_samples&quot;: 10,
+    &quot;eos&quot;: &quot;&lt;|endoftext|&gt;&quot;,
+    &quot;seed&quot;: 0,
+    &quot;model&quot;: &quot;/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df&quot;,
+    &quot;modeltype&quot;: &quot;causal&quot;,
+    &quot;peft_model&quot;: null,
+    &quot;revision&quot;: null,
+    &quot;trust_remote_code&quot;: false,
+    &quot;tasks&quot;: &quot;humaneval&quot;,
+    &quot;instruction_tokens&quot;: null,
+    &quot;batch_size&quot;: 4,
+    &quot;max_length_generation&quot;: 1024,
+    &quot;precision&quot;: &quot;bf16&quot;,
+    &quot;load_in_8bit&quot;: false,
+    &quot;load_in_4bit&quot;: false,
+    &quot;left_padding&quot;: false,
+    &quot;limit&quot;: null,
+    &quot;limit_start&quot;: 0,
+    &quot;save_every_k_tasks&quot;: -1,
+    &quot;postprocess&quot;: true,
+    &quot;allow_code_execution&quot;: true,
+    &quot;generation_only&quot;: false,
+    &quot;load_generations_path&quot;: null,
+    &quot;load_data_path&quot;: null,
+    &quot;metric_output_path&quot;: &quot;/home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-humaneval-pass@10.json&quot;,
+    &quot;save_generations&quot;: true,
+    &quot;load_generations_intermediate_paths&quot;: null,
+    &quot;save_generations_path&quot;: &quot;generations.json&quot;,
+    &quot;save_references&quot;: false,
+    &quot;save_references_path&quot;: &quot;references.json&quot;,
+    &quot;prompt&quot;: &quot;prompt&quot;,
+    &quot;max_memory_per_gpu&quot;: null,
+    &quot;check_references&quot;: false
+  }
+}
+</code></pre>
+<hr />
+<p>接着我们测试pass@100的效果（采用8*RTX3090_24GB进行）</p>
+<p>修改完对应的<code>accelerate config</code>后，进行评估：</p>
+<pre><code class="language-shell">accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --temperature 0.8 \
+  --do_sample True \
+  --n_samples 100 \
+  --batch_size 10 \
+  --precision bf16 \
+  --allow_code_execution \
+  --save_generations \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/re
+sult/llama3-8b-base-humaneval-pass@100.json
+
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+Selected Tasks: ['humaneval']
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading model in bf16
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:11&lt;00:00,  2.61s/it]
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:11&lt;00:00,  2.84s/it]
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:11&lt;00:00,  2.87s/it]
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:11&lt;00:00,  2.85s/it]
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:11&lt;00:00,  2.89s/it]
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:11&lt;00:00,  2.91s/it]
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:12&lt;00:00,  3.03s/it]
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:12&lt;00:00,  3.14s/it]
+number of problems for this task is 164
+100%|███████████████████████████████████████████████████████████████████████████████████| 205/205 [1:07:10&lt;00:00, 19.66s/it]
+100%|███████████████████████████████████████████████████████████████████████████████████| 205/205 [1:07:14&lt;00:00, 19.68s/it]
+100%|███████████████████████████████████████████████████████████████████████████████████| 205/205 [1:07:10&lt;00:00, 19.66s/it]
+100%|███████████████████████████████████████████████████████████████████████████████████| 205/205 [1:07:14&lt;00:00, 19.68s/it]
+100%|███████████████████████████████████████████████████████████████████████████████████| 205/205 [1:07:14&lt;00:00, 19.68s/it]
+100%|███████████████████████████████████████████████████████████████████████████████████| 205/205 [1:07:14&lt;00:00, 19.68s/it]
+100%|███████████████████████████████████████████████████████████████████████████████████| 205/205 [1:07:16&lt;00:00, 19.69s/it]
+100%|███████████████████████████████████████████████████████████████████████████████████| 205/205 [1:07:16&lt;00:00, 19.69s/it]
+generations were saved at /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-humaneval-pass@100-generations.json
+Evaluating generations...
+{
+  &quot;humaneval&quot;: {
+    &quot;pass@1&quot;: 0.2428048780487804,
+    &quot;pass@10&quot;: 0.6223362092383807,
+    &quot;pass@100&quot;: 0.8414634146341463
+  },
+  &quot;config&quot;: {
+    &quot;prefix&quot;: &quot;&quot;,
+    &quot;do_sample&quot;: true,
+    &quot;temperature&quot;: 0.8,
+    &quot;top_k&quot;: 0,
+    &quot;top_p&quot;: 0.95,
+    &quot;n_samples&quot;: 100,
+    &quot;eos&quot;: &quot;&lt;|endoftext|&gt;&quot;,
+    &quot;seed&quot;: 0,
+    &quot;model&quot;: &quot;/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df&quot;,
+    &quot;modeltype&quot;: &quot;causal&quot;,
+    &quot;peft_model&quot;: null,
+    &quot;revision&quot;: null,
+    &quot;trust_remote_code&quot;: false,
+    &quot;tasks&quot;: &quot;humaneval&quot;,
+    &quot;instruction_tokens&quot;: null,
+    &quot;batch_size&quot;: 10,
+    &quot;max_length_generation&quot;: 1024,
+    &quot;precision&quot;: &quot;bf16&quot;,
+    &quot;load_in_8bit&quot;: false,
+    &quot;load_in_4bit&quot;: false,
+    &quot;left_padding&quot;: false,
+    &quot;limit&quot;: null,
+    &quot;limit_start&quot;: 0,
+    &quot;save_every_k_tasks&quot;: -1,
+    &quot;postprocess&quot;: true,
+    &quot;allow_code_execution&quot;: true,
+    &quot;generation_only&quot;: false,
+    &quot;load_generations_path&quot;: null,
+    &quot;load_data_path&quot;: null,
+    &quot;metric_output_path&quot;: &quot;/home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-humaneval-pass@100.json&quot;,
+    &quot;save_generations&quot;: true,
+    &quot;load_generations_intermediate_paths&quot;: null,
+    &quot;save_generations_path&quot;: &quot;generations.json&quot;,
+    &quot;save_references&quot;: false,
+    &quot;save_references_path&quot;: &quot;references.json&quot;,
+    &quot;prompt&quot;: &quot;prompt&quot;,
+    &quot;max_memory_per_gpu&quot;: null,
+    &quot;check_references&quot;: false
+  }
+}
+</code></pre>
+<h2><a id="deepseek-coder" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>DeepSeek-Coder</h2>
+<h3><a id="prepare" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prepare</h3>
+<p>先创建新的虚拟环境，并安装相应的包：</p>
+<blockquote>
+<p>注：由于transofrmers库版本的原因，需要将requirements.txt内的<code>transformers==4.35.0</code>变为<code>transformers</code></p>
+</blockquote>
+<pre><code class="language-shell">conda create -n &quot;reft-code-eval-2&quot; python=3.9
+
+git clone https://github.com/deepseek-ai/DeepSeek-Coder.git
+
+cd DeepSeek-Coder
+
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/bin/pip install -r requirements.txt
+</code></pre>
+<p><br />
+接着安装evaluate必要的包：</p>
+<pre><code class="language-shell">/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/bin/pip install accelerate
+
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/bin/pip install attrdict
+
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/bin/pip install transformers
+
+# 注：这里应为torch
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/bin/pip install pytorch
+</code></pre>
+<p><br />
+检查已经安装的库：</p>
+<pre><code class="language-shell">conda list
+
+# packages in environment at /home/workspace/nanyang/anaconda3/envs/reft-code-eval-2:
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                 conda_forge    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+_openmp_mutex             4.5                  2_kmp_llvm    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+accelerate                0.30.1                    &lt;pip&gt;
+attrdict                  2.0.1                     &lt;pip&gt;
+ca-certificates           2024.3.11            h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+certifi                   2024.2.2                  &lt;pip&gt;
+charset-normalizer        3.3.2                     &lt;pip&gt;
+filelock                  3.13.1                    &lt;pip&gt;
+fsspec                    2024.2.0                  &lt;pip&gt;
+huggingface-hub           0.23.0                    &lt;pip&gt;
+idna                      3.7                       &lt;pip&gt;
+Jinja2                    3.1.3                     &lt;pip&gt;
+ld_impl_linux-64          2.38                 h1181459_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libffi                    3.4.4                h6a678d5_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+libgcc-ng                 12.2.0              h65d4601_19    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+libstdcxx-ng              12.2.0              h46fd767_19    https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+llvm-openmp               14.0.6               h9e868ea_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+MarkupSafe                2.1.5                     &lt;pip&gt;
+mpmath                    1.3.0                     &lt;pip&gt;
+ncurses                   6.4                  h6a678d5_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+networkx                  3.2.1                     &lt;pip&gt;
+numpy                     1.26.3                    &lt;pip&gt;
+nvidia-cublas-cu12        12.1.3.1                  &lt;pip&gt;
+nvidia-cuda-cupti-cu12    12.1.105                  &lt;pip&gt;
+nvidia-cuda-nvrtc-cu12    12.1.105                  &lt;pip&gt;
+nvidia-cuda-runtime-cu12  12.1.105                  &lt;pip&gt;
+nvidia-cudnn-cu12         8.9.2.26                  &lt;pip&gt;
+nvidia-cufft-cu12         11.0.2.54                 &lt;pip&gt;
+nvidia-curand-cu12        10.3.2.106                &lt;pip&gt;
+nvidia-cusolver-cu12      11.4.5.107                &lt;pip&gt;
+nvidia-cusparse-cu12      12.1.0.106                &lt;pip&gt;
+nvidia-nccl-cu12          2.19.3                    &lt;pip&gt;
+nvidia-nvjitlink-cu12     12.1.105                  &lt;pip&gt;
+nvidia-nvtx-cu12          12.1.105                  &lt;pip&gt;
+openssl                   3.0.13               h7f8727e_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+packaging                 24.0                      &lt;pip&gt;
+Pebble                    5.0.7                     &lt;pip&gt;
+pillow                    10.2.0                    &lt;pip&gt;
+pip                       24.0             py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+psutil                    5.9.8                     &lt;pip&gt;
+python                    3.9.19               h955ad1f_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+PyYAML                    6.0.1                     &lt;pip&gt;
+readline                  8.2                  h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+regex                     2024.5.10                 &lt;pip&gt;
+requests                  2.31.0                    &lt;pip&gt;
+safetensors               0.4.3                     &lt;pip&gt;
+setuptools                69.5.1           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+six                       1.16.0                    &lt;pip&gt;
+sqlite                    3.45.3               h5eee18b_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+sympy                     1.12                      &lt;pip&gt;
+timeout-decorator         0.5.0                     &lt;pip&gt;
+tk                        8.6.14               h39e8969_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+tokenizers                0.19.1                    &lt;pip&gt;
+torch                     2.2.1+cu121               &lt;pip&gt;
+torchaudio                2.2.1+cu121               &lt;pip&gt;
+torchvision               0.17.1+cu121              &lt;pip&gt;
+tqdm                      4.66.4                    &lt;pip&gt;
+transformers              4.40.2                    &lt;pip&gt;
+triton                    2.2.0                     &lt;pip&gt;
+typing_extensions         4.9.0                     &lt;pip&gt;
+tzdata                    2024a                h04d1e81_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+urllib3                   2.2.1                     &lt;pip&gt;
+wheel                     0.43.0           py39h06a4308_0    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+xz                        5.4.6                h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+zlib                      1.2.13               h5eee18b_1    https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+</code></pre>
+<h3><a id="eval" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eval</h3>
+<p>进入到对应路径下，执行命令：</p>
+<blockquote>
+<p>注：这里采用的<code>accelerate config</code>和</p>
+</blockquote>
+<pre><code class="language-shell">cd /home/workspace/nanyang/DeepSeek-Coder/Evaluation/HumanEval
+
+MODEL_NAME_OR_PATH=&quot;/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df&quot;
+
+DATASET_ROOT=&quot;data/&quot;
+
+LANGUAGE=&quot;python&quot;
+
+accelerate launch eval_pal.py --logdir ${MODEL_NAME_OR_PATH} --language ${LANGUAGE} --dataroot ${DATASET_ROOT}
+</code></pre>
+<p><br />
+然而报错未找到<code>pandas</code>和<code>fire</code>库，在虚拟环境下安装后重新运行命令，输出如下：</p>
+<pre><code class="language-shell">Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Loading checkpoint shards: 100%|██████████████████████████████████████████████████████████████| 4/4 [00:03&lt;00:00,  1.08it/s]
+Loading checkpoint shards: 100%|██████████████████████████████████████████████████████████████| 4/4 [00:03&lt;00:00,  1.06it/s]
+Loading checkpoint shards: 100%|██████████████████████████████████████████████████████████████| 4/4 [00:04&lt;00:00,  1.01s/it]
+Loading checkpoint shards: 100%|██████████████████████████████████████████████████████████████| 4/4 [00:03&lt;00:00,  1.08it/s]
+Read HumanEval from data/, number of samples 164
+Read HumanEval from data/, number of samples 164
+Read HumanEval from data/, number of samples 164
+Read HumanEval from data/, number of samples 164
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:492: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:497: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:492: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:497: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:492: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:497: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:492: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/workspace/nanyang/anaconda3/envs/reft-code-eval-2/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:497: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+DP RANK:2 process_num/all_num:1/41 avg_time_per_batch:1.07 s still_need:0.73 m mem:15.156 GiB bs:1
+DP RANK:1 process_num/all_num:1/41 avg_time_per_batch:1.16 s still_need:0.79 m mem:15.215 GiB bs:1
+DP RANK:3 process_num/all_num:1/41 avg_time_per_batch:1.36 s still_need:0.93 m mem:15.282 GiB bs:1
+DP RANK:2 process_num/all_num:2/41 avg_time_per_batch:0.69 s still_need:0.46 m mem:15.156 GiB bs:1
+DP RANK:3 process_num/all_num:2/41 avg_time_per_batch:0.86 s still_need:0.57 m mem:15.309 GiB bs:1
+DP RANK:2 process_num/all_num:3/41 avg_time_per_batch:0.59 s still_need:0.38 m mem:15.199 GiB bs:1
+DP RANK:1 process_num/all_num:2/41 avg_time_per_batch:0.90 s still_need:0.60 m mem:15.215 GiB bs:1
+DP RANK:0 process_num/all_num:1/41 avg_time_per_batch:2.94 s still_need:2.01 m mem:15.192 GiB bs:1
+DP RANK:0 process_num/all_num:2/41 avg_time_per_batch:1.60 s still_need:1.07 m mem:15.192 GiB bs:1
+DP RANK:2 process_num/all_num:4/41 avg_time_per_batch:0.86 s still_need:0.54 m mem:15.199 GiB bs:1
+DP RANK:0 process_num/all_num:3/41 avg_time_per_batch:1.22 s still_need:0.79 m mem:15.192 GiB bs:1
+DP RANK:2 process_num/all_num:5/41 avg_time_per_batch:0.74 s still_need:0.46 m mem:15.199 GiB bs:1
+DP RANK:1 process_num/all_num:3/41 avg_time_per_batch:1.27 s still_need:0.83 m mem:15.219 GiB bs:1
+DP RANK:1 process_num/all_num:4/41 avg_time_per_batch:1.03 s still_need:0.66 m mem:15.219 GiB bs:1
+DP RANK:3 process_num/all_num:3/41 avg_time_per_batch:1.47 s still_need:0.96 m mem:15.309 GiB bs:1
+DP RANK:1 process_num/all_num:5/41 avg_time_per_batch:0.93 s still_need:0.57 m mem:15.219 GiB bs:1
+DP RANK:3 process_num/all_num:4/41 avg_time_per_batch:1.26 s still_need:0.80 m mem:15.309 GiB bs:1
+DP RANK:2 process_num/all_num:6/41 avg_time_per_batch:0.88 s still_need:0.53 m mem:15.305 GiB bs:1
+DP RANK:0 process_num/all_num:4/41 avg_time_per_batch:1.32 s still_need:0.84 m mem:15.192 GiB bs:1
+DP RANK:2 process_num/all_num:7/41 avg_time_per_batch:0.80 s still_need:0.47 m mem:15.305 GiB bs:1
+DP RANK:2 process_num/all_num:8/41 avg_time_per_batch:1.01 s still_need:0.57 m mem:15.305 GiB bs:1
+DP RANK:1 process_num/all_num:6/41 avg_time_per_batch:1.40 s still_need:0.84 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:9/41 avg_time_per_batch:1.03 s still_need:0.57 m mem:15.305 GiB bs:1
+DP RANK:0 process_num/all_num:5/41 avg_time_per_batch:1.90 s still_need:1.17 m mem:15.192 GiB bs:1
+DP RANK:2 process_num/all_num:10/41 avg_time_per_batch:0.96 s still_need:0.51 m mem:15.305 GiB bs:1
+DP RANK:0 process_num/all_num:6/41 avg_time_per_batch:1.63 s still_need:0.98 m mem:15.192 GiB bs:1
+DP RANK:0 process_num/all_num:7/41 avg_time_per_batch:1.43 s still_need:0.84 m mem:15.192 GiB bs:1
+DP RANK:0 process_num/all_num:8/41 avg_time_per_batch:1.34 s still_need:0.76 m mem:15.192 GiB bs:1
+DP RANK:1 process_num/all_num:7/41 avg_time_per_batch:1.55 s still_need:0.90 m mem:15.233 GiB bs:1
+DP RANK:1 process_num/all_num:8/41 avg_time_per_batch:1.41 s still_need:0.80 m mem:15.233 GiB bs:1
+DP RANK:1 process_num/all_num:9/41 avg_time_per_batch:1.31 s still_need:0.72 m mem:15.233 GiB bs:1
+DP RANK:0 process_num/all_num:9/41 avg_time_per_batch:1.33 s still_need:0.73 m mem:15.192 GiB bs:1
+DP RANK:2 process_num/all_num:11/41 avg_time_per_batch:1.13 s still_need:0.59 m mem:15.305 GiB bs:1
+DP RANK:2 process_num/all_num:12/41 avg_time_per_batch:1.06 s still_need:0.53 m mem:15.305 GiB bs:1
+DP RANK:1 process_num/all_num:10/41 avg_time_per_batch:1.33 s still_need:0.71 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:13/41 avg_time_per_batch:1.11 s still_need:0.54 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:11/41 avg_time_per_batch:1.38 s still_need:0.71 m mem:15.233 GiB bs:1
+DP RANK:1 process_num/all_num:12/41 avg_time_per_batch:1.35 s still_need:0.68 m mem:15.233 GiB bs:1
+DP RANK:1 process_num/all_num:13/41 avg_time_per_batch:1.28 s still_need:0.62 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:14/41 avg_time_per_batch:1.20 s still_need:0.56 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:14/41 avg_time_per_batch:1.22 s still_need:0.57 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:15/41 avg_time_per_batch:1.23 s still_need:0.55 m mem:15.329 GiB bs:1
+DP RANK:2 process_num/all_num:16/41 avg_time_per_batch:1.17 s still_need:0.51 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:15/41 avg_time_per_batch:1.27 s still_need:0.57 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:17/41 avg_time_per_batch:1.12 s still_need:0.47 m mem:15.329 GiB bs:1
+DP RANK:2 process_num/all_num:18/41 avg_time_per_batch:1.08 s still_need:0.43 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:16/41 avg_time_per_batch:1.22 s still_need:0.53 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:19/41 avg_time_per_batch:1.06 s still_need:0.41 m mem:15.329 GiB bs:1
+DP RANK:2 process_num/all_num:20/41 avg_time_per_batch:1.03 s still_need:0.38 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:17/41 avg_time_per_batch:1.33 s still_need:0.55 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:21/41 avg_time_per_batch:1.08 s still_need:0.38 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:18/41 avg_time_per_batch:1.29 s still_need:0.52 m mem:15.233 GiB bs:1
+DP RANK:1 process_num/all_num:19/41 avg_time_per_batch:1.35 s still_need:0.52 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:22/41 avg_time_per_batch:1.18 s still_need:0.39 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:20/41 avg_time_per_batch:1.32 s still_need:0.48 m mem:15.233 GiB bs:1
+DP RANK:1 process_num/all_num:21/41 avg_time_per_batch:1.28 s still_need:0.45 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:23/41 avg_time_per_batch:1.19 s still_need:0.38 m mem:15.329 GiB bs:1
+DP RANK:2 process_num/all_num:24/41 avg_time_per_batch:1.16 s still_need:0.35 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:22/41 avg_time_per_batch:1.30 s still_need:0.43 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:25/41 avg_time_per_batch:1.15 s still_need:0.33 m mem:15.329 GiB bs:1
+DP RANK:3 process_num/all_num:5/41 avg_time_per_batch:6.00 s still_need:3.70 m mem:15.309 GiB bs:1
+DP RANK:1 process_num/all_num:23/41 avg_time_per_batch:1.37 s still_need:0.43 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:26/41 avg_time_per_batch:1.23 s still_need:0.33 m mem:15.329 GiB bs:1
+DP RANK:3 process_num/all_num:6/41 avg_time_per_batch:5.48 s still_need:3.29 m mem:15.309 GiB bs:1
+DP RANK:1 process_num/all_num:24/41 avg_time_per_batch:1.38 s still_need:0.41 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:27/41 avg_time_per_batch:1.23 s still_need:0.31 m mem:15.329 GiB bs:1
+DP RANK:1 process_num/all_num:25/41 avg_time_per_batch:1.34 s still_need:0.38 m mem:15.233 GiB bs:1
+DP RANK:3 process_num/all_num:7/41 avg_time_per_batch:4.79 s still_need:2.79 m mem:15.422 GiB bs:1
+DP RANK:1 process_num/all_num:26/41 avg_time_per_batch:1.32 s still_need:0.35 m mem:15.233 GiB bs:1
+DP RANK:2 process_num/all_num:28/41 avg_time_per_batch:1.26 s still_need:0.29 m mem:15.339 GiB bs:1
+DP RANK:1 process_num/all_num:27/41 avg_time_per_batch:1.31 s still_need:0.33 m mem:15.264 GiB bs:1
+DP RANK:2 process_num/all_num:29/41 avg_time_per_batch:1.26 s still_need:0.27 m mem:15.339 GiB bs:1
+DP RANK:2 process_num/all_num:30/41 avg_time_per_batch:1.24 s still_need:0.25 m mem:15.339 GiB bs:1
+DP RANK:3 process_num/all_num:8/41 avg_time_per_batch:4.71 s still_need:2.67 m mem:15.422 GiB bs:1
+DP RANK:1 process_num/all_num:28/41 avg_time_per_batch:1.35 s still_need:0.32 m mem:15.351 GiB bs:1
+DP RANK:2 process_num/all_num:31/41 avg_time_per_batch:1.22 s still_need:0.22 m mem:15.339 GiB bs:1
+DP RANK:1 process_num/all_num:29/41 avg_time_per_batch:1.32 s still_need:0.29 m mem:15.351 GiB bs:1
+DP RANK:3 process_num/all_num:9/41 avg_time_per_batch:4.26 s still_need:2.34 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:10/41 avg_time_per_batch:3.89 s still_need:2.07 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:11/41 avg_time_per_batch:3.61 s still_need:1.87 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:12/41 avg_time_per_batch:3.36 s still_need:1.68 m mem:15.422 GiB bs:1
+DP RANK:2 process_num/all_num:32/41 avg_time_per_batch:1.27 s still_need:0.21 m mem:15.339 GiB bs:1
+DP RANK:1 process_num/all_num:30/41 avg_time_per_batch:1.38 s still_need:0.28 m mem:15.351 GiB bs:1
+DP RANK:3 process_num/all_num:13/41 avg_time_per_batch:3.22 s still_need:1.56 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:14/41 avg_time_per_batch:3.04 s still_need:1.42 m mem:15.422 GiB bs:1
+DP RANK:1 process_num/all_num:31/41 avg_time_per_batch:1.45 s still_need:0.27 m mem:15.351 GiB bs:1
+DP RANK:1 process_num/all_num:32/41 avg_time_per_batch:1.43 s still_need:0.24 m mem:15.351 GiB bs:1
+DP RANK:1 process_num/all_num:33/41 avg_time_per_batch:1.41 s still_need:0.21 m mem:15.351 GiB bs:1
+DP RANK:2 process_num/all_num:33/41 avg_time_per_batch:1.43 s still_need:0.21 m mem:15.339 GiB bs:1
+DP RANK:3 process_num/all_num:15/41 avg_time_per_batch:3.18 s still_need:1.43 m mem:15.422 GiB bs:1
+DP RANK:1 process_num/all_num:34/41 avg_time_per_batch:1.42 s still_need:0.19 m mem:15.351 GiB bs:1
+DP RANK:1 process_num/all_num:35/41 avg_time_per_batch:1.39 s still_need:0.16 m mem:15.351 GiB bs:1
+DP RANK:3 process_num/all_num:16/41 avg_time_per_batch:3.05 s still_need:1.32 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:17/41 avg_time_per_batch:2.88 s still_need:1.20 m mem:15.422 GiB bs:1
+DP RANK:1 process_num/all_num:36/41 avg_time_per_batch:1.36 s still_need:0.14 m mem:15.351 GiB bs:1
+DP RANK:3 process_num/all_num:18/41 avg_time_per_batch:2.74 s still_need:1.09 m mem:15.422 GiB bs:1
+DP RANK:1 process_num/all_num:37/41 avg_time_per_batch:1.35 s still_need:0.11 m mem:15.351 GiB bs:1
+DP RANK:3 process_num/all_num:19/41 avg_time_per_batch:2.66 s still_need:1.02 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:20/41 avg_time_per_batch:2.69 s still_need:0.99 m mem:15.422 GiB bs:1
+DP RANK:2 process_num/all_num:34/41 avg_time_per_batch:1.61 s still_need:0.22 m mem:15.360 GiB bs:1
+DP RANK:3 process_num/all_num:21/41 avg_time_per_batch:2.66 s still_need:0.93 m mem:15.422 GiB bs:1
+DP RANK:2 process_num/all_num:35/41 avg_time_per_batch:1.60 s still_need:0.19 m mem:15.360 GiB bs:1
+DP RANK:3 process_num/all_num:22/41 avg_time_per_batch:2.55 s still_need:0.85 m mem:15.422 GiB bs:1
+DP RANK:2 process_num/all_num:36/41 avg_time_per_batch:1.56 s still_need:0.16 m mem:15.360 GiB bs:1
+DP RANK:3 process_num/all_num:23/41 avg_time_per_batch:2.49 s still_need:0.79 m mem:15.422 GiB bs:1
+DP RANK:1 process_num/all_num:38/41 avg_time_per_batch:1.52 s still_need:0.10 m mem:15.351 GiB bs:1
+DP RANK:2 process_num/all_num:37/41 avg_time_per_batch:1.58 s still_need:0.13 m mem:15.360 GiB bs:1
+DP RANK:1 process_num/all_num:39/41 avg_time_per_batch:1.50 s still_need:0.08 m mem:15.351 GiB bs:1
+DP RANK:2 process_num/all_num:38/41 avg_time_per_batch:1.56 s still_need:0.10 m mem:15.360 GiB bs:1
+DP RANK:3 process_num/all_num:24/41 avg_time_per_batch:2.48 s still_need:0.74 m mem:15.422 GiB bs:1
+DP RANK:2 process_num/all_num:39/41 avg_time_per_batch:1.53 s still_need:0.08 m mem:15.360 GiB bs:1
+DP RANK:2 process_num/all_num:40/41 avg_time_per_batch:1.53 s still_need:0.05 m mem:15.360 GiB bs:1
+DP RANK:0 process_num/all_num:10/41 avg_time_per_batch:6.17 s still_need:3.29 m mem:15.386 GiB bs:1
+DP RANK:2 process_num/all_num:41/41 avg_time_per_batch:1.51 s still_need:0.03 m mem:15.360 GiB bs:1
+EVAL DONE! Process time 1.03 m
+DP RANK:1 process_num/all_num:40/41 avg_time_per_batch:1.55 s still_need:0.05 m mem:15.351 GiB bs:1
+DP RANK:1 process_num/all_num:41/41 avg_time_per_batch:1.52 s still_need:0.03 m mem:15.351 GiB bs:1
+EVAL DONE! Process time 1.04 m
+DP RANK:3 process_num/all_num:25/41 avg_time_per_batch:2.57 s still_need:0.73 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:26/41 avg_time_per_batch:2.62 s still_need:0.70 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:27/41 avg_time_per_batch:2.55 s still_need:0.64 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:28/41 avg_time_per_batch:2.50 s still_need:0.58 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:29/41 avg_time_per_batch:2.46 s still_need:0.53 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:30/41 avg_time_per_batch:2.43 s still_need:0.49 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:31/41 avg_time_per_batch:2.37 s still_need:0.44 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:32/41 avg_time_per_batch:2.31 s still_need:0.38 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:33/41 avg_time_per_batch:2.33 s still_need:0.35 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:34/41 avg_time_per_batch:2.27 s still_need:0.30 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:35/41 avg_time_per_batch:2.24 s still_need:0.26 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:36/41 avg_time_per_batch:2.19 s still_need:0.22 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:37/41 avg_time_per_batch:2.15 s still_need:0.18 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:38/41 avg_time_per_batch:2.11 s still_need:0.14 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:39/41 avg_time_per_batch:2.06 s still_need:0.10 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:40/41 avg_time_per_batch:2.04 s still_need:0.07 m mem:15.422 GiB bs:1
+DP RANK:3 process_num/all_num:41/41 avg_time_per_batch:2.02 s still_need:0.03 m mem:15.422 GiB bs:1
+EVAL DONE! Process time 1.38 m
+DP RANK:0 process_num/all_num:11/41 avg_time_per_batch:10.05 s still_need:5.19 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:12/41 avg_time_per_batch:13.27 s still_need:6.64 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:13/41 avg_time_per_batch:12.44 s still_need:6.01 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:14/41 avg_time_per_batch:11.58 s still_need:5.40 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:15/41 avg_time_per_batch:10.82 s still_need:4.87 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:16/41 avg_time_per_batch:10.20 s still_need:4.42 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:17/41 avg_time_per_batch:9.63 s still_need:4.01 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:18/41 avg_time_per_batch:9.19 s still_need:3.68 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:19/41 avg_time_per_batch:8.73 s still_need:3.35 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:20/41 avg_time_per_batch:8.34 s still_need:3.06 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:21/41 avg_time_per_batch:7.99 s still_need:2.80 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:22/41 avg_time_per_batch:7.69 s still_need:2.56 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:23/41 avg_time_per_batch:7.38 s still_need:2.34 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:24/41 avg_time_per_batch:7.09 s still_need:2.13 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:25/41 avg_time_per_batch:6.86 s still_need:1.94 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:26/41 avg_time_per_batch:6.71 s still_need:1.79 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:27/41 avg_time_per_batch:6.47 s still_need:1.62 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:28/41 avg_time_per_batch:6.25 s still_need:1.46 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:29/41 avg_time_per_batch:7.73 s still_need:1.67 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:30/41 avg_time_per_batch:7.49 s still_need:1.50 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:31/41 avg_time_per_batch:7.28 s still_need:1.33 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:32/41 avg_time_per_batch:7.11 s still_need:1.19 m mem:15.393 GiB bs:1
+DP RANK:0 process_num/all_num:33/41 avg_time_per_batch:8.43 s still_need:1.26 m mem:15.423 GiB bs:1
+DP RANK:0 process_num/all_num:34/41 avg_time_per_batch:8.25 s still_need:1.10 m mem:15.423 GiB bs:1
+DP RANK:0 process_num/all_num:35/41 avg_time_per_batch:8.02 s still_need:0.94 m mem:15.423 GiB bs:1
+DP RANK:0 process_num/all_num:36/41 avg_time_per_batch:7.81 s still_need:0.78 m mem:15.423 GiB bs:1
+DP RANK:0 process_num/all_num:37/41 avg_time_per_batch:7.68 s still_need:0.64 m mem:15.423 GiB bs:1
+DP RANK:0 process_num/all_num:38/41 avg_time_per_batch:7.53 s still_need:0.50 m mem:15.423 GiB bs:1
+DP RANK:0 process_num/all_num:39/41 avg_time_per_batch:7.47 s still_need:0.37 m mem:15.423 GiB bs:1
+DP RANK:0 process_num/all_num:40/41 avg_time_per_batch:7.39 s still_need:0.25 m mem:15.423 GiB bs:1
+DP RANK:0 process_num/all_num:41/41 avg_time_per_batch:7.28 s still_need:0.12 m mem:15.423 GiB bs:1
+EVAL DONE! Process time 4.98 m
+Reading samples...
+100%|████████████████████████████████████████████████████████████████████████████████████| 164/164 [00:01&lt;00:00, 135.94it/s]
+Running test suites...
+100%|█████████████████████████████████████████████████████████████████████████████████████| 164/164 [00:07&lt;00:00, 21.33it/s]
+{'pass@1': 0.27439024390243905}
+score is 0.27439024390243905
+</code></pre>
+<p><br />
+通过后续实验可以看到，这两种方法得到的是一致的结果，因此我们采用<strong>bigcode-evaluation-harness</strong>进行实验，因为其可以输出保存对应的config文件。</p>
+<h2><a id="result-base" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Result-Base</h2>
+<p>首先是没有code微调的llama3-8b-base和llama3-8b-instruct上的代码效果测评。</p>
+<p>我们对两个基础模型分别进行以下实验：</p>
+<ul>
+<li>采用greedy search的<code>pass@1</code>实验，用<code>pass@1-g</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.2</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@1</code>实验，用<code>pass@1-b</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.6</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@10</code>实验，用<code>pass@10-b</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.8</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@100</code>实验，用<code>pass@100-b</code>表示；</li>
+</ul>
+<p>实验结果如下所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center"></th>
+<th>Llama3-8B-Base</th>
+<th style="text-align: left">Llama3-8B-Instruct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">pass@1-g</td>
+<td>0.27439024390243905</td>
+<td style="text-align: left">0.5609756097560976</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@1-b</td>
+<td>0.2926829268292683</td>
+<td style="text-align: left">0.5609756097560976</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@10-b</td>
+<td>0.5792682926829268</td>
+<td style="text-align: left">0.8170731707317073</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@100-b</td>
+<td>0.8841463414634146</td>
+<td style="text-align: left">0.9390243902439024</td>
+</tr>
+</tbody>
+</table>
+<p>一些有趣的现象：</p>
+<ul>
+<li>Llama3-8B-Instruct在greedy search时结果和<code>temperature=0.6, top_p=1, top_k=50</code>的结果相同。</li>
+<li>Instruct模型的pass@1指标远远高于Base模型，但pass@100差不太多（100个例子再做不出个对的，这模型就别要了）</li>
+</ul>
+<h2><a id="result-reft" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Result-ReFT</h2>
+<p>经过ReFT微调后的模型，最大的难点就是：<strong>ReFT保存的模型并非transformers库中的model格式，而是要采用特殊的方式与transformers加载的模型结合到一起，并且经过结合后，该模型的generate函数居然与transformers自带的generate函数不符。</strong></p>
+<p>考虑到这一点，重新新开一篇文章进行解决方案的梳理。</p>
+<pre><code class="language-shell"># just for convenience
+accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --do_sample False \
+  --n_samples 10 \
+  --batch_size 10 \
+  --precision bf16 \
+  --allow_code_execution \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-humaneval-pass@10.json
+
+accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B-Instruct/snapshots/a8977699a3d0820e80129fb3c93c20fbd9972c41 \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --do_sample False \
+  --n_samples 10 \
+  --batch_size 10 \
+  --precision bf16 \
+  --allow_code_execution \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-instruct-humaneval-pass@10.json
+
+accelerate launch  main.py \
+  --model /root/autodl-tmp/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --reft_model /root/autodl-tmp/pyreft/examples/loreft/official_results/Meta-Llama-3-8B.code.20240509210531714954 \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --do_sample False \
+  --n_samples 1 \
+  --batch_size 1 \
+  --precision bf16 \
+  --allow_code_execution \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-reft-humaneval-pass@1.json
+</code></pre>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script><script>!function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;var l=a.element.classList;if(l.contains('language-mermaid') || l.contains('language-echarts') || l.contains('language-plantuml')){return;} if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.css"><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><style>div.code-toolbar > .toolbar > .toolbar-item > a, div.code-toolbar > .toolbar > .toolbar-item > button, div.code-toolbar > .toolbar > .toolbar-item > span {padding: 4px .5em; background: #f5f2f0; background: rgba(224, 224, 224, 0.4);}</style><script>window.MathJax = {     tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } ,     startup: {     pageReady() {       return MathJax.startup.defaultPageReady().then(function () {          window.mweb_mathjax_ready_val = 'yes';          if(window.mweb_mathjax_ready !== undefined){ mweb_mathjax_ready(); }       });     }   }};document.addEventListener('DOMContentLoaded', function(event) {    if (typeof Prism != 'undefined') {         Prism.highlightAll();     }});window.mweb_mathjax_ready_val = '';function theMWebMathJaxRenderIsReady(key){ return window.mweb_mathjax_ready_val; }</script><script>window.MathJax = { tex: { packages: {'[+]': ['physics']}, tags: 'all', inlineMath: [ ['$','$'], ['\\(','\\)'] ] },loader: { load: ['[tex]/physics'] } }; </script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>

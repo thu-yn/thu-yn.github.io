@@ -218,7 +218,7 @@ if &quot;Meta-Llama-3-8B-Instruct&quot; in tokenizer.name_or_path: # pretty bad 
 --use_normalized_template \
 --share_weights \
 --warmup_ratio 0.1 \
---greedy_decoding \
+--greedy_decoding 
 </code></pre>
 <p><br />
 然而还是太慢了，因此考虑只训练一小部分数据集，进行加速：因为我们只需要观察在模型 eval 时是否有输出，因此可以这么做。</p>
@@ -227,9 +227,19 @@ if &quot;Meta-Llama-3-8B-Instruct&quot; in tokenizer.name_or_path: # pretty bad 
 <pre><code class="language-python">parser.add_argument('-is_select', '--is_select', action='store_true')
 </code></pre>
 <p><br />
-在 <code>finetune()</code> 函数开始进行一些基本的 check：</p>
-<pre><code class="language-python">if is_select:
-    assert task in {&quot;commonsense&quot;, &quot;math&quot;}
+在 <code>finetune()</code> 函数开始时，新增该入参<code>is_select</code>，并进行一些基本的 check：</p>
+<pre><code class="language-python">def finetune(
+    ...,
+    is_select: bool,
+    ...):
+{
+    if is_select:
+        import random   # for random choose
+        
+        assert task in {&quot;commonsense&quot;, &quot;math&quot;}
+    
+    ...
+}
 </code></pre>
 <p><br />
 在 <code>task_config.py</code> 内，对以上两个任务添加一个参数 <code>selected_train_datasets</code>：</p>
@@ -283,8 +293,8 @@ if is_select and task in {&quot;commonsense&quot;, &quot;math&quot;}:
         
     print(&quot;selected train data load successfully&quot;)
 </code></pre>
-<p>\</p>
-<p>我们将挑选后的数据放入 <code>/dataset/selected_original_name/train.json</code> 中，其余都不用改变，开始测试训练：</p>
+<p><br />
+我们将挑选后的数据放入 <code>/dataset/selected_original_name/train.json</code> 中，其余都不用改变，开始测试训练：</p>
 <pre><code class="language-shell">python train.py -task commonsense \
 -data_dir dataset \
 -is_select \

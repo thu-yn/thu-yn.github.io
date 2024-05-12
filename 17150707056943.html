@@ -195,7 +195,7 @@ completes the request.
 &quot;&quot;&quot;
 </code></pre>
 <h3><a id="eval-dataset" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eval Dataset</h3>
-<p>~~ 在验证数据集上，采用 <a href="https://github.com/openai/human-eval" title="human-eval">Human-Eval</a> 和<a href="https://github.com/google-research/google-research/tree/master/mbpp" title="mbpp">MBPP</a>共同作为评分的指标。~~<br />
+<p><del>在验证数据集上，采用 <a href="https://github.com/openai/human-eval" title="human-eval">Human-Eval</a> 和<a href="https://github.com/google-research/google-research/tree/master/mbpp" title="mbpp">MBPP</a>共同作为评分的指标。</del><br />
 采用 <a href="https://github.com/bigcode-project/bigcode-evaluation-harness" title="bigcode-evaluation-harness">bigcode-evaluation-harness</a> 来进行各个指标的评估。</p>
 <h4><a id="human-eval" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Human-Eval</h4>
 <p>首先是 Human-Eval 数据集，将其 git 到 <code>/root/auto-tmp/</code> 路径下，并安装相关包：</p>
@@ -366,6 +366,9 @@ cd /root/auto-tmp/bigcode-evaluation-harness
 # installation
 # 注：在这行该命令时，会自动安装 1.12.1 版本的 torch，但是需要卸载掉它，然后重新安装 1.12.1+cu116 版本的 torch。
 /root/miniconda3/envs/CodeEval/bin/pip install -e &quot;.[ds1000]&quot;
+
+# uninstall torch
+/root/miniconda3/envs/CodeEval/bin/pip uninstall torch
 
 # install pytorch
 /root/miniconda3/envs/CodeEval/bin/pip install torch==1.12.1+cu116 --extra-index-url https://download.pytorch.org/whl/cu116
@@ -664,6 +667,33 @@ wandb: 🚀 View run at https://wandb.ai/prada-lab/just_fot_test/runs/56sh3v4t
 {'loss': 0.659, 'grad_norm': 2.338649034500122, 'learning_rate': 1.1805859204197638e-06, 'epoch': 0.0}                                                                                        
   0%|                                                                                                                                                    | 3/22866 [00:20&lt;42:47:26,  6.74s/it]
 </code></pre>
+<p><br />
+训练结束后，可以看到模型被保存到<code>/home/workspace/nanyang/pyreft/examples/loreft/official_results/Meta-Llama-3-8B.code.20240509210531714954</code>中，需要注意的是：<strong>该模型并非微调后所有的模型，而是一个辅助品，需要配合原模型使用。</strong> 该模型文件如下所示：</p>
+<pre><code class="language-plain_text">├── /home/workspace/nanyang/pyreft/examples/loreft/official_results/Meta-Llama-3-8B.code.20240509210531714954
+│   ├── args.json                                                    # 描述了微调任务
+│   ├── config.json                                                  # 描述了intervention相关
+│   ├── intkey_layer.0.comp.block_output.unit.pos.nunit.1#0.bin      # 第1层相关配置
+│   ├── ...
+│   ├── intkey_layer.31.comp.block_output.unit.pos.nunit.1#0.bin     # 第32层相关配置
+</code></pre>
+<p><br />
+若要重新加载该模型，则应采用以下方法：</p>
+<pre><code class="language-python">import torch, transformers, pyreft
+device = &quot;cuda&quot;
+
+# load base model
+model_name_or_path = &quot;your/base/model/path&quot;     # e.g '/root/autodl-tmp/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df'
+model = transformers.AutoModelForCausalLM.from_pretrained(
+    model_name_or_path, torch_dtype=torch.bfloat16, device_map=device)
+
+# load reft model
+reft_model = pyreft.ReftModel.load(
+    &quot;your/reft/model/path&quot;,                     # e.g '/root/autodl-tmp/pyreft/examples/loreft/official_results/Meta-Llama-3-8B.code.20240509210531714954'
+    model   
+)
+</code></pre>
+<p><br />
+注意：加载后的模型，在generate时，并非调用的<code>transformers</code>库中的<code>generate</code>函数，而是<code>pyvene.IntervenableModel</code>类中定义的<code>generate</code>函数。</p>
 
                   </article>
                   <div class="comments-wrap">
