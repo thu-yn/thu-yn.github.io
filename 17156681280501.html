@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    Debug - Prepare for the FUTURE
+    LoREFT-Code-HumanEval-Result - Prepare for the FUTURE
     
     </title>
     
@@ -77,7 +77,7 @@
                   <div class="post-body single-content">
                     
                     <h1 class="title">
-                            Debug   
+                            LoREFT-Code-HumanEval-Result   
                       </h1>
                      
                     
@@ -86,7 +86,7 @@
                             <div class="media-content">
                               <div class="content">
                                 <p>
-                                 <span class="date">2024/05/10</span>
+                                 <span class="date">2024/05/14</span>
                                   
                                          
                                   
@@ -95,6 +95,8 @@
                                       
                                   <br />
                                   <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_Llama3%20ReFTEng%20vs%20PEFT.html'>#Llama3 ReFTEng vs PEFT</a>
                                      
 
                                 </p>
@@ -104,63 +106,247 @@
                     </div>
                 </div>
                   <article class="markdown-body single-content">
-                    <pre><code class="language-bash">$ accelerate launch  main.py --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df --tasks humaneval --max_length_generation 1024 --temperature 0.6 --do_sample True --n_samples 1 --batch_size 1 --precision bf16 --allow_code_execution --save_generations
-
-2024-05-10 19:49:56.432777: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2024-05-10 19:49:56.598499: E tensorflow/stream_executor/cuda/cuda_blas.cc:2981] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-2024-05-10 19:49:57.446740: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory
-2024-05-10 19:49:57.446849: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory
-2024-05-10 19:49:57.446862: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
-Loading model in bf16
-Selected Tasks: ['humaneval']
-Loading checkpoint shards: 100%|███████████████████████████████| 4/4 [00:06&lt;00:00,  1.61s/it]
-Traceback (most recent call last):
-  File &quot;main.py&quot;, line 414, in &lt;module&gt;
-    main()
-  File &quot;main.py&quot;, line 296, in main
-    **model_kwargs,
-  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/models/auto/auto_factory.py&quot;, line 485, in from_pretrained
-    pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
-  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/modeling_utils.py&quot;, line 2896, in from_pretrained
-    keep_in_fp32_modules=keep_in_fp32_modules,
-  File &quot;/home/workspace/nanyang/anaconda3/envs/CodeEval/lib/python3.7/site-packages/transformers/modeling_utils.py&quot;, line 3278, in _load_pretrained_model
-    raise RuntimeError(f&quot;Error(s) in loading state_dict for {model.__class__.__name__}:\n\t{error_msg}&quot;)
-RuntimeError: Error(s) in loading state_dict for LlamaForCausalLM:
-        size mismatch for model.layers.0.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.1.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.2.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.3.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.4.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.5.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.6.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.7.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.8.self_attn.v_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.9.self_attn.k_proj.weight: copying a param with shape torch.Size([1024,
-        size mismatch for model.layers.10.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.11.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.12.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.13.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.14.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.15.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.16.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.17.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.18.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.19.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.20.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.21.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.22.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.23.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.24.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.25.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.26.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.27.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.28.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.29.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.30.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        size mismatch for model.layers.31.self_attn.k_proj.weight: copying a param with shape torch.Size([1024, 4096]) from checkpoint, the shape in current model is torch.Size([4096, 4096]).
-        You may consider adding `ignore_mismatched_sizes=True` in the model `from_pretrained` method.
+                    <p>这篇文章主要是记录DeepSeek-Coder和bigcode-evaluation-harness的结果。</p>
+<p>注：在计算pass@100时，最好使用8*24G的显卡。</p>
+<h2><a id="mention" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mention!!!!!!!</h2>
+<p>在运行bigcode-evaluation-harness时，一定要检查自己的<code>.bashrc</code>文件，确保其中的<code>HF_ENDPOINT</code>如下：</p>
+<pre><code class="language-shell">export HF_ENDPOINT=https://hf-mirror.com
 </code></pre>
+<h2><a id="base-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Base Model</h2>
+<p>首先是没有code微调的llama3-8b-base和llama3-8b-instruct上的代码效果测评。</p>
+<p>两个代码运行shell示例如下：</p>
+<pre><code class="language-shell"># llama3-8b-base-dir
+/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df
+
+# llama3-8b-instruct-dir
+/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B-Instruct/snapshots/a8977699a3d0820e80129fb3c93c20fbd9972c41
+
+# for bigcode-evaluation-harness 
+accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --is_llama_3 \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --do_sample False \
+  --n_samples 10 \
+  --batch_size 10 \
+  --precision bf16 \
+  --allow_code_execution \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-humaneval-pass@10.json
+
+# for DeepSeek-Coder(modified)
+accelerate launch eval_pal.py \
+  --base_model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B-Instruct/snapshots/a8977699a3d0820e80129fb3c93c20fbd9972c41 \
+  --language python \
+  --dataroot data/ \
+  -il3 \
+  --n_sample 1 \
+  --batch_size 1 \
+  -t 0.2 \
+  -top_p 1 \
+  -top_k 50 \
+  -trc \
+  -dtype bfloat16 \
+  -msl 4096 \
+  -mgl 1024 \
+  -ds
+</code></pre>
+<h3><a id="bigcode-evaluation-harness" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>bigcode-evaluation-harness</h3>
+<p>我们对两个基础模型分别进行以下实验：</p>
+<ul>
+<li>采用greedy search的<code>pass@1</code>实验，用<code>pass@1-g</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.2</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@1</code>实验，用<code>pass@1-b</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.6</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@10</code>实验，用<code>pass@10-b</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.8</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@100</code>实验，用<code>pass@100-b</code>表示；</li>
+</ul>
+<p>实验结果如下所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">bigcode-evaluation-harness</th>
+<th>Llama3-8B-Base</th>
+<th style="text-align: left">Llama3-8B-Instruct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">pass@1-g</td>
+<td>0.27439024390243905</td>
+<td style="text-align: left">0.5609756097560976</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@1-b</td>
+<td>0.2926829268292683</td>
+<td style="text-align: left">0.5609756097560976</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@10-b</td>
+<td>0.5792682926829268</td>
+<td style="text-align: left">0.8170731707317073</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@100-b</td>
+<td>0.8841463414634146</td>
+<td style="text-align: left">0.9390243902439024</td>
+</tr>
+</tbody>
+</table>
+<h3><a id="deepseek-coder" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>DeepSeek-Coder</h3>
+<p>我们对两个基础模型分别进行以下实验：</p>
+<ul>
+<li>采用greedy search的<code>pass@1</code>实验，用<code>pass@1-g</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.2</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@1</code>实验，用<code>pass@1-b</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.6</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@10</code>实验，用<code>pass@10-b</code>表示；</li>
+<li>根据图1，采用<code>best_temperature=0.8</code>，hugging_face中model.generate默认值的<code>top_p=1</code>和<code>top_k=50</code>进行<code>pass@100</code>实验，用<code>pass@100-b</code>表示；</li>
+</ul>
+<p>实验结果如下所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">DeepSeek-Coder</th>
+<th>Llama3-8B-Base</th>
+<th style="text-align: left">Llama3-8B-Instruct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">pass@1-g</td>
+<td>0.27439024390243905</td>
+<td style="text-align: left">0.5487804878048781</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@1-b</td>
+<td>0.2804878048780488</td>
+<td style="text-align: left">0.5548780487804879</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@10-b</td>
+<td>0.5914634146341463</td>
+<td style="text-align: left">0.7865853658536586</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@100-b</td>
+<td></td>
+<td style="text-align: left"></td>
+</tr>
+</tbody>
+</table>
+<h2><a id="reft-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ReFT Model</h2>
+<p>接着对进行code任务微调后的ReFT模型进行评测：</p>
+<p>两个代码运行shell示例如下：</p>
+<pre><code class="language-shell"># llama3-8b-base-dir (in server-57)
+/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df
+
+# llama3-8b-base-reft-dir (in server-57)
+/home/workspace/nanyang/pyreft/examples/loreft/official_results/Meta-Llama-3-8B.code.20240509210531714954
+
+# llama3-8b-instruct-dir (in server-57)
+/home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B-Instruct/snapshots/a8977699a3d0820e80129fb3c93c20fbd9972c41
+
+# llama3-8b-instruct-reft-dir (in server-57)
+/home/workspace/nanyang/pyreft/examples/loreft/official_results/Meta-Llama-3-8B-Instruct.code.20240512081302727605
+
+# for bigcode-evaluation-harness 
+accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --reft_model /home/workspace/nanyang/pyreft/examples/loreft/official_results/Meta-Llama-3-8B.code.20240509210531714954 \
+  --tasks humaneval \
+  --max_length_generation 1024 \
+  --precision bf16 \
+  --allow_code_execution \
+  --is_llama_3 \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-reft-code-humaneval-pass@1.json \
+  --do_sample True \
+  --n_samples 1 \
+  --batch_size 1 \
+  --temperature 0.2 \
+  --top_p 1 \
+  --top_k 50
+
+# for DeepSeek-Coder(modified)
+accelerate launch eval_pal.py \
+  --base_model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B-Instruct/snapshots/a8977699a3d0820e80129fb3c93c20fbd9972c41 \
+  --reft_model /home/workspace/nanyang/pyreft/examples/loreft/official_results/Meta-Llama-3-8B-Instruct.code.20240512081302727605 \
+  --language python \
+  --dataroot data/ \
+  -il3 \
+  --n_sample 1 \
+  --batch_size 1 \
+  -t 0.2 \
+  -top_p 1 \
+  -top_k 50 \
+  -trc \
+  -dtype bfloat16 \
+  -msl 4096 \
+  -mgl 1024 \
+  -ds
+</code></pre>
+<h3><a id="bigcode-evaluation-harness" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>bigcode-evaluation-harness</h3>
+<p>得到结果如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">bigcode-evaluation-harness</th>
+<th>Llama3-8B-Base</th>
+<th style="text-align: left">Llama3-8B-Instruct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">pass@1-g</td>
+<td>0.3170731707317073</td>
+<td style="text-align: left">0.4878048780487805</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@1-b</td>
+<td>0.3231707317073171</td>
+<td style="text-align: left">0.5304878048780488</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@10-b</td>
+<td>0.6341463414634146</td>
+<td style="text-align: left">0.774390243902439</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@100-b</td>
+<td></td>
+<td style="text-align: left"></td>
+</tr>
+</tbody>
+</table>
+<h3><a id="deepseek-coder" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>DeepSeek-Coder</h3>
+<p>得到结果如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">DeepSeek-Coder</th>
+<th>Llama3-8B-Base</th>
+<th style="text-align: left">Llama3-8B-Instruct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">pass@1-g</td>
+<td>0.31097560975609756</td>
+<td style="text-align: left">0.47560975609756095</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@1-b</td>
+<td>0.3048780487804878</td>
+<td style="text-align: left">0.49390243902439024</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@10-b</td>
+<td>0.6524390243902439</td>
+<td style="text-align: left">0.75</td>
+</tr>
+<tr>
+<td style="text-align: center">pass@100-b</td>
+<td></td>
+<td style="text-align: left"></td>
+</tr>
+</tbody>
+</table>
 
                   </article>
                   <div class="comments-wrap">

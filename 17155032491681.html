@@ -105,6 +105,567 @@
                 </div>
                   <article class="markdown-body single-content">
                     <p>本篇文章将尽力实现：调用transformers中的generate函数进行reft的模型的生成。</p>
+<h2><a id="core" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Core</h2>
+<p>核心就是：ReFT模型的generate函数是自己定义的（借助<a href="https://github.com/stanfordnlp/pyvene" title="pyvene">pyvene</a>，可以看到在<code>/pyvene/models/intervenable_base.py</code>第1585行，本质还是调用transformers中的generate函数），而ReFT中没有针对code task的evaluate函数，因此要用到第三方的服务，而第三方通常会采用transformers中的generate函数，这会导致不匹配的行为。</p>
+<p>同时，设置reft model的device的函数并不是<code>model = model.to(device)</code>，而是<code>model.set_device(device)</code></p>
+<h2><a id="bigcode-evaluation-harness" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>bigcode-evaluation-harness</h2>
+<p>这里只讲述核心代码修改：</p>
+<h3><a id="main-py" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>main.py</h3>
+<p>这里改动主要是针对reft模型和llama3模型进行改动：传入对应参数，融合对应模型。</p>
+<p>在<code>parse_args(·)</code>函数中：</p>
+<pre><code class="language-python">parser.add_argument(
+    &quot;--reft_model&quot;,
+    default=&quot;&quot;,
+    help=&quot;Adapter to the REFT base model. Can be utilized for loading PEFT adapters such as a LoREFT trained model. The --model parameter needs to be the base model.&quot;,
+)
+
+parser.add_argument(
+    &quot;--is_llama_3&quot;,
+    action=&quot;store_true&quot;,
+    help=&quot;Add additional padding token for llama3 model&quot;,
+)
+</code></pre>
+<p><br />
+在<code>parse_args(·)</code>函数中：</p>
+<pre><code class="language-python"># add padding tokens for llama-3
+if args.is_llama_3:
+    tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+    model.resize_token_embeddings(len(tokenizer))
+
+## 判断是否采用reft模型，若采用，调用pyreft中的函数进行reft model的merge
+if args.reft_model:
+    import pyreft         # dynamic import to avoid dependency on reft
+
+    print(&quot;Loaded REFT model. Merging...&quot;)
+    # 注意这里的入参和peft的相反
+    model = pyreft.ReftModel.load(args.reft_model, model)
+    print(&quot;Merge complete.&quot;)
+</code></pre>
+<h3><a id="generation-py" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>generation.py</h3>
+<p>这里主要是针对是否采用reft模型而进行改动，更细节的变化均在<code>utils.py</code>中实现。</p>
+<p>初始化TokenizedDataset，详细变化在<code>utils.py</code>中。</p>
+<pre><code class="language-python">if args.reft_model:
+    is_reft = True
+else:
+    is_reft = False
+    
+# 初始化TokenizedDataset
+ds_tokenized = TokenizedDataset(
+    task,
+    dataset,
+    tokenizer,
+    num_devices=accelerator.state.num_processes,
+    max_length=args.max_length_generation,
+    limit_start=args.limit_start + curr_sample_idx,
+    n_tasks=n_tasks,
+    n_copies=n_copies,
+    prefix=args.prefix,
+    has_encoder=args.modeltype == &quot;seq2seq&quot;,
+    instruction_tokens=instruction_tokens,
+    is_reft=is_reft,        # diff
+)
+</code></pre>
+<p><br />
+注意需要将reft model利用<code>set_device(·)</code>加载到GPU上。</p>
+<pre><code class="language-python">if args.max_memory_per_gpu is not None:
+    ···
+elif not is_loaded_in_8bit and not is_loaded_in_4bit:
+    # model.to() is not supported for reft models, use set_device() instead
+    if is_reft:
+        print(&quot;use set_device to set reft model's device&quot;)
+        model.set_device(accelerator.device)
+    else:
+        model = model.to(accelerator.device)
+    ds_loader = accelerator.prepare(ds_loader)
+else:
+    ···
+</code></pre>
+<p><br />
+在code generation上，采用两个不同的函数进行处理：</p>
+<pre><code class="language-python"># 生成code
+if is_reft:
+    print(&quot;generate with reft model...&quot;)
+    generations = reft_complete_code(
+        ···
+    )
+
+else:
+    print(&quot;generate with base model...&quot;)
+    generations = complete_code(
+        ···
+    )
+</code></pre>
+<h3><a id="utils-py" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>utils.py</h3>
+<p>修改最多的部分在这里面了。</p>
+<p>首先是关于<code>TokenizedDataset</code>类：我们需要传入<code>is_reft</code>参数，并在<code>__iter__(·)</code>函数中对于reft函数进行特别修改，改变其输出。</p>
+<p>这里主要是添加了outputs中的attention_mask，因为reft model的generate函数中，需要的输入是input_ids和attention_mask的集合字典：{'input_ids':tensor([[...]], device:device), 'attention_mask':tensor([[...]], device:device)}</p>
+<pre><code class="language-python"># 输出
+for sample in range(self.n_tasks):
+    for _ in range(self.n_copies):
+        if self.has_encoder:
+            if not self.is_reft:  
+                ···
+            else:
+                ···
+        else:
+            # e.g for humaneval
+            if not self.is_reft:
+                ···
+            else:
+                yield {
+                    &quot;ids&quot;: outputs.input_ids[sample],
+                    &quot;task_id&quot;: sample,
+                    &quot;input_len&quot;: outputs.attention_mask[sample].sum(),
+                    &quot;masks&quot;: outputs.attention_mask[sample],    # add
+                }  
+</code></pre>
+<p><br />
+其次是仿照<code>complete_code(·)</code>函数，构建了针对reft模型的<code>reft_complete_code(·)</code>函数：</p>
+<pre><code class="language-python">def reft_complete_code(
+    task,
+    accelerator,
+    model,
+    tokenizer,
+    dataloader,
+    n_tasks,
+    limit_start=0,
+    batch_size=20,
+    prefix=&quot;&quot;,
+    instruction_tokens=None,
+    postprocess=True,
+    is_wrapped=False,
+    save_every_k_tasks: int = -1,
+    intermediate_generations: Optional[List[Optional[List[Optional[str]]]]] = None,
+    intermediate_save_generations_path: Optional[str] = None,
+    **gen_kwargs,
+):
+    # print(&quot;0&quot;)
+    import pyreft
+
+    # keep track of the list of generated codes
+    # where len(code_gens) = n_tasks and len(code_gens[0]) = number of generated code samples
+    # 初始化
+    code_gens: List[List[Optional[str]]] = [[] for _ in range(n_tasks)]
+    generations = [] if not intermediate_generations else intermediate_generations
+    gen_token_dict = defaultdict(list)  # dict of list of generated tokens
+    # print(&quot;1&quot;)
+    for step, batch in tqdm(
+        enumerate(dataloader),
+        total=math.ceil(
+            n_tasks * dataloader.dataset.n_copies / accelerator.num_processes
+        )
+    ):
+        # print(&quot;2&quot;)
+        with torch.no_grad():
+            # e.g humaneval, task.stop_words: ['\nclass', '\ndef', '\n#', '\n@', '\nprint', '\nif', '\n```', '&lt;file_sep&gt;']
+            if task.stop_words:
+                # Set the start_length after which to check for stopping to be the longest input ignoring padding
+                max_len = batch[&quot;input_len&quot;].max().item()
+                if &quot;ids_encoder&quot; in batch:
+                    max_len += 1  # Add 1 for decoder_start_token_id
+                gen_kwargs[&quot;stopping_criteria&quot;][0].start_length = max_len
+            if hasattr(task, &quot;max_length_multiplier&quot;) and task.max_length_multiplier:
+                idx = 1 if task.stop_words else 0
+                gen_kwargs[&quot;stopping_criteria&quot;][idx].input_length = (
+                    batch[&quot;input_len&quot;].max().item()
+                )
+
+            inputs = batch[&quot;ids&quot;][:, : batch[&quot;input_len&quot;]] if tokenizer.padding_side == &quot;right&quot; else batch[&quot;ids&quot;]
+            # tokenizer result is not batch[&quot;outputs&quot;]
+            # batch[&quot;outputs&quot;]: {'input_ids': tensor([[prompt1_token], [prompt_2_token], ..., [prompt_last_token]], device='your device'), 'attention_mask': tensor([[prompt1_attention_mask], [prompt_2_attention_mask], ..., [prompt_last_attention_mask]], device='your device')}
+            # batch[&quot;outputs&quot;][0]:  Encoding(num_tokens=len(prompt1_token), attributes=[ids, type_ids, tokens, offsets, attention_mask, special_tokens_mask, overflowing])
+            # generate(batch[&quot;outputs&quot;].input_ids): tensor([[prompt1_generation], [prompt_2_generation], ..., [prompt_last_generation]], device='your device')
+
+            # tokenizer result is batch[&quot;outputs_reft&quot;]
+            # batch[&quot;outputs_reft&quot;]: [{'input_ids': tensor([[prompt1_token]], device='your device'), 'attention_mask': tensor([[prompt1_attention_mask]], device='your device')}, {'input_ids': tensor([[prompt2_token]], device='your device'), 'attention_mask': tensor([[prompt2_attention_mask]], device='your device')}, ...]
+            # batch[&quot;outputs_reft&quot;][0]: {'input_ids': tensor([[prompt1_token]], device='your device'), 'attention_mask': tensor([[prompt1_attention_mask]], device='your device')}, is equal to tokenizer(prompt1)
+
+            # now:
+            # batch[&quot;input_len&quot;] = torch.tensor([110], device='cuda:1'), batch[&quot;input_len&quot;].item(): 110
+            input_len = batch[&quot;input_len&quot;].item()
+            #if step == 0:
+            #    print(&quot;the first batch is :&quot;)
+            #   print(&quot;batch[ids]: &quot;, batch[&quot;ids&quot;])
+            #    print(&quot;batch[input_len]: &quot;, batch[&quot;input_len&quot;])
+            #    print(&quot;input_len: &quot;, input_len)
+            #   print(&quot;batch[masks]: &quot;, batch[&quot;masks&quot;])
+            #    print(&quot;batch[task_id]: &quot;, batch[&quot;task_id&quot;])
+            
+            tmp_input_ids = batch[&quot;ids&quot;][:, :input_len]
+            tmp_attention_mask = batch[&quot;masks&quot;][:, :input_len]
+            tmp_reft = {
+                'input_ids': tmp_input_ids,
+                'attention_mask': tmp_attention_mask,
+            }
+
+            # tmp_reft: {'input_ids': tensor([[prompt_token]], device='your device'), 'attention_mask': tensor([[prompt_attention_mask]], device='your device')}
+
+            intervention_locations = torch.tensor([pyreft.get_intervention_locations(last_position=tmp_reft[&quot;input_ids&quot;].shape[-1], positions=&quot;f7+l7&quot;, num_interventions=len(model.interventions))]).permute(1, 0, 2).tolist()
+            # print(&quot;3&quot;)
+
+            _, generated_tokens = model.generate(
+                tmp_reft,
+                unit_locations={&quot;sources-&gt;base&quot;: (None, intervention_locations)},
+                intervene_on_prompt=True,
+                pad_token_id=tokenizer.pad_token_id, eos_token_id=tokenizer.eos_token_id, 
+                **gen_kwargs, early_stopping=True,
+                num_return_sequences=batch_size,
+            )
+            # generated_tokens = generated_tokens[0]
+            generated_tokens_before = generated_tokens
+            # print(&quot;4&quot;)
+
+            # each task is generated batch_size times
+            generated_tasks = batch[&quot;task_id&quot;].repeat(batch_size)
+            generated_tokens = accelerator.pad_across_processes(
+                generated_tokens, dim=1, pad_index=tokenizer.pad_token_id
+            )
+            # print(&quot;5&quot;)
+            # if step == 0 and accelerator.device.index == 1:
+            #    print(&quot;the first batch is :&quot;)
+            #    print(&quot;batch[ids]: &quot;, batch[&quot;ids&quot;])
+            #    print(&quot;batch[input_len]: &quot;, batch[&quot;input_len&quot;])
+            #    print(&quot;batch[masks]: &quot;, batch[&quot;masks&quot;])
+            #    print(&quot;batch[task_id]: &quot;, batch[&quot;task_id&quot;])
+
+            #    print(&quot;the first reft input is :&quot;)
+            #    print(&quot;tmp_input_ids: &quot;, tmp_input_ids)
+            #    print(&quot;tmp_attention_mask: &quot;, tmp_attention_mask)
+            #    print(&quot;tmp_reft: &quot;, tmp_reft)
+
+            #    print(&quot;before pad_across_processes, generated_tokens: &quot;, generated_tokens_before)
+            #    print(&quot;after pad_across_processes, generated_tokens: &quot;, generated_tokens)
+            #    print(&quot;generated_tasks: &quot;, generated_tasks)
+
+            generated_tokens, generated_tasks = accelerator.gather(
+                (generated_tokens, generated_tasks)
+            )
+            # print(&quot;5.5&quot;)
+            generated_tokens = generated_tokens.cpu().numpy()
+            generated_tasks = generated_tasks.cpu().numpy()
+            # print(&quot;6&quot;)
+            for sample, generated_tokens in zip(generated_tasks, generated_tokens):
+                gen_token_dict[sample].append(generated_tokens)
+            # print(&quot;7&quot;)
+            if save_every_k_tasks &gt;= 1 and (step + 1) % save_every_k_tasks == 0:
+                if not intermediate_save_generations_path:
+                    raise ValueError(
+                        &quot;intermediate_save_generations_path cannot be empty!&quot;
+                    )
+
+                code_gens = update_code_gens(
+                    task,
+                    tokenizer,
+                    limit_start,
+                    prefix,
+                    instruction_tokens,
+                    postprocess,
+                    code_gens,
+                    gen_token_dict,
+                )
+                with open(intermediate_save_generations_path, &quot;w&quot;) as fp:
+                    json.dump(generations + code_gens, fp)
+                    print(
+                        f&quot;intermediate generations were saved at {intermediate_save_generations_path}&quot;
+                    )
+                # reset gen_token_dict - prevent redundant decoding
+                gen_token_dict = defaultdict(list)
+
+    code_gens = update_code_gens(
+        task,
+        tokenizer,
+        limit_start,
+        prefix,
+        instruction_tokens,
+        postprocess,
+        code_gens,
+        gen_token_dict,
+    )
+
+    generations.extend(code_gens)
+    return generations
+</code></pre>
+<p><br />
+主要有以下改动：</p>
+<ul>
+<li>利用类<code>TokenizedDataset</code>的输出<code>batch</code>的结构，对其输出中的<code>input_ids</code>和<code>masks</code>进行组合，得到reft model的<code>generate</code>函数的输入<code>tmp_reft</code>；</li>
+<li>根据模型等信息，得到reft model的<code>generate</code>函数的另一输入<code>intervention_locations</code>；</li>
+<li>根据reft model的函数模版，构建<code>generate</code>函数。</li>
+</ul>
+<p>就结束了，修改后对应进行程序运行的shell模版是：</p>
+<pre><code class="language-shell">accelerate launch  main.py \
+  --model (/your/base/model/path) \
+  --reft_model (/your/reft/model/path \
+  --tasks humaneval \
+  --max_length_generation (max generation length) \
+  --precision (load model type) \
+  --allow_code_execution \
+  --is_llama_3 \
+  --metric_output_path (/your/result/path) \
+  --do_sample (whether do sample) \
+  --n_samples (num of samples) \
+  --batch_size (batch size) \
+  --temperature (temperature) \
+  --top_p (top_p) \
+  --top_k (top_k)
+</code></pre>
+<h2><a id="deepseek-coder" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>DeepSeek-Coder</h2>
+<p>我们发现用<a href="https://github.com/deepseek-ai/DeepSeek-Coder" title="DeepSeek-Coder">DeepSeek-Coder</a>进行修改更加方便，这里只讲述核心代码修改：</p>
+<h3><a id="eval-pal-py" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>eval_pal.py</h3>
+<p>这里的改动主要是添加了更多的入参：</p>
+<pre><code class="language-python">    parser = ArgumentParser()
+    parser.add_argument(&quot;--base_model&quot;, type=str, default=&quot;&quot;)
+    parser.add_argument(&quot;--reft_model&quot;, type=str, default=&quot;&quot;)
+    parser.add_argument(&quot;--language&quot;, type=str, default=&quot;&quot;)
+    parser.add_argument(&quot;--dataroot&quot;, type=str, default=&quot;&quot;)
+    parser.add_argument(&quot;-il3&quot;, &quot;--is_llama_3&quot;, action='store_true')
+    parser.add_argument(&quot;-ds&quot;, &quot;--do_sample&quot;, action='store_true')
+    parser.add_argument('-n_sample', '--n_sample', type=int, default=1)
+    parser.add_argument('-batch_size', '--batch_size', type=int, default=1)
+    parser.add_argument('-t', '--temperature', type=float, default=None)
+    parser.add_argument('-top_p', '--top_p', type=float, default=None)
+    parser.add_argument('-top_k', '--top_k', type=int, default=None)
+    parser.add_argument(&quot;-trc&quot;, &quot;--trust_remote_code&quot;, action='store_true')
+    parser.add_argument('-dtype', '--torch_dtype', type=str, default=&quot;bfloat16&quot;)
+    parser.add_argument('-msl', '--max_seq_len', type=int, default=None)
+    parser.add_argument('-mgl', '--max_gen_len', type=int, default=1024)
+    args = parser.parse_args()
+</code></pre>
+<p><br />
+其中，</p>
+<ul>
+<li><code>reft_model</code>参数会让程序判断是否融合reft模型，以及针对后面的<code>generate</code>函数做修改</li>
+<li><code>is_llama_3</code>参数会让程序对llama3系列模型添加<code>pad_token</code></li>
+</ul>
+<p>其次就是对evaltor函数进行相应入参的增加：</p>
+<pre><code class="language-python">evaluator = evaltor(data_root=dataroot, max_seq_len=max_seq_len, tokenizer_cfg=tokenizer, base_dir=base_model, is_llama_3=is_llama_3, reft_dir=reft_model, n_sample=n_sample, k_sample=n_sample, batch_size=batch_size, language=language, max_gen_len=max_gen_len, do_sample=do_sample, temperature=temperature, top_p=top_p, top_k=top_k)
+</code></pre>
+<h3><a id="humaneval-py" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>humaneval.py</h3>
+<p>这里主要改动在<code>eval_model</code>函数中。</p>
+<ul>
+<li>针对llama3模型进行pad_token的添加，并resize模型：</li>
+</ul>
+<pre><code class="language-python"># add padding tokens
+if self.is_llama_3:
+    self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+    gpt.resize_token_embeddings(len(self.tokenizer))
+</code></pre>
+<ul>
+<li>
+<p>采用<code>use with torch.no_grad()</code>代替<code>gpt.eval()</code></p>
+</li>
+<li>
+<p>针对reft，进行模型融合：</p>
+</li>
+</ul>
+<pre><code class="language-python">if self.reft_dir:
+    import pyreft
+
+    print(&quot;Loaded REFT model. Merging...&quot;)
+    # 注意这里的入参和peft的相反
+    gpt = pyreft.ReftModel.load(self.reft_dir, gpt)
+    gpt.set_device(accelerator.device)
+    print(&quot;Merge complete.&quot;)
+</code></pre>
+<ul>
+<li>在generate之前，对于reft模型进行一些参数的获取：</li>
+</ul>
+<blockquote>
+<p>需要注意的是，DeepSeek-Coder原始使用的是：将输入序列拆分成一个一个词，分别获取他们的token id后再拼到一起，得到总的输入序列的imputs_id；然而对于经过reft微调后的模型，输入的不只是inputs_id，因此需要直接对输入序列进行<code>tokenizer(·)</code>而不是<code>tokenizer.encode(·)</code>，而输入序列存放于<code>prompt_list</code>中，因此直接对它进行处理，得到reft模型generate函数的必要参数<code>tmp_reft</code>和<code>intervention_locations</code>。</p>
+</blockquote>
+<pre><code class="language-python"># split the dataset into batches and construct a list of inputs
+for idx in range(0, len(indices), self.batch_size):
+    prompt_list = []
+    prompt_lens = []
+    orriginal_prompt_list = []
+    tokenized_prompt_lens = []
+    taskid = []
+    # get the prompts from the dataset
+    for j in indices[idx:idx + self.batch_size]:
+        data = dataset[j]
+        fprompt = data[&quot;prompt&quot;].strip()
+        prompt_list.append(fprompt)
+        tmp = self.tokenizer.encode(fprompt)
+        orriginal_prompt_list.append(data[&quot;original_prompt&quot;])
+        prompt_lens.append(len(fprompt))
+        tokenized_prompt_lens.append(tmp)
+        taskid.append(data[&quot;task_id&quot;])
+
+    input_ids = torch.tensor(tokenized_prompt_lens).to(accelerator.device)
+
+    if self.reft_dir:
+        tmp_reft = self.tokenizer(prompt_list, return_tensors='pt').to(accelerator.device)
+        assert(tmp_reft[&quot;input_ids&quot;].equal(input_ids))
+
+        intervention_locations = torch.tensor([pyreft.get_intervention_locations(last_position=tmp_reft[&quot;input_ids&quot;].shape[-1], positions=&quot;f7+l7&quot;, num_interventions=len(gpt.interventions))]).permute(1, 0, 2).tolist()
+</code></pre>
+<ul>
+<li>根据模型类型，改变generate：</li>
+</ul>
+<blockquote>
+<p>这里就采用模版进行构建就可以。</p>
+</blockquote>
+<pre><code class="language-python"># generate the code
+with torch.no_grad():
+    if not self.reft_dir: 
+        decoded = gpt.generate(
+            input_ids=input_ids,
+            max_new_tokens=self.max_gen_len,
+            do_sample=self.do_sample, temperature=self.temperature, top_p=self.top_p, top_k=self.top_k,
+            eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.eos_token_id,
+        )
+    else:
+        _, decoded = gpt.generate(
+            tmp_reft, 
+            unit_locations={&quot;sources-&gt;base&quot;: (None, intervention_locations)},
+            intervene_on_prompt=True, max_new_tokens=self.max_gen_len, do_sample=self.do_sample,
+            temperature=self.temperature, top_p=self.top_p, top_k=self.top_k,
+            pad_token_id=self.tokenizer.pad_token_id, eos_token_id=self.tokenizer.eos_token_id, 
+            early_stopping=True
+        )
+</code></pre>
+<p>就结束了。修改完之后，对应进行程序运行的shell模版是：</p>
+<pre><code class="language-shell"># params help
+accelerate launch eval_pal.py \
+  --base_model (/your/base/model/path) \
+  --reft_model (/your/reft/model/path) \
+  --language (what language do you want to test) \
+  --dataroot (/your/dataset/path) \
+  -il3 (optional, whether is llama3-model) \
+  -ds (optional, whether do sample) \
+  --n_sample (k) \
+  --batch_size (must less than or equal to k) \
+  -t (temperature) \
+  -top_p (top_p) \
+  -top_k (top_k) \
+  -trc (whether trust remote code) \
+  -dtype (your data type) \
+  -msl (max sequence length) \
+  -mgl (max generation length)
+</code></pre>
+<h2><a id="learn" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Learn</h2>
+<p>在ReFT中，生成推理时，使用的是pyvene中的generate函数：</p>
+<pre><code class="language-python">def generate(
+    self,
+    base,
+    sources: Optional[List] = None,
+    unit_locations: Optional[Dict] = None,
+    source_representations: Optional[Dict] = None,
+    intervene_on_prompt: bool = False,
+    subspaces: Optional[List] = None,
+    output_original_output: Optional[bool] = False,
+    **kwargs,
+):
+    &quot;&quot;&quot;
+    Intervenable generation function that serves a
+    wrapper to regular model generate calls.
+
+    Currently, we support basic interventions **in the
+    prompt only**. We will support generation interventions
+    in the next release.
+
+    TODO: Unroll sources and intervene in the generation step.
+
+    Parameters:
+    base:                The base example.
+    sources:             A list of source examples.
+    unit_locations:      The intervention locations of
+                             base.
+    activations_sources: A list of representations.
+    intervene_on_prompt: Whether only intervene on prompt.
+    **kwargs:            All other generation parameters.
+
+    Return:
+    base_output: the non-intervened output of the base input.
+    counterfactual_outputs: the intervened output of the base input.
+    &quot;&quot;&quot;
+    # TODO: forgive me now, i will change this later.
+    activations_sources = source_representations
+    if sources is not None and not isinstance(sources, list):
+        sources = [sources]
+            
+    self._cleanup_states()
+
+    self._intervene_on_prompt = intervene_on_prompt
+    self._is_generation = True
+        
+    if not intervene_on_prompt and unit_locations is None:
+        # that means, we intervene on every generated tokens!
+        unit_locations = {&quot;base&quot;: 0}
+        
+    # broadcast
+    unit_locations = self._broadcast_unit_locations(get_batch_size(base), unit_locations)
+    sources = [None]*len(self._intervention_group) if sources is None else sources
+    sources = self._broadcast_sources(sources)
+    activations_sources = self._broadcast_source_representations(activations_sources)
+    subspaces = self._broadcast_subspaces(get_batch_size(base), subspaces)
+        
+    self._input_validation(
+        base,
+        sources,
+        unit_locations,
+        activations_sources,
+        subspaces,
+    )
+        
+    base_outputs = None
+    if output_original_output:
+        # returning un-intervened output
+        base_outputs = self.model.generate(**base, **kwargs)
+
+    set_handlers_to_remove = None
+    try:
+        # intervene
+        if self.mode == &quot;parallel&quot;:
+            set_handlers_to_remove = (
+                self._wait_for_forward_with_parallel_intervention(
+                    sources,
+                    unit_locations,
+                    activations_sources,
+                    subspaces,
+                )
+            )
+        elif self.mode == &quot;serial&quot;:
+            set_handlers_to_remove = (
+                self._wait_for_forward_with_serial_intervention(
+                    sources,
+                    unit_locations,
+                    activations_sources,
+                    subspaces,
+                )
+            )
+            
+        # run intervened generate
+        counterfactual_outputs = self.model.generate(
+            **base, **kwargs
+        )
+            
+        collected_activations = []
+        if self.return_collect_activations:
+            for key in self.sorted_keys:
+                if isinstance(
+                    self.interventions[key][0],
+                    CollectIntervention
+                ):
+                    collected_activations += self.activations[key]
+    except Exception as e:
+        raise e
+    finally:
+        if set_handlers_to_remove is not None:
+            set_handlers_to_remove.remove()
+        self._is_generation = False
+        self._cleanup_states(
+            skip_activation_gc = \
+                (sources is None and activations_sources is not None) or \
+                self.return_collect_activations
+            )
+        
+    if self.return_collect_activations:
+        return (base_outputs, collected_activations), counterfactual_outputs
+        
+    return base_outputs, counterfactual_outputs
+</code></pre>
 
                   </article>
                   <div class="comments-wrap">
@@ -215,7 +776,7 @@ div.code-toolbar > .toolbar > .toolbar-item > span:focus {
   color: inherit;
   text-decoration: none;
 }
-</style>
+</style><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script><script>!function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;var l=a.element.classList;if(l.contains('language-mermaid') || l.contains('language-echarts') || l.contains('language-plantuml')){return;} if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.css"><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><style>div.code-toolbar > .toolbar > .toolbar-item > a, div.code-toolbar > .toolbar > .toolbar-item > button, div.code-toolbar > .toolbar > .toolbar-item > span {padding: 4px .5em; background: #f5f2f0; background: rgba(224, 224, 224, 0.4);}</style>
 
 
   

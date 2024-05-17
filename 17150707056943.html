@@ -694,6 +694,35 @@ reft_model = pyreft.ReftModel.load(
 </code></pre>
 <p><br />
 注意：加载后的模型，在generate时，并非调用的<code>transformers</code>库中的<code>generate</code>函数，而是<code>pyvene.IntervenableModel</code>类中定义的<code>generate</code>函数。</p>
+<h2><a id="result" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Result</h2>
+<h3><a id="train" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Train</h3>
+<p>该部分记录 llama3-8b-base 在微调code task时的训练参数情况。</p>
+<p><img src="media/17150707056943/epoch.png" alt="epoch" /></p>
+<p><img src="media/17150707056943/global_step.png" alt="global_step" /></p>
+<p><img src="media/17150707056943/grad_norm.png" alt="grad_norm" /></p>
+<p><img src="media/17150707056943/learning_rate.png" alt="learning_rate" /></p>
+<p><img src="media/17150707056943/loss.png" alt="loss" /></p>
+<p><img src="media/17150707056943/n_params.png" alt="n_params" /></p>
+<h3><a id="system" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>System</h3>
+<p>该部分记录 llama3-8b-base 在微调code task时的系统情况。</p>
+<p><img src="media/17150707056943/Disk%20I_O%20Utilization%20-MB-.png" alt="Disk I_O Utilization -MB-" /></p>
+<p><img src="media/17150707056943/Disk%20Utilization%20-%25-.png" alt="Disk Utilization -%-" /></p>
+<p><img src="media/17150707056943/Disk%20Utilization%20-GB-.png" alt="Disk Utilization -GB-" /></p>
+<p><img src="media/17150707056943/GPU%20Memory%20Allocated%20-%25-.png" alt="GPU Memory Allocated -%-" /></p>
+<p><img src="media/17150707056943/GPU%20Power%20Usage%20-%25-.png" alt="GPU Power Usage -%-" /></p>
+<p><img src="media/17150707056943/GPU%20Power%20Usage%20-W-.png" alt="GPU Power Usage -W-" /></p>
+<p><img src="media/17150707056943/GPU%20Temp%20-%E2%84%83-.png" alt="GPU Temp -℃-" /></p>
+<p><img src="media/17150707056943/GPU%20Time%20Spent%20Accessing%20Memory%20-%25-.png" alt="GPU Time Spent Accessing Memory -%-" /></p>
+<p><img src="media/17150707056943/GPU%20Utilization%20-%25-.png" alt="GPU Utilization -%-" /></p>
+<p><img src="media/17150707056943/gpu.0.memoryAllocatedBytes.png" alt="gpu.0.memoryAllocatedBytes" /></p>
+<p><img src="media/17150707056943/Network%20Traffic%20-bytes-.png" alt="Network Traffic -bytes-" /></p>
+<p><img src="media/17150707056943/Process%20CPU%20Threads%20In%20Use.png" alt="Process CPU Threads In Use" /></p>
+<p><img src="media/17150707056943/Process%20CPU%20Utilization%20-%25-.png" alt="Process CPU Utilization -%-" /></p>
+<p><img src="media/17150707056943/Process%20Memory%20Available%20-non-swap-%20-MB-.png" alt="Process Memory Available -non-swap- -MB-" /></p>
+<p><img src="media/17150707056943/Process%20Memory%20In%20Use%20-non-swap-%20-%25-.png" alt="Process Memory In Use -non-swap- -%-" /></p>
+<p><img src="media/17150707056943/Process%20Memory%20In%20Use%20-non-swap-%20-MB-.png" alt="Process Memory In Use -non-swap- -MB-" /></p>
+<p><img src="media/17150707056943/System%20CPU%20Utilization%20-per%20core-%20-%25-.png" alt="System CPU Utilization -per core- -%-" /></p>
+<p><img src="media/17150707056943/System%20Memory%20Utilization%20-%25-.png" alt="System Memory Utilization -%-" /></p>
 
                   </article>
                   <div class="comments-wrap">

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+    Debug - Prepare for the FUTURE
+    
+    </title>
+    
+
+    
+    
+    <link href="atom.xml" rel="alternate" title="Prepare for the FUTURE" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/style.min.css">
+    <link rel="stylesheet" href="asset/css/doc.css">
+    <script src="asset/app.js"></script>
+</head>
+  <body>
+    <section class="hero">
+      <div class="hero-head">
+          <nav class="navbar" role="navigation" aria-label="main navigation">
+              <div class="container">
+              <div class="navbar-brand">
+                
+                <a target="_self" class="navbar-item " href="index.html">Home</a>
+                
+                <a target="_self" class="navbar-item " href="archives.html">Archives</a>
+                
+
+                <a role="button" id="navbarSNSRssSwitchBtn" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarSNSRssButtons">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+            
+              <div id="navbarSNSRssButtons" class="navbar-menu">
+                <div class="navbar-start">
+                  
+                </div>
+            
+                <div class="navbar-end">
+                  <div class="navbar-item">
+                    <!--buttons start-->
+                    <div class="buttons">
+                      
+                        
+                        
+                        
+                        
+                      
+                      <a href="atom.xml" target="_blank" title="RSS">
+                          <span class="icon is-large has-text-black-bis">
+                              <svg class="svg-inline--fa fa-rss fa-w-14 fa-lg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="rss" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg><!-- <i class="fas fa-rss fa-lg"></i> -->
+                          </span>
+                      </a>
+                    </div>
+                    <!--buttons end-->
+
+                  </div>
+                </div>
+                </div>
+              </div>
+            </nav>
+      </div>
+
+ <div class="hero-body ct-body"></div>
+      
+    </section>
+    <section class="ct-body">
+      <div class="container">
+          <div class="columns is-variable bd-klmn-columns is-4 is-centered">
+              <div class="column is-four-fifths">
+                  <div class="post-body single-content">
+                    
+                    <h1 class="title">
+                            Debug   
+                      </h1>
+                     
+                    
+                      <div class="media">
+                            
+                            <div class="media-content">
+                              <div class="content">
+                                <p>
+                                 <span class="date">2024/05/17</span>
+                                  
+                                         
+                                  
+
+                                   
+                                      
+                                  <br />
+                                  <span class="tran-tags">Tags:</span>&nbsp;
+                                  
+                                    <a class="tag is-link is-light" href='tag_Llama3%20ReFTEng%20vs%20PEFT.html'>#Llama3 ReFTEng vs PEFT</a>
+                                     
+
+                                </p>
+                              </div>
+                            </div>
+                         
+                    </div>
+                </div>
+                  <article class="markdown-body single-content">
+                    <p>这里存放一些debug的临时文件和shell模版。</p>
+<pre><code class="language-shell"># DEBUG
+# mission: 使用DeepSeek-Coder计算llama3-8b-instruct在MBPP上的pass@100指标
+# environment: 4*RTX3090(24G)
+# shell:
+accelerate launch eval_pal.py \
+  --base_model /root/autodl-tmp/.cache/huggingface/model/llama3-8b-instruct/base \
+  --language python \
+  --dataroot data/ \
+  -il3 \
+  --n_sample 100 \
+  --batch_size 10 \
+  -t 0.8 \
+  -top_p 1 \
+  -top_k 50 \
+  -trc \
+  -dtype bfloat16 \
+  -msl 4096 \
+  -mgl 1024 \
+  -ds
+# output:
+DP RANK:0 process_num/all_num:3950/4100 avg_time_per_batch:46.09 s still_need:12.29 m mem:18.417 GiB bs:10
+DP RANK:0 process_num/all_num:3960/4100 avg_time_per_batch:46.09 s still_need:11.52 m mem:18.417 GiB bs:10
+DP RANK:0 process_num/all_num:3970/4100 avg_time_per_batch:46.08 s still_need:10.75 m mem:18.417 GiB bs:10
+[rank1]:[W socket.cpp:432] [c10d] While waitForInput, poolFD failed with (errno: 0 - Success).
+[rank1]: Traceback (most recent call last):
+[rank1]:   File &quot;/root/autodl-tmp/DeepSeek-Coder/Evaluation/HumanEval/eval_pal.py&quot;, line 83, in &lt;module&gt;
+[rank1]:     evaluator.eval_model(model, accelerator)
+[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/utils/_contextlib.py&quot;, line 115, in decorate_context
+[rank1]:     return func(*args, **kwargs)
+[rank1]:   File &quot;/root/autodl-tmp/DeepSeek-Coder/Evaluation/HumanEval/humaneval.py&quot;, line 153, in eval_model
+[rank1]:     accelerator.wait_for_everyone()
+[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/accelerator.py&quot;, line 2530, in wait_for_everyone
+[rank1]:     wait_for_everyone()
+[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/utils/other.py&quot;, line 138, in wait_for_everyone
+[rank1]:     PartialState().wait_for_everyone()
+[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/state.py&quot;, line 379, in wait_for_everyone
+[rank1]:     torch.distributed.barrier()
+[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/distributed/c10d_logger.py&quot;, line 75, in wrapper
+[rank1]:     return func(*args, **kwargs)
+[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py&quot;, line 3683, in barrier
+[rank1]:     work = default_pg.barrier(opts=opts)
+[rank1]: torch.distributed.DistBackendError: [1] is setting up NCCL communicator and retrieving ncclUniqueId from [0] via c10d key-value store by key '0', but store-&gt;get('0') got error: Socket Timeout
+[rank1]: Exception raised from doWait at ../torch/csrc/distributed/c10d/TCPStore.cpp:563 (most recent call first):
+[rank1]: frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x57 (0x7f7e5dccf897 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libc10.so)
+[rank1]: frame #1: &lt;unknown function&gt; + 0x166ffe7 (0x7f7e45fe6fe7 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
+[rank1]: frame #2: c10d::TCPStore::doGet(std::string const&amp;) + 0x32 (0x7f7e4a4abf82 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
+[rank1]: frame #3: c10d::TCPStore::get(std::string const&amp;) + 0xa1 (0x7f7e4a4acfd1 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
+[rank1]: frame #4: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
+[rank1]: frame #5: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
+[rank1]: frame #6: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
+[rank1]: frame #7: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
+[rank1]: frame #8: c10d::ProcessGroupNCCL::broadcastUniqueNCCLID(ncclUniqueId*, bool, std::string const&amp;, int) + 0xa9 (0x7f7e11c6e6d9 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
+[rank1]: frame #9: c10d::ProcessGroupNCCL::getNCCLComm(std::string const&amp;, c10::Device&amp;, c10d::OpType, int, bool) + 0xc50 (0x7f7e11c75b60 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
+[rank1]: frame #10: &lt;unknown function&gt; + 0x11ba3b0 (0x7f7e11c7e3b0 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
+[rank1]: frame #11: c10d::ProcessGroupNCCL::allreduce_impl(at::Tensor&amp;, c10d::AllreduceOptions const&amp;) + 0x10 (0x7f7e11c7f730 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/tor...
+...
+--------------------------------------------------------------------------------------------------------------------------------------------
+# 思考在eval_pay.py中添加：
+os.environ['NCCL_BLOCKING_WAIT'] = '0' 
+# 重新进行实验中...
+</code></pre>
+<pre><code class="language-shell"># Template
+# mission: 使用bigcode-evaluation-harness计算llama3-8b-instruct在MBPP上的pass@1指标
+# shell:
+accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B-Instruct/snapshots/a8977699a3d0820e80129fb3c93c20fbd9972c41 \
+  --tasks mbpp \
+  --max_length_generation 2048 \
+  --is_llama_3 \
+  --precision bf16 \
+  --allow_code_execution \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-instruct-mbpp-pass@1.json \
+  --n_samples 1 \
+  --batch_size 1 \
+  --top_p 1 \
+  --top_k 50 \
+  --do_sample False \
+  --temperature 0.2 \
+</code></pre>
+
+                  </article>
+                  <div class="comments-wrap">
+                    <div class="share-comments">
+                      
+
+                      
+
+                      
+                    </div>
+                  </div><!-- end comments wrap -->
+              </div>
+            </div><!-- end columns -->
+      </div><!-- end container -->
+    </section>
+
+
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+              Copyright &copy; 2019
+              Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+              Theme used <a target="_blank" href="https://bulma.io/">Bulma CSS</a>.
+          </p>
+        </div>
+      </footer>
+
+<style>.mweb-charts{background:#fff;}
+body{ box-sizing: border-box;
+    margin: 0 auto;}
+@media print{
+    pre, code, pre code {
+     overflow: visible !important;
+     white-space: pre-wrap !important;       /* css-3 */
+     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+     white-space: -pre-wrap !important;      /* Opera 4-6 */
+     white-space: -o-pre-wrap !important;    /* Opera 7 */
+     word-wrap: break-word !important;       /* Internet Explorer 5.5+ */
+    }
+    html,body{margin:0;padding:4px;}
+}
+
+
+
+div.code-toolbar {
+  position: relative;
+}
+
+div.code-toolbar > .toolbar {
+  position: absolute;
+  z-index: 10;
+  top: .3em;
+  right: .2em;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+  opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within > .toolbar {
+  opacity: 1;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item {
+  display: inline-block;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a {
+  cursor: pointer;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a,
+div.code-toolbar > .toolbar > .toolbar-item > button,
+div.code-toolbar > .toolbar > .toolbar-item > span {
+  color: inherit;
+  font-size: .8em;
+  padding: 4px .5em;
+  background: #f5f2f0;
+  background: rgba(224, 224, 224, 0.4);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.2);
+  border-radius: .5em;
+}
+
+div.code-toolbar > .toolbar > .toolbar-item > a:hover,
+div.code-toolbar > .toolbar > .toolbar-item > a:focus,
+div.code-toolbar > .toolbar > .toolbar-item > button:hover,
+div.code-toolbar > .toolbar > .toolbar-item > button:focus,
+div.code-toolbar > .toolbar > .toolbar-item > span:hover,
+div.code-toolbar > .toolbar > .toolbar-item > span:focus {
+  color: inherit;
+  text-decoration: none;
+}
+</style><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script><script>!function(){if("undefined"!=typeof Prism&&"undefined"!=typeof document){var e=[],t={},n=function(){};Prism.plugins.toolbar={};var a=Prism.plugins.toolbar.registerButton=function(n,a){var r;r="function"==typeof a?a:function(e){var t;return"function"==typeof a.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",(function(){a.onClick.call(this,e)}))):"string"==typeof a.url?(t=document.createElement("a")).href=a.url:t=document.createElement("span"),a.className&&t.classList.add(a.className),t.textContent=a.text,t},n in t?console.warn('There is a button with the key "'+n+'" registered already.'):e.push(t[n]=r)},r=Prism.plugins.toolbar.hook=function(a){var r=a.element.parentNode;var l=a.element.classList;if(l.contains('language-mermaid') || l.contains('language-echarts') || l.contains('language-plantuml')){return;} if(r&&/pre/i.test(r.nodeName)&&!r.parentNode.classList.contains("code-toolbar")){var o=document.createElement("div");o.classList.add("code-toolbar"),r.parentNode.insertBefore(o,r),o.appendChild(r);var i=document.createElement("div");i.classList.add("toolbar");var l=e,d=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);d&&(l=d.map((function(e){return t[e]||n}))),l.forEach((function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),i.appendChild(n)}})),o.appendChild(i)}};a("label",(function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}})),Prism.hooks.add("complete",r)}}();</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.css"><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><style>div.code-toolbar > .toolbar > .toolbar-item > a, div.code-toolbar > .toolbar > .toolbar-item > button, div.code-toolbar > .toolbar > .toolbar-item > span {padding: 4px .5em; background: #f5f2f0; background: rgba(224, 224, 224, 0.4);}</style>
+
+
+  
+    
+
+
+
+
+  </body>
+</html>
