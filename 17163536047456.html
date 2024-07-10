@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    Base Optimizer - Prepare for the FUTURE
+    PEPR - Prepare for the FUTURE
     
     </title>
     
@@ -77,7 +77,7 @@
                   <div class="post-body single-content">
                     
                     <h1 class="title">
-                            Base Optimizer   
+                            PEPR   
                       </h1>
                      
                     
@@ -86,7 +86,7 @@
                             <div class="media-content">
                               <div class="content">
                                 <p>
-                                 <span class="date">2024/04/24</span>
+                                 <span class="date">2024/05/22</span>
                                   
                                          
                                   
@@ -106,44 +106,47 @@
                     </div>
                 </div>
                   <article class="markdown-body single-content">
-                    <p><strong>基础流程</strong></p>
-<p><img src="media/17139637898699/17139638095172.jpg" alt="" /></p>
-<h2><a id="1-sgd" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 SGD</h2>
-<p>没有动量概念：</p>
-<p>\( \begin{align}  m_t = g_t; V_t = I ^ 2\\ \eta _t = \alpha · g_t \end{align}\)</p>
-<p>方法最简单，但下降速度慢，可能会导致震荡，或停留在局部最优点。</p>
-<h2><a id="2-sgd-m" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 SGD-M</h2>
-<p>带有一阶动量概念的SGD：梯度不仅由当前决定，还由过去时刻的梯度决定。</p>
-<p>\( \begin{align}  m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t \end{align}\)</p>
-<p>其中\(\beta _1\)通常由经验设置为0.9。</p>
-<p>图示：</p>
-<p><img src="media/17139637898699/17139640673761.jpg" alt="" /></p>
-<p>但仍存在局部最优的问题。</p>
-<h2><a id="3-nag" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 NAG</h2>
-<p>SGD-M的改进，本质是考虑了二阶动量，因而更能加速收敛。</p>
-<p>\( \begin{align}  g_t = \nabla f (\omega _t - \alpha · m_{t - 1} / \sqrt {V_{t - 1}}) \end{align}\)</p>
-<p>图示：</p>
-<p><img src="media/17139637898699/17139641915827.jpg" alt="" /></p>
-<h2><a id="4-adagrad" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 AdaGrad</h2>
-<p>真正使用二阶动量，即过去所有梯度的平方和。</p>
-<p>\( \begin{align}  V _t = \sum ^t _{\tau = 1} g ^ 2 _{\tau}\\ \eta _t = \alpha · m_t / \sqrt {V_t} \end{align}\)</p>
-<p>二阶动量越大，学习率越低。学习率会单调递减至0，可能使训练过程提前结束。</p>
-<h2><a id="5-adadelta" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 AdaDelta</h2>
-<p>相较于考虑全局历史梯度、激进的AdaGrad，AdaDelta只考虑最近一段时间窗口下的历史梯度。</p>
-<p>\( \begin{align}  V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
-<p>可以避免训练过程提前结束。</p>
-<h2><a id="6-adam" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6 Adam</h2>
-<p>由SGD-M和AdaDelta结合而成，同时考虑一阶动量和二阶动量。</p>
-<p>\( \begin{align}  m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t\\ V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
-<h2><a id="7-nadam" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>7 Nadam</h2>
-<p>由Adam和NAG结合而成。</p>
-<p>\( \begin{align}  g_t = \nabla f (\omega _t - \alpha · m_{t - 1} / \sqrt {V_{t - 1}}) \\ m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t\\ V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
-<h2><a id="8-yogi" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>8 Yogi</h2>
-<p>改进Adam，防止当\(V _t\)的二阶矩估计值爆炸时可能无法正常收敛。</p>
-<p>考虑Adam算法的\(V _t\)重写如下：</p>
-<p>\( \begin{align}  V_t = V_{t-1} + (1 - \beta _2)(g ^2  _t - V_{t-1}) \end{align}\)</p>
-<p>当\(g ^2  _t \)过大时，\(V _t\)就会太快的忘记过去的值。因此将其修改为：</p>
-<p>\( \begin{align}  V_t = V_{t-1} + (1 - \beta _2)g ^2  _t  \odot (g ^2  _t - V_{t-1}) \end{align}\)</p>
+                    <p>该框架可以预测一个prompt集合中不同prompt组合的效果，并给出一个有效的prompt组合。</p>
+<h2><a id="pipeline" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pipeline</h2>
+<p><img src="media/17163536047456/17163537853097.jpg" alt="" /></p>
+<ul>
+<li>prompt regression：根据prompt库中元素影响LLM输出的程度，给各个prompt赋以权重；</li>
+<li>prompt selection：根据权重，选择合适的prompt组合，实现想要的表现。</li>
+</ul>
+<h2><a id="prompt-regression" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prompt Regression</h2>
+<h3><a id="methodology" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Methodology</h3>
+<p>对于大模型\(\pi\)，一个prompt库\(s = (p_1, ..., p_K)\)，目标是预测库中prompt组合对模型表现的影响。</p>
+<h3><a id="prompt-regression-for-log-probability-data-pepr-r" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prompt regression for log-probability data (PEPR-R)</h3>
+<p>令\(\mathcal {I} = \{ I_k \in \{ 0, 1 \} \} ^{K} _{k=1}\)，这里\(I_k = 1\)表示prompt \(p_k\)在集合\(s(\mathcal {I})\)中。假设给定输入\(x\)和prompt集合\(s(\mathcal {I})\)时响应\(y\)的对数概率是分别给定输入\(x\)和prompt集合中不同元素\(p_k \in \mathcal {I}\)时响应\(y\)的对数概率的凸组合：</p>
+<p>\( \begin{align}  \log \pi (y | (s(\mathcal {I}), x)) \approx \sum \limits_{k: I_k=1} \lambda _k (\mathcal {I}) \log \pi (y | (p_k, x)) \end{align}\)</p>
+<p>这里$\lambda _k (\mathcal {I}) \in \Delta ^{|s(\mathcal {I}) | - 1} $是一个表示每个prompt元素的权重的集合。并且假设增添或删除pronpt库中的元素并不会给别的prompt造成影响。接着可以将模型的权重建模为：</p>
+<p>\( \begin{align}  \lambda _k (\mathcal {I}) = \frac {\lambda _k} {\sum _{k \in \mathcal{I}} \lambda _k}  \end{align}\)</p>
+<p>这里\(\lambda _k := \lambda _k (\{ I_k = 1 \} ^K _{k = 1})\)表示采用整个prompt库时各个元素的权重，\(\lambda _k (\mathcal {I})\)是该权重的归一化。通过以下约束回归学习权重\(\{ \lambda _k \} ^K _{k=1} \)：</p>
+<p>\( \begin{align}  \min \limits_{\lambda \in \Delta ^{K - 1}} \sum ^{n} _{i = 1} [\log \pi (y_i | (s, x_i)) - \sum _k \lambda _k \delta ^i _k] ^2, \delta ^i _k := \log \pi (y_i | (p_k, x_i)) \end{align}\)</p>
+<p>优势：</p>
+<ul>
+<li>可以计算任何可能的prompt组合的影响；</li>
+<li>进行回归时不需要知道真实的\(y\)值。</li>
+</ul>
+<h3><a id="prompt-regression-for-log-probability-data-pepr-p" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prompt regression for log-probability data (PEPR-P)</h3>
+<p>令\(\{ (x_i, y ^1 _i, y ^2 _i) \} ^n _{i = 1}\)为输入\(x_i\)和LLM响应\(y ^1 _i, y ^2 _i\)的数据集，这里\( y ^1 _i\)比\( y ^2 _i\)优先。我们采用\(Bradley-Terry\)模型：</p>
+<p>\( \begin{align}  \mathbf {P} \{ y_1 \succeq y_2 | x; \pi, s(\mathcal {I}) \} = \frac {1} {1 + \exp [\beta \log \pi (y_2 | (s(\mathcal {I}), x)) - \log \pi (y_1 | (s(\mathcal {I}), x))]} \end{align}\)</p>
+<p>这里\(\succeq\)代表优先位，\(\beta &gt; 0\)是温度系数，我们的分数/奖励函数是相关响应的对数概率。对上式做替换：</p>
+<p>\( \begin{align}  \log \mathbf {P} \{ y_1 \succeq y_2 | x; \pi, s(\mathcal {I}) \} \approx \sum ^{n} _{i = 1} [\log \pi (y_i ^1 | (s, x_i)) - \log \pi (y_i ^2 | (s, x_i))] \end{align}\)</p>
+<p>最终的目标函数为：</p>
+<p>\( \begin{align}  \min \limits_{\lambda \in \Delta ^{K - 1}} \sum ^{n} _{i = 1} [\log \pi (y_i ^1 | (s, x_i)) - \log \pi (y_i ^2 | (s, x _i)) - \sum \limits_k \lambda_k \delta ^i _k]^2, \delta ^i _k := log \pi (y_i ^1 | (p_k, x_i)) - \log \pi (y_i ^2 | (p_k, x_i)) \end{align}\)</p>
+<p>最终的prompt回归模型为：</p>
+<p>\( \begin{align}  \log \pi (y_i ^1 | (s(\mathcal {I}), x)) - \log \pi (y_i ^2 | (s(\mathcal {I}), x)) = \sum \limits_{k: I_k=1} \lambda _k (\mathcal {I}) [log \pi (y_i ^1 | (p_k, x)) - \log \pi (y_i ^2 | (p_k, x))] \end{align}\)</p>
+<h2><a id="prompt-selection" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prompt Selection</h2>
+<h3><a id="methodology" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Methodology</h3>
+<p>目标：从prompt库中选出有效的prompt子集。</p>
+<h3><a id="prompt-selection-via-log-probability-data-prompt-regression" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prompt selection via log-probability data prompt regression</h3>
+<p>令\(\{ (x_i, y_i) \} ^n _{i = 1}\)为给定输入和相关参考输出的数据集。为了选择最大化LLM产生参考输出的可能性的prompt集合，求解以下模型：</p>
+<p>\( \begin{align}  \max \limits_{\mathcal {I}} \sum \limits_{i} \log \pi (y_i | (s(\mathcal {I}), x_i)) \to \max \limits_{\mathcal {I}} \frac {1} {\sum _k \lambda _k I _k} \sum \limits_i \sum \limits_k \lambda _k I_k (- \delta _k ^i) = \frac {\sum _k \lambda _k I _k R_k} {\sum _k \lambda _k I _k} \end{align}\)</p>
+<p>这里$ R_k = - \sum _i \delta ^i _k, \delta ^i _k := \log \pi (y_i | (p_k, x_i)) $。这是一个整数规划的实例，通常很难求解，但幸运的是，我们可以通过放宽\(I_k \in [0, 1]\)并将\(Charnes-Cooper\)变换应用于线性分数规划，将其转换为简单的线性规划。 保证得到的解位于可行集的边界上。</p>
+<h3><a id="prompt-selection-via-preference-data-prompt-regression" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prompt selection via preference data prompt regression</h3>
+<p>令\(\{ (x_i, y ^1 _i, y ^2 _i) \} ^n _{i = 1}\)为输入\(x_i\)和LLM响应\(y ^1 _i, y ^2 _i\)的数据集，这里\( y_1 \succeq y_2\)。我们的目标是：通过使用与偏好相对应的提示回归模型，找到最大化输出所需偏好的近似对数似然的prompt组合：</p>
+<p>\( \begin{align}  \max \limits_{\mathcal {I}} \sum \limits_{i} \log \mathbf {P} \{ y_1 \succeq y_2 | x; \pi, s(\mathcal {I}) \} \to \max \limits_{\mathcal {I}} \sum \limits_i \sum \limits_k \lambda _k (\mathcal {I}) (log \pi (y_i ^1 | (p_k, x_i)) - \log \pi (y_i ^2 | (p_k, x_i))) \end{align}\)</p>
 
                   </article>
                   <div class="comments-wrap">

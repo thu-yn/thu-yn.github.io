@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    Debug - Prepare for the FUTURE
+    Gazebo Model - Prepare for the FUTURE
     
     </title>
     
@@ -77,7 +77,7 @@
                   <div class="post-body single-content">
                     
                     <h1 class="title">
-                            Debug   
+                            Gazebo Model   
                       </h1>
                      
                     
@@ -86,7 +86,7 @@
                             <div class="media-content">
                               <div class="content">
                                 <p>
-                                 <span class="date">2024/05/17</span>
+                                 <span class="date">2024/06/05</span>
                                   
                                          
                                   
@@ -96,7 +96,7 @@
                                   <br />
                                   <span class="tran-tags">Tags:</span>&nbsp;
                                   
-                                    <a class="tag is-link is-light" href='tag_Llama3%20ReFTEng%20vs%20PEFT.html'>#Llama3 ReFTEng vs PEFT</a>
+                                    <a class="tag is-link is-light" href='tag_UAV.html'>#UAV</a>
                                      
 
                                 </p>
@@ -106,88 +106,80 @@
                     </div>
                 </div>
                   <article class="markdown-body single-content">
-                    <p>这里存放一些debug的临时文件和shell模版。</p>
-<hr />
-<pre><code class="language-shell"># DEBUG
-# mission: 使用DeepSeek-Coder计算llama3-8b-instruct在HumanEval上的pass@100指标
-# environment: 4*RTX3090(24G)
-# shell:
-accelerate launch eval_pal.py \
-  --base_model /root/autodl-tmp/.cache/huggingface/model/llama3-8b-instruct/base \
-  --language python \
-  --dataroot data/ \
-  -il3 \
-  --n_sample 100 \
-  --batch_size 10 \
-  -t 0.8 \
-  -top_p 1 \
-  -top_k 50 \
-  -trc \
-  -dtype bfloat16 \
-  -msl 4096 \
-  -mgl 1024 \
-  -ds
-# output:
-DP RANK:0 process_num/all_num:3950/4100 avg_time_per_batch:46.09 s still_need:12.29 m mem:18.417 GiB bs:10
-DP RANK:0 process_num/all_num:3960/4100 avg_time_per_batch:46.09 s still_need:11.52 m mem:18.417 GiB bs:10
-DP RANK:0 process_num/all_num:3970/4100 avg_time_per_batch:46.08 s still_need:10.75 m mem:18.417 GiB bs:10
-[rank1]:[W socket.cpp:432] [c10d] While waitForInput, poolFD failed with (errno: 0 - Success).
-[rank1]: Traceback (most recent call last):
-[rank1]:   File &quot;/root/autodl-tmp/DeepSeek-Coder/Evaluation/HumanEval/eval_pal.py&quot;, line 83, in &lt;module&gt;
-[rank1]:     evaluator.eval_model(model, accelerator)
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/utils/_contextlib.py&quot;, line 115, in decorate_context
-[rank1]:     return func(*args, **kwargs)
-[rank1]:   File &quot;/root/autodl-tmp/DeepSeek-Coder/Evaluation/HumanEval/humaneval.py&quot;, line 153, in eval_model
-[rank1]:     accelerator.wait_for_everyone()
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/accelerator.py&quot;, line 2530, in wait_for_everyone
-[rank1]:     wait_for_everyone()
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/utils/other.py&quot;, line 138, in wait_for_everyone
-[rank1]:     PartialState().wait_for_everyone()
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/state.py&quot;, line 379, in wait_for_everyone
-[rank1]:     torch.distributed.barrier()
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/distributed/c10d_logger.py&quot;, line 75, in wrapper
-[rank1]:     return func(*args, **kwargs)
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py&quot;, line 3683, in barrier
-[rank1]:     work = default_pg.barrier(opts=opts)
-[rank1]: torch.distributed.DistBackendError: [1] is setting up NCCL communicator and retrieving ncclUniqueId from [0] via c10d key-value store by key '0', but store-&gt;get('0') got error: Socket Timeout
-[rank1]: Exception raised from doWait at ../torch/csrc/distributed/c10d/TCPStore.cpp:563 (most recent call first):
-[rank1]: frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x57 (0x7f7e5dccf897 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libc10.so)
-[rank1]: frame #1: &lt;unknown function&gt; + 0x166ffe7 (0x7f7e45fe6fe7 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #2: c10d::TCPStore::doGet(std::string const&amp;) + 0x32 (0x7f7e4a4abf82 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #3: c10d::TCPStore::get(std::string const&amp;) + 0xa1 (0x7f7e4a4acfd1 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #4: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #5: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #6: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #7: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #8: c10d::ProcessGroupNCCL::broadcastUniqueNCCLID(ncclUniqueId*, bool, std::string const&amp;, int) + 0xa9 (0x7f7e11c6e6d9 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
-[rank1]: frame #9: c10d::ProcessGroupNCCL::getNCCLComm(std::string const&amp;, c10::Device&amp;, c10d::OpType, int, bool) + 0xc50 (0x7f7e11c75b60 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
-[rank1]: frame #10: &lt;unknown function&gt; + 0x11ba3b0 (0x7f7e11c7e3b0 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
-[rank1]: frame #11: c10d::ProcessGroupNCCL::allreduce_impl(at::Tensor&amp;, c10d::AllreduceOptions const&amp;) + 0x10 (0x7f7e11c7f730 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/tor...
-...
---------------------------------------------------------------------------------------------------------------------------------------------
-# 思考在eval_pay.py中添加：
-os.environ['NCCL_BLOCKING_WAIT'] = '0' 
-# 重新进行实验中...
+                    <p>基于旋转三维激光雷达的四旋翼无人机自主飞行的模型搭建。</p>
+<p>首先是运行px4的roslaunch命令：</p>
+<pre><code class="language-shell">cd /home/ubuntu/yn/SLAM/Drone_SLAM/PX4_Firmware
+
+catkin_make
+
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/home/ubuntu/yn/SLAM/Drone_SLAM/PX4_Firmware
+
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/home/ubuntu/yn/SLAM/Drone_SLAM/PX4_Firmware/Tools/sitl_gazebo
+
+source devel.setup.bash
+
+roslaunch px4 mavros_posix_sitl.launch
 </code></pre>
-<hr />
-<pre><code class="language-shell"># Template
-# mission: 使用bigcode-evaluation-harness计算llama3-8b-instruct在MBPP上的pass@1指标
-# shell:
-accelerate launch  main.py \
-  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B-Instruct/snapshots/a8977699a3d0820e80129fb3c93c20fbd9972c41 \
-  --tasks mbpp \
-  --max_length_generation 2048 \
-  --is_llama_3 \
-  --precision bf16 \
-  --allow_code_execution \
-  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-instruct-mbpp-pass@1.json \
-  --n_samples 1 \
-  --batch_size 1 \
-  --top_p 1 \
-  --top_k 50 \
-  --do_sample False \
-  --temperature 0.2 \
+<p><br />
+此时便自动打开gazebo，展示出我们当前的模型信息。</p>
+<p>对于模型信息，需要做以下修改：</p>
+<p>首先新增阳台仿真模型，位于<code>/home/ubuntu/yn/SLAM/Drone_SLAM/PX4_Firmware/Tools/sitl_gazebo/models/yangtai_model</code>文件夹中，其中包括以下文件信息：</p>
+<pre><code class="language-shell">├── yangtai_model
+│   ├── goodyang.dae    # dae文件
+│   ├── goodyang
+│   │  ├── model.config # config文件
+│   │  ├── model.sdf    # sdf文件
 </code></pre>
+<p><br />
+其中需要将<code>model.config</code>中作如下修改，将dae文件路径更改为<code>&lt;uri&gt;model://yangtai_model/goodyang.dae&lt;/uri&gt;</code>，这里采用相对路径表示。</p>
+<p>接着创建一个没有ground_plane的world模型<code>/home/ubuntu/yn/SLAM/Drone_SLAM/PX4_Firmware/Tools/sitl_gazebo/worlds/empty1.word</code>，与<code>empty.world</code>的区别是，其中删除了以下关于ground_plane的内容：</p>
+<pre><code class="language-xml">&lt;!-- A ground plane --&gt;
+&lt;include&gt;
+  &lt;uri&gt;model://ground_plane&lt;/uri&gt;
+&lt;/include&gt;
+</code></pre>
+<p><br />
+接着便可以修改<code>/home/ubuntu/yn/SLAM/Drone_SLAM/PX4_Firmware/launch/mavros_posix_sitl.launch</code>文件，将其中的world和sdf修改为以下：</p>
+<pre><code class="language-shell">&lt;arg name=&quot;world&quot; default=&quot;$(find mavlink_sitl_gazebo)/worlds/empty1.world&quot;/&gt;
+&lt;arg name=&quot;sdf&quot; default=&quot;$(find mavlink_sitl_gazebo)/models/yangtai_model/goodyang/model.sdf&quot;/&gt;
+</code></pre>
+<p><br />
+然而在运行时发现模型竟然倾斜了！</p>
+<p><img src="media/17176021910922/17176031945578.jpg" alt="" /></p>
+<p>因此思考创建一个带有模型的world文件，观察原因。在<code>/home/ubuntu/yn/SLAM/Drone_SLAM/PX4_Firmware/Tools/sitl_gazebo/worlds</code>内新建一个<code>my.world</code>文件，如下所示：</p>
+<pre><code class="language-xml">&lt;!--?xml version=&quot;1.0&quot; ?--&gt;
+&lt;sdf version=&quot;1.5&quot;&gt;
+  &lt;world name=&quot;my_world&quot;&gt;
+    &lt;!-- light --&gt;
+    &lt;include&gt;
+      &lt;uri&gt;model://sun&lt;/uri&gt;
+    &lt;/include&gt;
+
+    &lt;!-- plane --&gt;
+    &lt;include&gt;
+      &lt;uri&gt;model://ground_plane&lt;/uri&gt;
+      &lt;script&gt;
+        &lt;uri&gt;file://media/materials/scripts/gazebo.material&lt;/uri&gt;
+        &lt;name&gt;Gazebo/White&lt;/name&gt;
+      &lt;/script&gt;
+    &lt;/include&gt;
+    
+    &lt;!-- model --&gt;
+    &lt;model name='goodyang'&gt;
+      &lt;include&gt;
+        &lt;uri&gt;model://yangtai_model/goodyang&lt;/uri&gt;
+      &lt;/include&gt;
+    &lt;/model&gt;
+    
+  &lt;/world&gt;
+&lt;/sdf&gt;
+</code></pre>
+<p><br />
+接着在<code>/home/ubuntu/yn/SLAM/Drone_SLAM/PX4_Firmware/Tools/sitl_gazebo/worlds</code>路径下运行<code>gazebo my.world</code>命令，观察输出：</p>
+<p><img src="media/17176021910922/17176034772643.jpg" alt="" /></p>
+<p>结果发现并没有区别，思考应该是模型和地面出现了碰撞导致。</p>
+<hr />
+<p>下一步：解决模型倒塌；模型sdf添加带有lidar的无人机，并实现飞到某个点并回来；成功获取lidar信息并录包；进行地面点检测。</p>
 
                   </article>
                   <div class="comments-wrap">

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    Debug - Prepare for the FUTURE
+    Plane Filter - Prepare for the FUTURE
     
     </title>
     
@@ -77,7 +77,7 @@
                   <div class="post-body single-content">
                     
                     <h1 class="title">
-                            Debug   
+                            Plane Filter   
                       </h1>
                      
                     
@@ -96,7 +96,7 @@
                                   <br />
                                   <span class="tran-tags">Tags:</span>&nbsp;
                                   
-                                    <a class="tag is-link is-light" href='tag_Llama3%20ReFTEng%20vs%20PEFT.html'>#Llama3 ReFTEng vs PEFT</a>
+                                    <a class="tag is-link is-light" href='tag_Dynamic%20Object%20Removal.html'>#Dynamic Object Removal</a>
                                      
 
                                 </p>
@@ -106,88 +106,209 @@
                     </div>
                 </div>
                   <article class="markdown-body single-content">
-                    <p>这里存放一些debug的临时文件和shell模版。</p>
-<hr />
-<pre><code class="language-shell"># DEBUG
-# mission: 使用DeepSeek-Coder计算llama3-8b-instruct在HumanEval上的pass@100指标
-# environment: 4*RTX3090(24G)
-# shell:
-accelerate launch eval_pal.py \
-  --base_model /root/autodl-tmp/.cache/huggingface/model/llama3-8b-instruct/base \
-  --language python \
-  --dataroot data/ \
-  -il3 \
-  --n_sample 100 \
-  --batch_size 10 \
-  -t 0.8 \
-  -top_p 1 \
-  -top_k 50 \
-  -trc \
-  -dtype bfloat16 \
-  -msl 4096 \
-  -mgl 1024 \
-  -ds
-# output:
-DP RANK:0 process_num/all_num:3950/4100 avg_time_per_batch:46.09 s still_need:12.29 m mem:18.417 GiB bs:10
-DP RANK:0 process_num/all_num:3960/4100 avg_time_per_batch:46.09 s still_need:11.52 m mem:18.417 GiB bs:10
-DP RANK:0 process_num/all_num:3970/4100 avg_time_per_batch:46.08 s still_need:10.75 m mem:18.417 GiB bs:10
-[rank1]:[W socket.cpp:432] [c10d] While waitForInput, poolFD failed with (errno: 0 - Success).
-[rank1]: Traceback (most recent call last):
-[rank1]:   File &quot;/root/autodl-tmp/DeepSeek-Coder/Evaluation/HumanEval/eval_pal.py&quot;, line 83, in &lt;module&gt;
-[rank1]:     evaluator.eval_model(model, accelerator)
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/utils/_contextlib.py&quot;, line 115, in decorate_context
-[rank1]:     return func(*args, **kwargs)
-[rank1]:   File &quot;/root/autodl-tmp/DeepSeek-Coder/Evaluation/HumanEval/humaneval.py&quot;, line 153, in eval_model
-[rank1]:     accelerator.wait_for_everyone()
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/accelerator.py&quot;, line 2530, in wait_for_everyone
-[rank1]:     wait_for_everyone()
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/utils/other.py&quot;, line 138, in wait_for_everyone
-[rank1]:     PartialState().wait_for_everyone()
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/accelerate/state.py&quot;, line 379, in wait_for_everyone
-[rank1]:     torch.distributed.barrier()
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/distributed/c10d_logger.py&quot;, line 75, in wrapper
-[rank1]:     return func(*args, **kwargs)
-[rank1]:   File &quot;/root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py&quot;, line 3683, in barrier
-[rank1]:     work = default_pg.barrier(opts=opts)
-[rank1]: torch.distributed.DistBackendError: [1] is setting up NCCL communicator and retrieving ncclUniqueId from [0] via c10d key-value store by key '0', but store-&gt;get('0') got error: Socket Timeout
-[rank1]: Exception raised from doWait at ../torch/csrc/distributed/c10d/TCPStore.cpp:563 (most recent call first):
-[rank1]: frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x57 (0x7f7e5dccf897 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libc10.so)
-[rank1]: frame #1: &lt;unknown function&gt; + 0x166ffe7 (0x7f7e45fe6fe7 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #2: c10d::TCPStore::doGet(std::string const&amp;) + 0x32 (0x7f7e4a4abf82 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #3: c10d::TCPStore::get(std::string const&amp;) + 0xa1 (0x7f7e4a4acfd1 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #4: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #5: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #6: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #7: c10d::PrefixStore::get(std::string const&amp;) + 0x31 (0x7f7e4a461371 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cpu.so)
-[rank1]: frame #8: c10d::ProcessGroupNCCL::broadcastUniqueNCCLID(ncclUniqueId*, bool, std::string const&amp;, int) + 0xa9 (0x7f7e11c6e6d9 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
-[rank1]: frame #9: c10d::ProcessGroupNCCL::getNCCLComm(std::string const&amp;, c10::Device&amp;, c10d::OpType, int, bool) + 0xc50 (0x7f7e11c75b60 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
-[rank1]: frame #10: &lt;unknown function&gt; + 0x11ba3b0 (0x7f7e11c7e3b0 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/torch/lib/libtorch_cuda.so)
-[rank1]: frame #11: c10d::ProcessGroupNCCL::allreduce_impl(at::Tensor&amp;, c10d::AllreduceOptions const&amp;) + 0x10 (0x7f7e11c7f730 in /root/miniconda3/envs/code-eval/lib/python3.9/site-packages/tor...
-...
---------------------------------------------------------------------------------------------------------------------------------------------
-# 思考在eval_pay.py中添加：
-os.environ['NCCL_BLOCKING_WAIT'] = '0' 
-# 重新进行实验中...
+                    <p>本篇文章将对地面点筛选进行进一步研究，以部署到无人机上。</p>
+<p>参考代码：<a href="https://github.com/AbangLZU/plane_fit_ground_filter" title="plane_fit_ground_filter">plane_fit_ground_filter</a></p>
+<h2><a id="set-up" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Set Up</h2>
+<p>首先git到本地文件夹：</p>
+<pre><code class="language-shell">cd home/ubuntu/yn/SLAM/Dynamic_Object_Removing/my_catkin_ws/src/
+
+git clone https://github.com/AbangLZU/plane_fit_ground_filter.git
+
+cd ..
+
+catkin build plane_ground_filter
+
+source devel/setup.bash
 </code></pre>
-<hr />
-<pre><code class="language-shell"># Template
-# mission: 使用bigcode-evaluation-harness计算llama3-8b-instruct在MBPP上的pass@1指标
-# shell:
-accelerate launch  main.py \
-  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B-Instruct/snapshots/a8977699a3d0820e80129fb3c93c20fbd9972c41 \
-  --tasks mbpp \
-  --max_length_generation 2048 \
-  --is_llama_3 \
-  --precision bf16 \
-  --allow_code_execution \
-  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-instruct-mbpp-pass@1.json \
-  --n_samples 1 \
-  --batch_size 1 \
-  --top_p 1 \
-  --top_k 50 \
-  --do_sample False \
-  --temperature 0.2 \
+<p><br />
+并且下载好对应的实验数据集存放于<code>/home/ubuntu/yn/SLAM/Dynamic_Object_Removing/Dataset/gournd_filter/kitti_2011_09_26_drive_0005_synced.bag</code></p>
+<p>接着，分别开四个终端进行运行：</p>
+<pre><code class="language-shell"># terminal-1
+roscore
+
+# terminal-2
+rosrun rviz rviz
+
+# terminal-3
+rosbag play /home/ubuntu/yn/SLAM/Dynamic_Object_Removing/Dataset/gournd_filter/kitti_2011_09_26_drive_0005_synced.bag --loop
+
+# terminal-4 (in &quot;home/ubuntu/yn/SLAM/Dynamic_Object_Removing/my_catkin_ws/&quot;)
+roslaunch plane_ground_filter plane_ground_filter.launch
 </code></pre>
+<p><br />
+然而发现rviz并没有输出，因此需要对rviz进行改动：</p>
+<ul>
+<li>在rviz的<code>Global Options</code>中，设置<code>Fixed Frame = base_link</code>；</li>
+</ul>
+<p><img src="media/17159399785835/2024-05-17%2018-10-52%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png" alt="2024-05-17 18-10-52屏幕截图" /></p>
+<ul>
+<li>在rviz的<code>Display</code>中，添加<code>PointCloud2</code>，并将其中的订阅的topic设为<code>/kitti/velo/pointcloud</code>；</li>
+</ul>
+<p><img src="media/17159399785835/2024-05-17%2018-11-35%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png" alt="2024-05-17 18-11-35屏幕截图" /></p>
+<p>此时便可以看到rviz出现了输出：</p>
+<p><img src="media/17159399785835/2024-05-17%2018-12-40%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png" alt="2024-05-17 18-12-40屏幕截图" /></p>
+<p>然而点云并没有具体的颜色信息，发现在进行roslaunch时出现如下问题：</p>
+<p><img src="media/17159399785835/2024-05-17%2018-13-26%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png" alt="2024-05-17 18-13-26屏幕截图" /></p>
+<p>可见，未能正确识别传入点云的<code>intensity</code>和<code>ring</code>信息。</p>
+<p>然而经过探索后，发现rviz是可以接收到intensity信息的：当将<code>PointCloud2</code>中的<code>Channel Name</code>改为<code>i</code>后，可以看到此时有了强度信息，而原始的默认情况下，<code>Channel Name = intensity</code>，对比如下：</p>
+<p><img src="media/17159399785835/17160968958333.jpg" alt="" /></p>
+<p><img src="media/17159399785835/17160971292975.jpg" alt="" /></p>
+<p>定位到代码中最开始的ros消息点云格式转换为pcl点云格式的部分：</p>
+<pre><code class="language-cpp">// 1.Msg to pointcloud
+pcl::PointCloud&lt;VPoint&gt; laserCloudIn;
+pcl::fromROSMsg(*in_cloud_ptr, laserCloudIn);
+</code></pre>
+<p><br />
+猜测错误发生在自定义的pcl点云类型<code>VPoint</code>中，找到其定义如下：</p>
+<pre><code class="language-cpp">namespace velodyne_pointcloud
+{
+/** Euclidean Velodyne coordinate, including intensity and ring number. */
+struct PointXYZIR
+{
+  PCL_ADD_POINT4D;                // quad-word XYZ
+  float intensity;                ///&lt; laser intensity reading
+  uint16_t ring;                  ///&lt; laser ring number
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW // ensure proper alignment
+} EIGEN_ALIGN16;
+
+}; // namespace velodyne_pointcloud
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_pointcloud::PointXYZIR,
+                                  (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(uint16_t, ring, ring))
+
+#define VPoint velodyne_pointcloud::PointXYZIR
+</code></pre>
+<p><br />
+可以看到<code>VPoint</code>即为<code>velodyne_pointcloud::PointXYZIR</code>，是传统的pcl点云类型<code>PCL_ADD_POINT4D</code>与强度<code>intensity</code>和线束<code>ring</code>信息拼接而成。</p>
+<p>进而推测是<strong>由于录制的包中，点云强度信息和线束信息的名称与这里的不相符</strong>，因此尝试将强度<code>intensity</code>修改为<code>i</code>：</p>
+<pre><code class="language-cpp">namespace velodyne_pointcloud
+{
+/** Euclidean Velodyne coordinate, including intensity and ring number. */
+struct PointXYZIR
+{
+  PCL_ADD_POINT4D;                // quad-word XYZ
+  float i;                        ///&lt; laser intensity reading
+  uint16_t ring;                  ///&lt; laser ring number
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW // ensure proper alignment
+} EIGEN_ALIGN16;
+
+}; // namespace velodyne_pointcloud
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_pointcloud::PointXYZIR,
+                                  (float, x, x)(float, y, y)(float, z, z)(float, i, i)(uint16_t, ring, ring))
+
+#define VPoint velodyne_pointcloud::PointXYZIR
+</code></pre>
+<p><br />
+此时显示如下：</p>
+<p><img src="media/17159399785835/17160996389473.jpg" alt="" /></p>
+<p>可以看到，已经解决了无法检测到<code>intensity</code>的问题，接下来尝试将<code>ring</code>改为<code>r</code>：</p>
+<pre><code class="language-cpp">namespace velodyne_pointcloud
+{
+/** Euclidean Velodyne coordinate, including intensity and ring number. */
+struct PointXYZIR
+{
+  PCL_ADD_POINT4D;                // quad-word XYZ
+  float i;                        ///&lt; laser intensity reading
+  uint16_t r;                     ///&lt; laser ring number
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW // ensure proper alignment
+} EIGEN_ALIGN16;
+
+}; // namespace velodyne_pointcloud
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_pointcloud::PointXYZIR,
+                                  (float, x, x)(float, y, y)(float, z, z)(float, i, i)(uint16_t, r, r))
+
+#define VPoint velodyne_pointcloud::PointXYZIR
+</code></pre>
+<p><br />
+然而这样虽然不再显示错误，但是得到的点的<code>r</code>均为0：</p>
+<p><img src="media/17159399785835/17161006230274.jpg" alt="" /></p>
+<p>然而发现这一切都不是问题：由于我们代码中并没有用到点云的intensity和ring信息，因此只需要观察输出就好。</p>
+<p>在rviz中新增两个<code>PointCloud2</code>的展示，分别订阅代码发布的话题<code>/points_no_ground</code>和<code>/points_ground</code>，将其合并输出：</p>
+<p><img src="media/17159399785835/17161029760559.jpg" alt="" /></p>
+<p>其中我们将地面点标为红色，将非地面点标记为绿色。</p>
+<h2><a id="ntu-dataset" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>NTU Dataset</h2>
+<p>在<a href="https://ntu-aris.github.io/ntu_viral_dataset/" title="NTU Dataset">link-1</a>中找到其无人机数据集下载，选择室内数据集<code>nya_01</code>进行处理。下载解压后文件夹格式如下：</p>
+<pre><code class="language-shell">├── nya_01
+│   │── camera_left.yaml              
+│   │── camera_right.yaml
+│   │── imu_v100.yaml
+│   │── leica_prism.yaml
+│   │── lidar_horz.yaml
+│   │── lidar_vert.yaml
+│   │── uwb_nodes.yaml
+│   │── nya_01.bag
+</code></pre>
+<p><br />
+通过以下命令播放nya_01包：</p>
+<pre><code class="language-shell"># terminal-1
+roscore
+
+# terminal-2
+rosrun rviz rviz
+
+# terminal-3
+rosbag play nya_01.bag --loop
+</code></pre>
+<p><br />
+我们得到相关信息为：</p>
+<p><img src="media/17159399785835/17161098622190.jpg" alt="" /></p>
+<p>接着添加<code>PointCloud2</code>：令其<code>topic=/os1_cloud_node1/points</code>，然而rviz却报错：<code>Displays/Global Options/Fixed Frame</code>为<code>map</code>时，无法获得相应的数据。</p>
+<p>我们采用一下方法得到发布点云的<code>frame_id</code>：</p>
+<pre><code class="language-shell">$ rostopic list
+/clicked_point
+/clock
+/dji_sdk/attitude
+/dji_sdk/gps_health
+/dji_sdk/gps_position
+/dji_sdk/height_above_takeoff
+/dji_sdk/imu
+/imu/imu
+/imu/magnetic_field
+/imu/temperature
+/initialpose
+/left/image_raw
+/leica/pose/relative
+/move_base_simple/goal
+/node_pos_marker_sc
+/node_pos_sc
+/os1_cloud_node1/imu
+/os1_cloud_node1/points
+/os1_cloud_node2/imu
+/os1_cloud_node2/points
+/right/image_raw
+/rosout
+/rosout_agg
+/tf
+/tf_static
+/uwb_endorange_info
+/uwb_exorange_info
+
+$ rostopic echo /os1_cloud_node1/points | grep frame_id
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  frame_id: &quot;sensor1/os_sensor&quot;
+  ...
+</code></pre>
+<p><br />
+接着将<code>Displays/Global Options/Fixed Frame</code>改为````sensor1/os_sensor```，此时便得到输出，但是点云数据十分稀疏：</p>
+<p><img src="media/17159399785835/17161101788858.jpg" alt="" /></p>
+<p>通过改变<code>Display</code>中<code>PointLoud2</code>的<code>size</code>，将其变为<code>0.1m</code>，得到直观点云的俯视图：</p>
+<p><img src="media/17159399785835/17161121876561.jpg" alt="" /></p>
+<p>然而Outster类型的Lidar的扫描方式和别的不同。</p>
+<h2><a id="granary-dataset" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Granary Dataset</h2>
 
                   </article>
                   <div class="comments-wrap">

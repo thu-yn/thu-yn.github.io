@@ -141,7 +141,7 @@ accelerate launch eval_pal.py \
   -trc \
   -dtype bfloat16 \
   -msl 4096 \
-  -mgl 1024 \
+  -mgl 2048 \
   -ds
 </code></pre>
 <h3><a id="bigcode-evaluation-harness" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>bigcode-evaluation-harness</h3>
@@ -158,12 +158,12 @@ accelerate launch eval_pal.py \
 <tr>
 <td style="text-align: center">pass@1-g</td>
 <td>0.454</td>
-<td style="text-align: left"></td>
+<td style="text-align: left">0.512</td>
 </tr>
 <tr>
 <td style="text-align: center">pass@1-b</td>
 <td>0.44</td>
-<td style="text-align: left"></td>
+<td style="text-align: left">0.52</td>
 </tr>
 <tr>
 <td style="text-align: center">pass@10-b</td>
@@ -211,7 +211,25 @@ accelerate launch eval_pal.py \
 </tbody>
 </table>
 <h2><a id="reft-model" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ReFT Model</h2>
-<p>首先是没有code微调的llama3-8b-base和llama3-8b-instruct上的代码效果测评。</p>
+<p>接着是经过code微调的llama3-8b-base和llama3-8b-instruct上的代码效果测评。</p>
+<p>shell如下所示：</p>
+<pre><code class="language-shell"># bigcode-evaluation-harness
+accelerate launch  main.py \
+  --model /home/share/nanyang/HuggingFace/.cache/huggingface/hub/models--Meta-Llama-3-8B/snapshots/1460c22666392e470910ce3d44ffeb2ab7dbd4df \
+  --reft_model /home/workspace/nanyang/pyreft/examples/loreft/official_results/Meta-Llama-3-8B.code.20240509210531714954 \
+  --tasks mbpp \
+  --max_length_generation 2048 \
+  --precision bf16 \
+  --allow_code_execution \
+  --is_llama_3 \
+  --metric_output_path /home/workspace/nanyang/bigcode-evaluation-harness/result/llama3-8b-base-reft-code-mbpp-pass@1.json \
+  --do_sample False \
+  --n_samples 1 \
+  --batch_size 1 \
+  --temperature 0.2 \
+  --top_p 1 \
+  --top_k 50
+</code></pre>
 <h3><a id="bigcode-evaluation-harness" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>bigcode-evaluation-harness</h3>
 <p>实验结果如下所示：</p>
 <table>
@@ -225,13 +243,13 @@ accelerate launch eval_pal.py \
 <tbody>
 <tr>
 <td style="text-align: center">pass@1-g</td>
-<td></td>
-<td style="text-align: left"></td>
+<td>0.44</td>
+<td style="text-align: left">0.53</td>
 </tr>
 <tr>
 <td style="text-align: center">pass@1-b</td>
-<td></td>
-<td style="text-align: left"></td>
+<td>0.44</td>
+<td style="text-align: left">0.506</td>
 </tr>
 <tr>
 <td style="text-align: center">pass@10-b</td>

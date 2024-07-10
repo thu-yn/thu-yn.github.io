@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
       
-    Base Optimizer - Prepare for the FUTURE
+    DCMHA - Prepare for the FUTURE
     
     </title>
     
@@ -77,7 +77,7 @@
                   <div class="post-body single-content">
                     
                     <h1 class="title">
-                            Base Optimizer   
+                            DCMHA   
                       </h1>
                      
                     
@@ -86,7 +86,7 @@
                             <div class="media-content">
                               <div class="content">
                                 <p>
-                                 <span class="date">2024/04/24</span>
+                                 <span class="date">2024/05/30</span>
                                   
                                          
                                   
@@ -106,44 +106,70 @@
                     </div>
                 </div>
                   <article class="markdown-body single-content">
-                    <p><strong>基础流程</strong></p>
-<p><img src="media/17139637898699/17139638095172.jpg" alt="" /></p>
-<h2><a id="1-sgd" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 SGD</h2>
-<p>没有动量概念：</p>
-<p>\( \begin{align}  m_t = g_t; V_t = I ^ 2\\ \eta _t = \alpha · g_t \end{align}\)</p>
-<p>方法最简单，但下降速度慢，可能会导致震荡，或停留在局部最优点。</p>
-<h2><a id="2-sgd-m" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 SGD-M</h2>
-<p>带有一阶动量概念的SGD：梯度不仅由当前决定，还由过去时刻的梯度决定。</p>
-<p>\( \begin{align}  m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t \end{align}\)</p>
-<p>其中\(\beta _1\)通常由经验设置为0.9。</p>
+                    <blockquote>
+<p>通过动态组合注意力头来提高模型表达能力</p>
+</blockquote>
+<p>核心：DCMHA 的核心是一个 Compose 函数，它以输入相关的方式转换注意力分数和权重矩阵。</p>
+<h2><a id="head-composition-by-transforming-attention-matrices" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Head Composition by Transforming Attention Matrices</h2>
+<p><strong>Notation</strong></p>
+<ul>
+<li>\(T\)：query序列长度</li>
+<li>\(S\)：key序列长度</li>
+<li>\( A_h \in \mathbb{R} ^{T \times S}\)：具有\(H\)个头的MHA得到的第\(h\)个头的注意力矩阵</li>
+<li>\(A = Stack (\{ A_h \} ^H _{h=1}) \in \mathbb {R} ^{H \times T \times S}\)：\(H\)个注意力矩阵的堆叠</li>
+<li>\(A_{:ij} = A[:, i, j] \in \mathbb {R} ^H\)：query向量\(Q_i\)和key向量\(K_j\)的注意力向量</li>
+</ul>
+<p>通过注意力矩阵组合，可以得到新的H个注意力矩阵\(\{ A'_h \} ^H _{h=1}\)，其中第\(h\)个组合矩阵\(A'_h\)是基础的\(H\)矩阵的线性组合：</p>
+<p>\( \begin{align}  A'_h = \sum ^H _{j=1} C_{hj} A_j \end{align}\)</p>
+<p>这里\(C \in \mathbb {R} ^{H \times H}\)被称为组合映射。</p>
+<p><img src="media/17170743988046/17170756490660.jpg" alt="" /></p>
 <p>图示：</p>
-<p><img src="media/17139637898699/17139640673761.jpg" alt="" /></p>
-<p>但仍存在局部最优的问题。</p>
-<h2><a id="3-nag" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 NAG</h2>
-<p>SGD-M的改进，本质是考虑了二阶动量，因而更能加速收敛。</p>
-<p>\( \begin{align}  g_t = \nabla f (\omega _t - \alpha · m_{t - 1} / \sqrt {V_{t - 1}}) \end{align}\)</p>
-<p>图示：</p>
-<p><img src="media/17139637898699/17139641915827.jpg" alt="" /></p>
-<h2><a id="4-adagrad" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 AdaGrad</h2>
-<p>真正使用二阶动量，即过去所有梯度的平方和。</p>
-<p>\( \begin{align}  V _t = \sum ^t _{\tau = 1} g ^ 2 _{\tau}\\ \eta _t = \alpha · m_t / \sqrt {V_t} \end{align}\)</p>
-<p>二阶动量越大，学习率越低。学习率会单调递减至0，可能使训练过程提前结束。</p>
-<h2><a id="5-adadelta" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 AdaDelta</h2>
-<p>相较于考虑全局历史梯度、激进的AdaGrad，AdaDelta只考虑最近一段时间窗口下的历史梯度。</p>
-<p>\( \begin{align}  V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
-<p>可以避免训练过程提前结束。</p>
-<h2><a id="6-adam" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>6 Adam</h2>
-<p>由SGD-M和AdaDelta结合而成，同时考虑一阶动量和二阶动量。</p>
-<p>\( \begin{align}  m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t\\ V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
-<h2><a id="7-nadam" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>7 Nadam</h2>
-<p>由Adam和NAG结合而成。</p>
-<p>\( \begin{align}  g_t = \nabla f (\omega _t - \alpha · m_{t - 1} / \sqrt {V_{t - 1}}) \\ m_t = \beta _1 · m_{t - 1} + (1 - \beta _1 ) · g_t\\ V _t = \beta _2 * V_{t - 1} + (1 - \beta _2)g ^2 _t \end{align}\)</p>
-<h2><a id="8-yogi" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>8 Yogi</h2>
-<p>改进Adam，防止当\(V _t\)的二阶矩估计值爆炸时可能无法正常收敛。</p>
-<p>考虑Adam算法的\(V _t\)重写如下：</p>
-<p>\( \begin{align}  V_t = V_{t-1} + (1 - \beta _2)(g ^2  _t - V_{t-1}) \end{align}\)</p>
-<p>当\(g ^2  _t \)过大时，\(V _t\)就会太快的忘记过去的值。因此将其修改为：</p>
-<p>\( \begin{align}  V_t = V_{t-1} + (1 - \beta _2)g ^2  _t  \odot (g ^2  _t - V_{t-1}) \end{align}\)</p>
+<ul>
+<li>(a)中Head3和Head8时共同激励的关系；Head2和Head5体现了共同禁止关系。当两个头正相关时：一个头激活，另一个头也激活；反之亦然。</li>
+<li>(b)展示一对多的共享：Head6向Head4和Head7共享了相同的权重；</li>
+<li>(c)展示多对一的共享：Head3和Head7对Head1共享了相同的权重。</li>
+</ul>
+<p>\(C \in \mathbb {R} ^{H \times H}\)的作用像一个\( 1 \times 1\)的卷积层。</p>
+<p>并且可以得到：由组合图\(C \in \mathbb {R} ^{H \times H}\)对注意力分数\(\{  A_i \} ^H _{i=1}\)进行组合的效果，和以下相同：通过连接现有投影\(\{  W^Q_i, W^K_i \in \mathbb {R} ^{D_m \times D_h} \} ^H _{i=1}\)，组成新的\(H\)倍维度的投影\(\{ \widetilde {W} ^Q_i, \widetilde {W} ^K_i \in \mathbb {R} ^{D_m \times H D_h} \} ^H _{i=1}\)，如下所示：</p>
+<p>\( \begin{align}  \widetilde {W} ^Q_i = \mathop{Concat} \limits_{j \in [H]} [C_{ij} W^Q_j], \; \widetilde {W} ^K_i = \mathop{Concat} \limits_{j \in [H]} [C_{ij} W^K_j] \end{align}\)</p>
+<p>同理，对于注意力权重的组合，也可以用以下组合来代替：</p>
+<p>\( \begin{align}  \widetilde {W} ^V_i = \mathop{Concat} \limits_{j \in [H]} [C_{ij} W^V_j], \; \widetilde {W} ^O_i = \mathop{Concat} \limits_{j \in [H]} [C_{ij} W^O_j] \end{align}\)</p>
+<h2><a id="dynamically-composable-multi-head-attention" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dynamically Composable Multi-Head Attention</h2>
+<p>DCMHA核心：对已给定的\(Q_i\)和\(K_j\)，将其注意力向量\(A_{:ij} \in \mathbb {R} ^H\)通过可训练参数\(\theta\)转换为一个新向量\(A'_{:ij}\)：</p>
+<p>\( \begin{align}  A'_{:ij} = Compose (A_{:ij}, Q_i, K_j; \theta) \end{align}\)</p>
+<p>也可以将其更细分为两个组合函数：当输入相关的交叉头开始作用时，一个应用于\(softmax\)前的注意力分数张量\(A^S\)上，另一个应用于\(softmax\)后的注意力权重张量\(A^W\)上：</p>
+<p>\( \begin{align}  A^S_i = \frac {QW^Q_i (KW^K_i)^T} {\sqrt {D_h}}; \; A^S = Stack(A^S_1, ..., A^S_H) \end{align}\)</p>
+<p>\( \begin{align}  A^S = Compose(A^S, Q, K; \theta _{pre}) \end{align}\)</p>
+<p>\( \begin{align}  A^W = Softmax(A^S, dim = -1) \end{align}\)</p>
+<p>\( \begin{align}  A^W = Compose(A^W, Q, K; \theta _{post}) \end{align}\)</p>
+<p>\( \begin{align}  O^S_i = A^W_i(VW^V_i); \; O = Stack(O_1, ..., O_H) \end{align}\)</p>
+<p>这里\(W^Q_i, W^K_i, W^V_i \in \mathbb {R}^{D_m \times D_h}\)是第\(i\)个头的投影矩阵，\(W^O \in \mathbb {R} ^{H D_h \times D_m}\)是输出投影矩阵。沿着张量的第一维进行\(Stack\)，最后一维进行\(Concat\)，如下图所示：</p>
+<p><img src="media/17170743988046/17171227089811.jpg" alt="" /></p>
+<p><strong>Compose</strong></p>
+<p>对于Compose函数内部实现：</p>
+<p><img src="media/17170743988046/17171228381374.jpg" alt="" /></p>
+<p>首先将\(A_{:ij}\)经过5个转换：</p>
+<ol>
+<li>
+<p>由与\(Q_i\)和\(K_j\)均无关的权重矩阵\(W_b\)进行投影，可以理解为一个base compose；</p>
+</li>
+<li>
+<p>\(A_{:ij}\)首先与\(w_{q1} \in \mathbb {R}^{H \times R}\)进行一个较低维度的投影，接着又与\(w_{q2} \in \mathbb {R}^{R \times H}\)进行维度恢复，从而得到\(A_{:ij} w_{q1} w_{q2}\)，其中动态权重\(w_{q1}\)和\(w_{q2}\)由\(Q_i\)计算得到。这一步骤模拟了注意力头分享彼此的注意力权重/分数；</p>
+</li>
+<li>
+<p>\(A_{:ij}\)与同样由\(Q_i\)计算得来的门限权重\(w_{qg} \in \mathbb{R}^H \)进行逐元素相乘，这一分支控制有多少注意力头保留/丢弃根据query得到的原始注意力分数；</p>
+</li>
+</ol>
+<p>剩余两个转换和第2个第3个转换对称，只是将\(Q_i\)变成了\(K_j\)。</p>
+<p>使用一个具有单一隐藏层和GELU激活函数的FFN来计算来自\(Q_i\)的动态投影参数\(w_{q1}\)和\(w_{q2}\)，该FFN由\(W_{q1} \in \mathbb {R} ^{D_m \times I}\)和\(W_{q2} \in \mathbb {R} ^{I \times I}\)参数化，这里\(I = 2HR\)。在进行矩阵相乘前，通过沿着注意力头维度对未经缩放的\(w_{q1}\)进行\(RMSnorm\)以稳定训练。</p>
+<p>\( \begin{align}  w_{q1}, w_{q2} = Chunk(GELU(Q_i W_{q1})W_{q2}, \; dim=1) \end{align}\)</p>
+<p>\( \begin{align}  w_{q1} = RMSnorm(Reshape(w_{q1}, (H, R)), \; dim=0) \end{align}\)</p>
+<p>\( \begin{align}  w_{q2} = Reshape(w_{q2}, (R, H)) \end{align}\)</p>
+<p>为了计算来自\(Q_i\)的动态门限参数\(w_{qg}\)，近采用由\(W_{qg} \in \mathbb {R} ^{D_m \times H}\)参数化的线性投影，并由\(\tanh\)进行非线性化：</p>
+<p>\( \begin{align}  w_{qg} = \tanh (Q_i W_{qg}) \end{align}\)</p>
+<p>关于\(K_j\)的另外两个分支的计算同上类似。最终更新的向量由以上5个分支输出相加而成：</p>
+<p>\( \begin{align}  A'_{:ij} = A_{:ij}W_b + A_{:ij}w_{q1}w_{q2} + A_{:ij} \otimes w_{qg} + A_{:ij}w_{k1}w_{k2} + A_{:ij} \otimes w_{kg} \end{align}\)</p>
+<p>DCMHA的可训练参数为\(\theta = \{ W_b, W_{q1}, W_{q2}, W_{qg}, W_{k1}, W_{k2}, W_{kg} \}\)，它们与模型其他的参数一起端到端的被学习。</p>
 
                   </article>
                   <div class="comments-wrap">
